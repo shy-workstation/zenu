@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/reminder.dart';
 import '../services/reminder_service.dart';
 import '../utils/state_management.dart';
+import '../l10n/app_localizations.dart';
 
 class StatisticsScreen extends StatelessWidget {
   final ReminderService reminderService;
@@ -12,13 +13,13 @@ class StatisticsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Statistics'),
+        title: Text(AppLocalizations.of(context)!.statistics),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'Reset Statistics',
+            tooltip: AppLocalizations.of(context)!.resetStatistics,
             onPressed: () => _showResetStatsDialog(context, reminderService),
           ),
         ],
@@ -30,13 +31,13 @@ class StatisticsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildOverviewCards(service),
+                _buildOverviewCards(context, service),
                 const SizedBox(height: 24),
-                _buildDailyStats(service),
+                _buildDailyStats(context, service),
                 const SizedBox(height: 24),
-                _buildWeeklyStats(service),
+                _buildWeeklyStats(context, service),
                 const SizedBox(height: 24),
-                _buildAllTimeStats(service),
+                _buildAllTimeStats(context, service),
               ],
             ),
           );
@@ -45,7 +46,7 @@ class StatisticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOverviewCards(ReminderService service) {
+  Widget _buildOverviewCards(BuildContext context, ReminderService service) {
     final stats = service.statistics;
     final activeReminders = service.reminders.where((r) => r.isEnabled).length;
     final totalCompletions = stats.totalCompletions.values.fold(
@@ -61,7 +62,7 @@ class StatisticsScreen extends StatelessWidget {
       children: [
         Expanded(
           child: _buildOverviewCard(
-            'Active Reminders',
+            AppLocalizations.of(context)!.activeReminders,
             '$activeReminders',
             Icons.notifications_active,
             Colors.blue,
@@ -70,7 +71,7 @@ class StatisticsScreen extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: _buildOverviewCard(
-            'Today',
+            AppLocalizations.of(context)!.today,
             '$todayCompletions',
             Icons.today,
             Colors.green,
@@ -79,7 +80,7 @@ class StatisticsScreen extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: _buildOverviewCard(
-            'All Time',
+            AppLocalizations.of(context)!.allTime,
             '$totalCompletions',
             Icons.emoji_events,
             Colors.orange,
@@ -118,27 +119,27 @@ class StatisticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDailyStats(ReminderService service) {
+  Widget _buildDailyStats(BuildContext context, ReminderService service) {
     return _buildStatsSection(
-      'Today\'s Progress',
+      AppLocalizations.of(context)!.todaysProgress,
       service.reminders,
       service.statistics.dailyCompletions,
       Colors.green,
     );
   }
 
-  Widget _buildWeeklyStats(ReminderService service) {
+  Widget _buildWeeklyStats(BuildContext context, ReminderService service) {
     return _buildStatsSection(
-      'This Week',
+      AppLocalizations.of(context)!.thisWeek,
       service.reminders,
       service.statistics.weeklyCompletions,
       Colors.blue,
     );
   }
 
-  Widget _buildAllTimeStats(ReminderService service) {
+  Widget _buildAllTimeStats(BuildContext context, ReminderService service) {
     return _buildStatsSection(
-      'All Time',
+      AppLocalizations.of(context)!.allTime,
       service.reminders,
       service.statistics.totalCompletions,
       Colors.purple,
@@ -218,14 +219,12 @@ class StatisticsScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Reset Statistics'),
-          content: const Text(
-            'Are you sure you want to reset all statistics? This action cannot be undone.',
-          ),
+          title: Text(AppLocalizations.of(context)!.resetStatistics),
+          content: Text(AppLocalizations.of(context)!.resetStatisticsDialog),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             ElevatedButton(
               onPressed: () {
@@ -234,8 +233,10 @@ class StatisticsScreen extends StatelessWidget {
                 service.saveData();
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Statistics reset successfully'),
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.statisticsResetSuccess,
+                    ),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -244,7 +245,7 @@ class StatisticsScreen extends StatelessWidget {
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Reset'),
+              child: Text(AppLocalizations.of(context)!.reset),
             ),
           ],
         );

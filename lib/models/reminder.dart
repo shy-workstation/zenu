@@ -7,6 +7,10 @@ enum ReminderType {
   pushUps,
   water,
   stretch,
+  squats, // Kniebeugen
+  jumpingJacks,
+  planks,
+  burpees,
   custom, // New custom type
 }
 

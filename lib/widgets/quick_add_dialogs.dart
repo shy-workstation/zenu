@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import '../generated/l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 import '../models/reminder.dart';
 import '../services/reminder_service.dart';
 
@@ -14,8 +14,10 @@ class QuickAddDialogs {
     final reminder = Reminder(
       id: const Uuid().v4(),
       type: ReminderType.water,
-      title: '💧 ${localizations?.waterReminder ?? 'Water Reminder'}',
-      description: 'Stay hydrated throughout the day',
+      title: '💧 ${localizations?.stayHydrated ?? 'Stay Hydrated'}',
+      description:
+          localizations?.drinkWaterRegularly ??
+          'Stay hydrated throughout the day',
       interval: const Duration(minutes: 30),
       icon: Icons.water_drop,
       color: const Color(0xFF06B6D4),
@@ -92,8 +94,10 @@ class QuickAddDialogs {
     final reminder = Reminder(
       id: const Uuid().v4(),
       type: ReminderType.eyeRest,
-      title: '👁️ ${localizations?.eyeRestReminder ?? 'Eye Rest Reminder'}',
-      description: 'Look away from screen - 20/20/20 rule',
+      title: '👁️ ${localizations?.restYourEyes ?? 'Rest Your Eyes'}',
+      description:
+          localizations?.lookAwayFromScreen ??
+          'Look away from screen - 20/20/20 rule',
       interval: const Duration(minutes: 20),
       icon: Icons.remove_red_eye,
       color: const Color(0xFF3B82F6),
@@ -149,11 +153,15 @@ class QuickAddDialogs {
 class _ExerciseTypeDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     final exerciseTypes = [
       {
         'type': ReminderType.pushUps,
         'title': '🏋️ Push-ups',
-        'description': 'Upper body strength exercise',
+        'description':
+            localizations?.upperBodyStrengthExercise ??
+            'Upper body strength exercise',
         'icon': Icons.fitness_center,
         'color': const Color(0xFFEF4444),
         'defaultCount': 5,
@@ -161,23 +169,67 @@ class _ExerciseTypeDialog extends StatelessWidget {
       {
         'type': ReminderType.pullUps,
         'title': '🏃 Pull-ups',
-        'description': 'Back and arm strengthening',
+        'description':
+            localizations?.backAndArmStrengthening ??
+            'Back and arm strengthening',
         'icon': Icons.sports_gymnastics,
         'color': const Color(0xFFF97316),
         'defaultCount': 3,
       },
       {
+        'type': ReminderType.squats,
+        'title': '🤸 Squats',
+        'description':
+            localizations?.lowerBodyStrengtheningExercise ??
+            'Lower body strengthening exercise',
+        'icon': Icons.accessibility_new,
+        'color': const Color(0xFF10B981),
+        'defaultCount': 10,
+      },
+      {
         'type': ReminderType.stretch,
-        'title': '🤸 Stretching',
-        'description': 'Body flexibility and mobility',
+        'title': '� Stretching',
+        'description':
+            localizations?.bodyFlexibilityAndMobility ??
+            'Body flexibility and mobility',
         'icon': Icons.self_improvement,
         'color': const Color(0xFF8B5CF6),
         'defaultCount': 1,
       },
+      {
+        'type': ReminderType.jumpingJacks,
+        'title': '⭐ Jumping Jacks',
+        'description':
+            localizations?.fullBodyCardioExercise ??
+            'Full body cardio exercise',
+        'icon': Icons.directions_run,
+        'color': const Color(0xFF06B6D4),
+        'defaultCount': 15,
+      },
+      {
+        'type': ReminderType.planks,
+        'title': '💪 Planks',
+        'description':
+            localizations?.coreStrengtheningExercise ??
+            'Core strengthening exercise',
+        'icon': Icons.horizontal_rule,
+        'color': const Color(0xFFEC4899),
+        'defaultCount': 1,
+      },
+      {
+        'type': ReminderType.burpees,
+        'title': '🔥 Burpees',
+        'description':
+            localizations?.fullBodyHighIntensityExercise ??
+            'Full body high intensity exercise',
+        'icon': Icons.bolt,
+        'color': const Color(0xFFDC2626),
+        'defaultCount': 5,
+      },
     ];
 
     return AlertDialog(
-      title: const Text('Choose Exercise Type'),
+      title: Text(localizations?.chooseExerciseType ?? 'Choose Exercise Type'),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       content: SizedBox(
         width: double.maxFinite,
@@ -215,7 +267,7 @@ class _ExerciseTypeDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(localizations?.cancel ?? 'Cancel'),
         ),
       ],
     );

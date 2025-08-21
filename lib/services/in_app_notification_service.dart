@@ -261,6 +261,14 @@ class _ReminderDialogState extends State<ReminderDialog>
         return 8;
       case ReminderType.pushUps:
         return 15;
+      case ReminderType.squats:
+        return 10;
+      case ReminderType.jumpingJacks:
+        return 15;
+      case ReminderType.planks:
+        return 1; // 1 plank (duration based)
+      case ReminderType.burpees:
+        return 5;
       case ReminderType.water:
         return 300; // ml
       case ReminderType.eyeRest:
@@ -278,6 +286,10 @@ class _ReminderDialogState extends State<ReminderDialog>
   bool _hasQuantity(ReminderType type) {
     return type == ReminderType.pullUps ||
         type == ReminderType.pushUps ||
+        type == ReminderType.squats ||
+        type == ReminderType.jumpingJacks ||
+        type == ReminderType.planks ||
+        type == ReminderType.burpees ||
         type == ReminderType.water ||
         type == ReminderType.eyeRest ||
         type == ReminderType.standUp ||
@@ -288,7 +300,12 @@ class _ReminderDialogState extends State<ReminderDialog>
     switch (type) {
       case ReminderType.pullUps:
       case ReminderType.pushUps:
+      case ReminderType.squats:
+      case ReminderType.jumpingJacks:
+      case ReminderType.burpees:
         return 'reps';
+      case ReminderType.planks:
+        return 'seconds';
       case ReminderType.water:
         return 'ml';
       case ReminderType.eyeRest:
@@ -454,6 +471,14 @@ class _ReminderDialogState extends State<ReminderDialog>
         return '💪 Build your upper body strength!\nYou\'ve got this!';
       case ReminderType.pushUps:
         return '💪 Push yourself to be stronger!\nEvery rep counts!';
+      case ReminderType.squats:
+        return '🏋️ Strengthen those legs!\nSquat your way to better health!';
+      case ReminderType.jumpingJacks:
+        return '⭐ Get your heart pumping!\nJumping jacks boost energy!';
+      case ReminderType.planks:
+        return '💪 Core power time!\nHold strong, build strength!';
+      case ReminderType.burpees:
+        return '🔥 Full body burn!\nPush your limits with burpees!';
       case ReminderType.water:
         return '💧 Stay hydrated, stay healthy!\nYour body will thank you.';
       case ReminderType.stretch:

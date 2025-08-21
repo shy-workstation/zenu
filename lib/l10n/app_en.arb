@@ -35,9 +35,41 @@
   "@exerciseReminder": {
     "description": "Exercise reminder type"
   },
+  "pushUpsReminder": "Push-ups Reminder", 
+  "@pushUpsReminder": {
+    "description": "Push-ups reminder type"
+  },
+  "pullUpsReminder": "Pull-ups Reminder",
+  "@pullUpsReminder": {
+    "description": "Pull-ups reminder type" 
+  },
+  "squatsReminder": "Squats Reminder",
+  "@squatsReminder": {
+    "description": "Squats reminder type"
+  },
+  "stretchingReminder": "Stretching Reminder",
+  "@stretchingReminder": {
+    "description": "Stretching reminder type"
+  },
+  "jumpingJacksReminder": "Jumping Jacks Reminder",
+  "@jumpingJacksReminder": {
+    "description": "Jumping jacks reminder type"
+  },
+  "planksReminder": "Planks Reminder", 
+  "@planksReminder": {
+    "description": "Planks reminder type"
+  },
+  "burpeesReminder": "Burpees Reminder",
+  "@burpeesReminder": {
+    "description": "Burpees reminder type"
+  },
   "eyeRestReminder": "Eye Rest Reminder",
   "@eyeRestReminder": {
     "description": "Eye rest reminder type"
+  },
+  "standUpReminder": "Stand Up Reminder",
+  "@standUpReminder": {
+    "description": "Stand up reminder type"
   },
   "customReminder": "Custom Reminder",
   "@customReminder": {
@@ -193,6 +225,34 @@
   "@chooseExerciseType": {
     "description": "Choose exercise type dialog title"
   },
+  "upperBodyStrengthExercise": "Upper body strength exercise",
+  "@upperBodyStrengthExercise": {
+    "description": "Upper body exercise description"
+  },
+  "backAndArmStrengthening": "Back and arm strengthening",
+  "@backAndArmStrengthening": {
+    "description": "Pull-ups exercise description"
+  },
+  "lowerBodyStrengtheningExercise": "Lower body strengthening exercise",
+  "@lowerBodyStrengtheningExercise": {
+    "description": "Squats exercise description"
+  },
+  "bodyFlexibilityAndMobility": "Body flexibility and mobility", 
+  "@bodyFlexibilityAndMobility": {
+    "description": "Stretching exercise description"
+  },
+  "fullBodyCardioExercise": "Full body cardio exercise",
+  "@fullBodyCardioExercise": {
+    "description": "Jumping jacks exercise description"
+  },
+  "coreStrengtheningExercise": "Core strengthening exercise",
+  "@coreStrengtheningExercise": {
+    "description": "Planks exercise description"
+  },
+  "fullBodyHighIntensityExercise": "Full body high intensity exercise",
+  "@fullBodyHighIntensityExercise": {
+    "description": "Burpees exercise description"
+  },
   "icon": "Icon:",
   "@icon": {
     "description": "Icon label"
@@ -283,11 +343,95 @@
   "@manualTestConfirmed": {
     "description": "Manual test confirmation message"
   },
+  "stayHydrated": "Stay Hydrated",
+  "@stayHydrated": {
+    "description": "Stay hydrated title"
+  },
+  "drinkWaterRegularly": "Drink water regularly",
+  "@drinkWaterRegularly": {
+    "description": "Drink water description"
+  },
+  "restYourEyes": "Rest Your Eyes",
+  "@restYourEyes": {
+    "description": "Rest your eyes title"
+  },
+  "lookAwayFromScreen": "Look away from screen and blink",
+  "@lookAwayFromScreen": {
+    "description": "Eye rest description"
+  },
+  "standAndMove": "Stand and Move",
+  "@standAndMove": {
+    "description": "Stand up title"
+  },
+  "getUpFromYourDesk": "Get up from your desk and move around",
+  "@getUpFromYourDesk": {
+    "description": "Stand up description"
+  },
+  "quickTips": "Quick Tips",
+  "@quickTips": {
+    "description": "Quick tips section title"
+  },
+  "startWithSimpleReminders": "Start with 2-3 simple reminders",
+  "@startWithSimpleReminders": {
+    "description": "Quick tip 1"
+  },
+  "useDefaultIntervals": "Use default intervals",
+  "@useDefaultIntervals": {
+    "description": "Quick tip 2"  
+  },
+  "enableNotifications": "Enable notifications",
+  "@enableNotifications": {
+    "description": "Quick tip 3"
+  },
+  "strengthenThoseLegs": "Strengthen those legs!",
+  "@strengthenThoseLegs": {
+    "description": "Squats motivational message"
+  },
+  "getYourHeartPumping": "Get your heart pumping!",
+  "@getYourHeartPumping": {
+    "description": "Jumping jacks motivational message"
+  },
+  "corePowerTime": "Core power time!",
+  "@corePowerTime": {
+    "description": "Planks motivational message"
+  },
+  "fullBodyBurn": "Full body burn!",
+  "@fullBodyBurn": {
+    "description": "Burpees motivational message"
+  },
   "error": "Error: {message}",
   "@error": {
     "description": "Error message",
     "placeholders": {
       "message": {"type": "String"}
     }
+  },
+  "activeReminders": "Active Reminders",
+  "@activeReminders": {
+    "description": "Active reminders count label on statistics screen"
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Today's completions label on statistics screen"
+  },
+  "allTime": "All Time",
+  "@allTime": {
+    "description": "All time completions label on statistics screen"
+  },
+  "todaysProgress": "Today's Progress",
+  "@todaysProgress": {
+    "description": "Today's progress section title on statistics screen"
+  },
+  "thisWeek": "This Week",
+  "@thisWeek": {
+    "description": "This week section title on statistics screen"
+  },
+  "resetStatisticsDialog": "Are you sure you want to reset all statistics? This action cannot be undone.",
+  "@resetStatisticsDialog": {
+    "description": "Reset statistics confirmation dialog message"
+  },
+  "tapAddReminderToStart": "Tap \"Add Reminder\" to create your first reminder",
+  "@tapAddReminderToStart": {
+    "description": "Empty state message on reminder management screen"
   }
 }

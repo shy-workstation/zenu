@@ -3,6 +3,7 @@ import '../models/reminder.dart';
 import '../utils/state_management.dart';
 import '../services/reminder_service.dart';
 import '../services/reminder_template_service.dart';
+import '../l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
 class ReminderManagementScreen extends StatelessWidget {
@@ -15,9 +16,9 @@ class ReminderManagementScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
-          'Manage Reminders',
-          style: TextStyle(
+        title: Text(
+          AppLocalizations.of(context)!.manageReminders,
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
             fontSize: 24,
@@ -36,7 +37,9 @@ class ReminderManagementScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        'Your Reminders (${reminderService.reminders.length})',
+                        AppLocalizations.of(
+                          context,
+                        )!.yourReminders(reminderService.reminders.length),
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 16,
@@ -47,7 +50,7 @@ class ReminderManagementScreen extends StatelessWidget {
                     ElevatedButton.icon(
                       onPressed: () => _showAddReminderDialog(context),
                       icon: const Icon(Icons.add),
-                      label: const Text('Add Reminder'),
+                      label: Text(AppLocalizations.of(context)!.addReminder),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
@@ -64,7 +67,7 @@ class ReminderManagementScreen extends StatelessWidget {
               Expanded(
                 child:
                     reminderService.reminders.isEmpty
-                        ? _buildEmptyState()
+                        ? _buildEmptyState(context)
                         : ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           itemCount: reminderService.reminders.length,
@@ -85,25 +88,25 @@ class ReminderManagementScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.notifications_off, size: 80, color: Colors.white24),
           const SizedBox(height: 16),
-          const Text(
-            'No reminders yet',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.noRemindersTitle,
+            style: const TextStyle(
               color: Colors.white54,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Tap "Add Reminder" to create your first reminder',
-            style: TextStyle(color: Colors.white38, fontSize: 14),
+          Text(
+            AppLocalizations.of(context)!.tapAddReminderToStart,
+            style: const TextStyle(color: Colors.white38, fontSize: 14),
           ),
         ],
       ),

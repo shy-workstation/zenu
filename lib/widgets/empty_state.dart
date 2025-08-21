@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../generated/l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 
 class EmptyState extends StatelessWidget {
   final VoidCallback onAddReminder;
@@ -142,7 +142,7 @@ class EmptyState extends StatelessWidget {
                     Icon(Icons.lightbulb_outline, color: Colors.blue, size: 24),
                     const SizedBox(height: 8),
                     Text(
-                      'Quick Tips',
+                      AppLocalizations.of(context)?.quickTips ?? 'Quick Tips',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -151,7 +151,7 @@ class EmptyState extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '• Start with 2-3 simple reminders\n• Use default intervals initially\n• Enable notifications for best results',
+                      '• ${AppLocalizations.of(context)?.startWithSimpleReminders ?? 'Start with 2-3 simple reminders'}\n• ${AppLocalizations.of(context)?.useDefaultIntervals ?? 'Use default intervals initially'}\n• ${AppLocalizations.of(context)?.enableNotifications ?? 'Enable notifications for best results'}',
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.blue.withValues(alpha: 0.8),

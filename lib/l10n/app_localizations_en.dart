@@ -36,7 +36,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exerciseReminder => 'Exercise Reminder';
 
   @override
+  String get pushUpsReminder => 'Push-ups Reminder';
+
+  @override
+  String get pullUpsReminder => 'Pull-ups Reminder';
+
+  @override
+  String get squatsReminder => 'Squats Reminder';
+
+  @override
+  String get stretchingReminder => 'Stretching Reminder';
+
+  @override
+  String get jumpingJacksReminder => 'Jumping Jacks Reminder';
+
+  @override
+  String get planksReminder => 'Planks Reminder';
+
+  @override
+  String get burpeesReminder => 'Burpees Reminder';
+
+  @override
   String get eyeRestReminder => 'Eye Rest Reminder';
+
+  @override
+  String get standUpReminder => 'Stand Up Reminder';
 
   @override
   String get customReminder => 'Custom Reminder';
@@ -71,9 +95,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get getStarted => 'Get Started';
 
   @override
-  String exerciseCount(num count) {
-    return 'Exercise Count';
-  }
+  String get exerciseCount => 'Exercise Count';
 
   @override
   String reminderDue(String reminderType) {
@@ -153,6 +175,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chooseExerciseType => 'Choose Exercise Type';
 
   @override
+  String get upperBodyStrengthExercise => 'Upper body strength exercise';
+
+  @override
+  String get backAndArmStrengthening => 'Back and arm strengthening';
+
+  @override
+  String get lowerBodyStrengtheningExercise =>
+      'Lower body strengthening exercise';
+
+  @override
+  String get bodyFlexibilityAndMobility => 'Body flexibility and mobility';
+
+  @override
+  String get fullBodyCardioExercise => 'Full body cardio exercise';
+
+  @override
+  String get coreStrengtheningExercise => 'Core strengthening exercise';
+
+  @override
+  String get fullBodyHighIntensityExercise =>
+      'Full body high intensity exercise';
+
+  @override
   String get icon => 'Icon:';
 
   @override
@@ -222,7 +267,72 @@ class AppLocalizationsEn extends AppLocalizations {
       'Manual testing confirmed - App is working!';
 
   @override
+  String get stayHydrated => 'Stay Hydrated';
+
+  @override
+  String get drinkWaterRegularly => 'Drink water regularly';
+
+  @override
+  String get restYourEyes => 'Rest Your Eyes';
+
+  @override
+  String get lookAwayFromScreen => 'Look away from screen and blink';
+
+  @override
+  String get standAndMove => 'Stand and Move';
+
+  @override
+  String get getUpFromYourDesk => 'Get up from your desk and move around';
+
+  @override
+  String get quickTips => 'Quick Tips';
+
+  @override
+  String get startWithSimpleReminders => 'Start with 2-3 simple reminders';
+
+  @override
+  String get useDefaultIntervals => 'Use default intervals';
+
+  @override
+  String get enableNotifications => 'Enable notifications';
+
+  @override
+  String get strengthenThoseLegs => 'Strengthen those legs!';
+
+  @override
+  String get getYourHeartPumping => 'Get your heart pumping!';
+
+  @override
+  String get corePowerTime => 'Core power time!';
+
+  @override
+  String get fullBodyBurn => 'Full body burn!';
+
+  @override
   String error(String message) {
     return 'Error: $message';
   }
+
+  @override
+  String get activeReminders => 'Active Reminders';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get allTime => 'All Time';
+
+  @override
+  String get todaysProgress => 'Today\'s Progress';
+
+  @override
+  String get thisWeek => 'This Week';
+
+  @override
+  String get resetStatisticsDialog =>
+      'Are you sure you want to reset all statistics? This action cannot be undone.';
+
+  @override
+  String get tapAddReminderToStart =>
+      'Tap \"Add Reminder\" to create your first reminder';
 }

@@ -69,6 +69,14 @@ class NotificationService {
         return 'Time for ${reminder.exerciseCount} pull-ups!';
       case ReminderType.pushUps:
         return 'Time for ${reminder.exerciseCount} push-ups!';
+      case ReminderType.squats:
+        return 'Time for ${reminder.exerciseCount} squats!';
+      case ReminderType.jumpingJacks:
+        return 'Time for ${reminder.exerciseCount} jumping jacks!';
+      case ReminderType.planks:
+        return 'Time for a ${reminder.exerciseCount} second plank!';
+      case ReminderType.burpees:
+        return 'Time for ${reminder.exerciseCount} burpees!';
       case ReminderType.water:
         return 'Don\'t forget to drink water!';
       case ReminderType.stretch:

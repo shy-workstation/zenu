@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'generated/l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'services/notification_service.dart';
 import 'services/reminder_service.dart';
 import 'services/data_service.dart';

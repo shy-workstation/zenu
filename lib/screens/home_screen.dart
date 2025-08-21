@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import '../utils/state_management.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import '../generated/l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 import '../services/reminder_service.dart';
 import '../services/theme_service.dart';
 import '../widgets/empty_state.dart';

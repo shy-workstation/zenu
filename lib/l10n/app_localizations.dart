@@ -152,11 +152,59 @@ abstract class AppLocalizations {
   /// **'Exercise Reminder'**
   String get exerciseReminder;
 
+  /// Push-ups reminder type
+  ///
+  /// In en, this message translates to:
+  /// **'Push-ups Reminder'**
+  String get pushUpsReminder;
+
+  /// Pull-ups reminder type
+  ///
+  /// In en, this message translates to:
+  /// **'Pull-ups Reminder'**
+  String get pullUpsReminder;
+
+  /// Squats reminder type
+  ///
+  /// In en, this message translates to:
+  /// **'Squats Reminder'**
+  String get squatsReminder;
+
+  /// Stretching reminder type
+  ///
+  /// In en, this message translates to:
+  /// **'Stretching Reminder'**
+  String get stretchingReminder;
+
+  /// Jumping jacks reminder type
+  ///
+  /// In en, this message translates to:
+  /// **'Jumping Jacks Reminder'**
+  String get jumpingJacksReminder;
+
+  /// Planks reminder type
+  ///
+  /// In en, this message translates to:
+  /// **'Planks Reminder'**
+  String get planksReminder;
+
+  /// Burpees reminder type
+  ///
+  /// In en, this message translates to:
+  /// **'Burpees Reminder'**
+  String get burpeesReminder;
+
   /// Eye rest reminder type
   ///
   /// In en, this message translates to:
   /// **'Eye Rest Reminder'**
   String get eyeRestReminder;
+
+  /// Stand up reminder type
+  ///
+  /// In en, this message translates to:
+  /// **'Stand Up Reminder'**
+  String get standUpReminder;
 
   /// Custom reminder type
   ///
@@ -222,7 +270,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Exercise Count'**
-  String exerciseCount(num count);
+  String get exerciseCount;
 
   /// No description provided for @reminderDue.
   ///
@@ -350,6 +398,48 @@ abstract class AppLocalizations {
   /// **'Choose Exercise Type'**
   String get chooseExerciseType;
 
+  /// Upper body exercise description
+  ///
+  /// In en, this message translates to:
+  /// **'Upper body strength exercise'**
+  String get upperBodyStrengthExercise;
+
+  /// Pull-ups exercise description
+  ///
+  /// In en, this message translates to:
+  /// **'Back and arm strengthening'**
+  String get backAndArmStrengthening;
+
+  /// Squats exercise description
+  ///
+  /// In en, this message translates to:
+  /// **'Lower body strengthening exercise'**
+  String get lowerBodyStrengtheningExercise;
+
+  /// Stretching exercise description
+  ///
+  /// In en, this message translates to:
+  /// **'Body flexibility and mobility'**
+  String get bodyFlexibilityAndMobility;
+
+  /// Jumping jacks exercise description
+  ///
+  /// In en, this message translates to:
+  /// **'Full body cardio exercise'**
+  String get fullBodyCardioExercise;
+
+  /// Planks exercise description
+  ///
+  /// In en, this message translates to:
+  /// **'Core strengthening exercise'**
+  String get coreStrengtheningExercise;
+
+  /// Burpees exercise description
+  ///
+  /// In en, this message translates to:
+  /// **'Full body high intensity exercise'**
+  String get fullBodyHighIntensityExercise;
+
   /// Icon label
   ///
   /// In en, this message translates to:
@@ -476,11 +566,137 @@ abstract class AppLocalizations {
   /// **'Manual testing confirmed - App is working!'**
   String get manualTestConfirmed;
 
+  /// Stay hydrated title
+  ///
+  /// In en, this message translates to:
+  /// **'Stay Hydrated'**
+  String get stayHydrated;
+
+  /// Drink water description
+  ///
+  /// In en, this message translates to:
+  /// **'Drink water regularly'**
+  String get drinkWaterRegularly;
+
+  /// Rest your eyes title
+  ///
+  /// In en, this message translates to:
+  /// **'Rest Your Eyes'**
+  String get restYourEyes;
+
+  /// Eye rest description
+  ///
+  /// In en, this message translates to:
+  /// **'Look away from screen and blink'**
+  String get lookAwayFromScreen;
+
+  /// Stand up title
+  ///
+  /// In en, this message translates to:
+  /// **'Stand and Move'**
+  String get standAndMove;
+
+  /// Stand up description
+  ///
+  /// In en, this message translates to:
+  /// **'Get up from your desk and move around'**
+  String get getUpFromYourDesk;
+
+  /// Quick tips section title
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Tips'**
+  String get quickTips;
+
+  /// Quick tip 1
+  ///
+  /// In en, this message translates to:
+  /// **'Start with 2-3 simple reminders'**
+  String get startWithSimpleReminders;
+
+  /// Quick tip 2
+  ///
+  /// In en, this message translates to:
+  /// **'Use default intervals'**
+  String get useDefaultIntervals;
+
+  /// Quick tip 3
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications'**
+  String get enableNotifications;
+
+  /// Squats motivational message
+  ///
+  /// In en, this message translates to:
+  /// **'Strengthen those legs!'**
+  String get strengthenThoseLegs;
+
+  /// Jumping jacks motivational message
+  ///
+  /// In en, this message translates to:
+  /// **'Get your heart pumping!'**
+  String get getYourHeartPumping;
+
+  /// Planks motivational message
+  ///
+  /// In en, this message translates to:
+  /// **'Core power time!'**
+  String get corePowerTime;
+
+  /// Burpees motivational message
+  ///
+  /// In en, this message translates to:
+  /// **'Full body burn!'**
+  String get fullBodyBurn;
+
   /// Error message
   ///
   /// In en, this message translates to:
   /// **'Error: {message}'**
   String error(String message);
+
+  /// Active reminders count label on statistics screen
+  ///
+  /// In en, this message translates to:
+  /// **'Active Reminders'**
+  String get activeReminders;
+
+  /// Today's completions label on statistics screen
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// All time completions label on statistics screen
+  ///
+  /// In en, this message translates to:
+  /// **'All Time'**
+  String get allTime;
+
+  /// Today's progress section title on statistics screen
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Progress'**
+  String get todaysProgress;
+
+  /// This week section title on statistics screen
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get thisWeek;
+
+  /// Reset statistics confirmation dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to reset all statistics? This action cannot be undone.'**
+  String get resetStatisticsDialog;
+
+  /// Empty state message on reminder management screen
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \"Add Reminder\" to create your first reminder'**
+  String get tapAddReminderToStart;
 }
 
 class _AppLocalizationsDelegate

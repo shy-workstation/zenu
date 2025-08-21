@@ -213,7 +213,7 @@ AccessibilityUtils.createLiveRegion();
 
 This certificate can be verified by reviewing the application source code, running the included accessibility tests, and testing with Windows built-in accessibility tools.
 
-**Certificate Status: ✅ ACTIVE - FULLY COMPLIANT**
+Certificate Status: ✅ ACTIVE - FULLY COMPLIANT
 
 ---
 
