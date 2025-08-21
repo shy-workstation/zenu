@@ -218,10 +218,10 @@ abstract class AppLocalizations {
   /// **'Get Started'**
   String get getStarted;
 
-  /// No description provided for @exerciseCount.
+  /// Exercise count label
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =0{No exercises} =1{1 exercise} other{{count} exercises}}'**
+  /// **'Exercise Count'**
   String exerciseCount(num count);
 
   /// No description provided for @reminderDue.
@@ -229,6 +229,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Time for {reminderType}!'**
   String reminderDue(String reminderType);
+
+  /// Statistics screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statistics;
+
+  /// Reset statistics button
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Statistics'**
+  String get resetStatistics;
+
+  /// Cancel button
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// Reset button
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// Delete button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// Edit button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// Save button
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// Complete button
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get complete;
+
+  /// Manage reminders screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Reminders'**
+  String get manageReminders;
+
+  /// Your reminders count
+  ///
+  /// In en, this message translates to:
+  /// **'Your Reminders ({count})'**
+  String yourReminders(int count);
+
+  /// Mark complete button
+  ///
+  /// In en, this message translates to:
+  /// **'Mark Complete'**
+  String get markComplete;
+
+  /// Reminder completed message
+  ///
+  /// In en, this message translates to:
+  /// **'{reminderTitle} completed!'**
+  String reminderCompleted(String reminderTitle);
+
+  /// Complete reminder dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Complete {reminderTitle}'**
+  String completeReminderTitle(String reminderTitle);
+
+  /// Reminder settings dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'{reminderTitle} Settings'**
+  String reminderSettings(String reminderTitle);
+
+  /// Interval in minutes label
+  ///
+  /// In en, this message translates to:
+  /// **'Interval (minutes)'**
+  String get intervalMinutes;
+
+  /// Water reminder added message
+  ///
+  /// In en, this message translates to:
+  /// **'Water reminder added! 💧'**
+  String get waterReminderAdded;
+
+  /// Exercise reminder added message
+  ///
+  /// In en, this message translates to:
+  /// **'{title} reminder added! 💪'**
+  String exerciseReminderAdded(String title);
+
+  /// Eye rest reminder added message
+  ///
+  /// In en, this message translates to:
+  /// **'Eye rest reminder added! 👁️'**
+  String get eyeRestReminderAdded;
+
+  /// Custom reminder added message
+  ///
+  /// In en, this message translates to:
+  /// **'Custom reminder \"{title}\" added! ✨'**
+  String customReminderAdded(String title);
+
+  /// Choose exercise type dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Exercise Type'**
+  String get chooseExerciseType;
+
+  /// Icon label
+  ///
+  /// In en, this message translates to:
+  /// **'Icon:'**
+  String get icon;
+
+  /// Color label
+  ///
+  /// In en, this message translates to:
+  /// **'Color:'**
+  String get color;
+
+  /// Unit label
+  ///
+  /// In en, this message translates to:
+  /// **'Unit:'**
+  String get unit;
+
+  /// Minimum label
+  ///
+  /// In en, this message translates to:
+  /// **'Min:'**
+  String get min;
+
+  /// Maximum label
+  ///
+  /// In en, this message translates to:
+  /// **'Max:'**
+  String get max;
+
+  /// Step label
+  ///
+  /// In en, this message translates to:
+  /// **'Step:'**
+  String get step;
+
+  /// Please enter title validation message
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a title'**
+  String get pleaseEnterTitle;
+
+  /// Statistics reset success message
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics reset successfully'**
+  String get statisticsResetSuccess;
+
+  /// App title for debug screen
+  ///
+  /// In en, this message translates to:
+  /// **'Zenu - Health Reminder'**
+  String get zenuHealthReminder;
+
+  /// Full app name
+  ///
+  /// In en, this message translates to:
+  /// **'Zenu Health Reminder App'**
+  String get zenuHealthReminderApp;
+
+  /// App running success message
+  ///
+  /// In en, this message translates to:
+  /// **'App is running successfully! 🎉'**
+  String get appRunningSuccessfully;
+
+  /// Compilation errors fixed message
+  ///
+  /// In en, this message translates to:
+  /// **'All compilation errors fixed'**
+  String get compilationErrorsFixed;
+
+  /// Compilation errors fixed description
+  ///
+  /// In en, this message translates to:
+  /// **'The app now compiles and runs without errors'**
+  String get compilationErrorsFixedDesc;
+
+  /// Provider integration status
+  ///
+  /// In en, this message translates to:
+  /// **'Provider integration in progress'**
+  String get providerIntegrationProgress;
+
+  /// UI functionality coming soon message
+  ///
+  /// In en, this message translates to:
+  /// **'Full UI functionality coming soon'**
+  String get fullUIFunctionalityComing;
+
+  /// Reminder service status
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Service: {status}'**
+  String reminderServiceStatus(String status);
+
+  /// Running status
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get running;
+
+  /// Stopped status
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped'**
+  String get stopped;
+
+  /// Reminders loaded count
+  ///
+  /// In en, this message translates to:
+  /// **'{count} reminders loaded'**
+  String remindersLoaded(int count);
+
+  /// Test app functionality button
+  ///
+  /// In en, this message translates to:
+  /// **'Test App Functionality'**
+  String get testAppFunctionality;
+
+  /// Manual test confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Manual testing confirmed - App is working!'**
+  String get manualTestConfirmed;
+
+  /// Error message
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {message}'**
+  String error(String message);
 }
 
 class _AppLocalizationsDelegate

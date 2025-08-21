@@ -90,5 +90,204 @@
     "placeholders": {
       "reminderType": {"type": "String"}
     }
+  },
+  "statistics": "Statistics",
+  "@statistics": {
+    "description": "Statistics screen title"
+  },
+  "resetStatistics": "Reset Statistics",
+  "@resetStatistics": {
+    "description": "Reset statistics button"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+  "reset": "Reset",
+  "@reset": {
+    "description": "Reset button"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button"
+  },
+  "complete": "Complete",
+  "@complete": {
+    "description": "Complete button"
+  },
+  "manageReminders": "Manage Reminders",
+  "@manageReminders": {
+    "description": "Manage reminders screen title"
+  },
+  "yourReminders": "Your Reminders ({count})",
+  "@yourReminders": {
+    "description": "Your reminders count",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "markComplete": "Mark Complete",
+  "@markComplete": {
+    "description": "Mark complete button"
+  },
+  "reminderCompleted": "{reminderTitle} completed!",
+  "@reminderCompleted": {
+    "description": "Reminder completed message",
+    "placeholders": {
+      "reminderTitle": {"type": "String"}
+    }
+  },
+  "completeReminderTitle": "Complete {reminderTitle}",
+  "@completeReminderTitle": {
+    "description": "Complete reminder dialog title",
+    "placeholders": {
+      "reminderTitle": {"type": "String"}
+    }
+  },
+  "reminderSettings": "{reminderTitle} Settings",
+  "@reminderSettings": {
+    "description": "Reminder settings dialog title",
+    "placeholders": {
+      "reminderTitle": {"type": "String"}
+    }
+  },
+  "intervalMinutes": "Interval (minutes)",
+  "@intervalMinutes": {
+    "description": "Interval in minutes label"
+  },
+  "exerciseCount": "Exercise Count",
+  "@exerciseCount": {
+    "description": "Exercise count label"
+  },
+  "waterReminderAdded": "Water reminder added! 💧",
+  "@waterReminderAdded": {
+    "description": "Water reminder added message"
+  },
+  "exerciseReminderAdded": "{title} reminder added! 💪",
+  "@exerciseReminderAdded": {
+    "description": "Exercise reminder added message",
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "eyeRestReminderAdded": "Eye rest reminder added! 👁️",
+  "@eyeRestReminderAdded": {
+    "description": "Eye rest reminder added message"
+  },
+  "customReminderAdded": "Custom reminder \"{title}\" added! ✨",
+  "@customReminderAdded": {
+    "description": "Custom reminder added message",
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "chooseExerciseType": "Choose Exercise Type",
+  "@chooseExerciseType": {
+    "description": "Choose exercise type dialog title"
+  },
+  "icon": "Icon:",
+  "@icon": {
+    "description": "Icon label"
+  },
+  "color": "Color:",
+  "@color": {
+    "description": "Color label"
+  },
+  "unit": "Unit:",
+  "@unit": {
+    "description": "Unit label"
+  },
+  "min": "Min:",
+  "@min": {
+    "description": "Minimum label"
+  },
+  "max": "Max:",
+  "@max": {
+    "description": "Maximum label"
+  },
+  "step": "Step:",
+  "@step": {
+    "description": "Step label"
+  },
+  "pleaseEnterTitle": "Please enter a title",
+  "@pleaseEnterTitle": {
+    "description": "Please enter title validation message"
+  },
+  "statisticsResetSuccess": "Statistics reset successfully",
+  "@statisticsResetSuccess": {
+    "description": "Statistics reset success message"
+  },
+  "zenuHealthReminder": "Zenu - Health Reminder",
+  "@zenuHealthReminder": {
+    "description": "App title for debug screen"
+  },
+  "zenuHealthReminderApp": "Zenu Health Reminder App",
+  "@zenuHealthReminderApp": {
+    "description": "Full app name"
+  },
+  "appRunningSuccessfully": "App is running successfully! 🎉",
+  "@appRunningSuccessfully": {
+    "description": "App running success message"
+  },
+  "compilationErrorsFixed": "All compilation errors fixed",
+  "@compilationErrorsFixed": {
+    "description": "Compilation errors fixed message"
+  },
+  "compilationErrorsFixedDesc": "The app now compiles and runs without errors",
+  "@compilationErrorsFixedDesc": {
+    "description": "Compilation errors fixed description"
+  },
+  "providerIntegrationProgress": "Provider integration in progress",
+  "@providerIntegrationProgress": {
+    "description": "Provider integration status"
+  },
+  "fullUIFunctionalityComing": "Full UI functionality coming soon",
+  "@fullUIFunctionalityComing": {
+    "description": "UI functionality coming soon message"
+  },
+  "reminderServiceStatus": "Reminder Service: {status}",
+  "@reminderServiceStatus": {
+    "description": "Reminder service status",
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "running": "Running",
+  "@running": {
+    "description": "Running status"
+  },
+  "stopped": "Stopped",
+  "@stopped": {
+    "description": "Stopped status"
+  },
+  "remindersLoaded": "{count} reminders loaded",
+  "@remindersLoaded": {
+    "description": "Reminders loaded count",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "testAppFunctionality": "Test App Functionality",
+  "@testAppFunctionality": {
+    "description": "Test app functionality button"
+  },
+  "manualTestConfirmed": "Manual testing confirmed - App is working!",
+  "@manualTestConfirmed": {
+    "description": "Manual test confirmation message"
+  },
+  "error": "Error: {message}",
+  "@error": {
+    "description": "Error message",
+    "placeholders": {
+      "message": {"type": "String"}
+    }
   }
 }
