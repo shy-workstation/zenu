@@ -1,0 +1,94 @@
+{
+  "appTitle": "Zenu",
+  "@appTitle": {
+    "description": "Main app title"
+  },
+  "healthDashboard": "Health Dashboard",
+  "@healthDashboard": {
+    "description": "Dashboard title"
+  },
+  "systemActive": "System Active - Monitoring your health",
+  "@systemActive": {
+    "description": "Status when system is running"
+  },
+  "systemPaused": "System Paused - Click to resume",
+  "@systemPaused": {
+    "description": "Status when system is paused"
+  },
+  "pauseSystem": "Pause System",
+  "@pauseSystem": {
+    "description": "Button to pause reminder system"
+  },
+  "startSystem": "Start System",
+  "@startSystem": {
+    "description": "Button to start reminder system"
+  },
+  "addReminder": "Add Reminder",
+  "@addReminder": {
+    "description": "Add reminder button"
+  },
+  "waterReminder": "Water Reminder",
+  "@waterReminder": {
+    "description": "Water reminder type"
+  },
+  "exerciseReminder": "Exercise Reminder",
+  "@exerciseReminder": {
+    "description": "Exercise reminder type"
+  },
+  "eyeRestReminder": "Eye Rest Reminder",
+  "@eyeRestReminder": {
+    "description": "Eye rest reminder type"
+  },
+  "customReminder": "Custom Reminder",
+  "@customReminder": {
+    "description": "Custom reminder type"
+  },
+  "completeExercise": "Complete Exercise",
+  "@completeExercise": {
+    "description": "Complete exercise button"
+  },
+  "snooze": "Snooze",
+  "@snooze": {
+    "description": "Snooze button"
+  },
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip button"
+  },
+  "noRemindersYet": "No reminders yet",
+  "@noRemindersYet": {
+    "description": "Empty state title"
+  },
+  "tapToCreateFirst": "Tap the + button to create your first healthy habit",
+  "@tapToCreateFirst": {
+    "description": "Empty state description"
+  },
+  "addFirstReminder": "Add First Reminder",
+  "@addFirstReminder": {
+    "description": "Empty state CTA button"
+  },
+  "noRemindersTitle": "No reminders yet",
+  "@noRemindersTitle": {
+    "description": "Empty state main title"
+  },
+  "noRemindersSubtitle": "Tap the + button to create your first healthy habit",
+  "@noRemindersSubtitle": {
+    "description": "Empty state subtitle"
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Get started button text"
+  },
+  "exerciseCount": "{count, plural, =0{No exercises} =1{1 exercise} other{{count} exercises}}",
+  "@exerciseCount": {
+    "placeholders": {
+      "count": {"type": "num"}
+    }
+  },
+  "reminderDue": "Time for {reminderType}!",
+  "@reminderDue": {
+    "placeholders": {
+      "reminderType": {"type": "String"}
+    }
+  }
+}
