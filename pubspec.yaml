@@ -59,6 +59,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.1
+  msix: ^3.16.12
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -115,3 +116,18 @@ flutter_launcher_icons:
   macos:
     generate: true
     image_path: "assets/icon/app_icon_zenu.png"
+
+# MSIX Configuration for Microsoft Store
+msix_config:
+  display_name: Zenu
+  publisher_display_name: Yousof Shehada
+  identity_name: YousofShehada.Zenu
+  publisher: CN=BE46DC6D-FD4E-4ABB-A08C-68EABDEC1169
+  msix_version: 1.0.2.0
+  description: Your Personal Wellness Reminder Assistant - Stay healthy with customizable reminders for exercise, eye rest, hydration, and stretching throughout your workday.
+  logo_path: assets/icon/app_icon_zenu.png
+  start_menu_icon_path: assets/icon/app_icon_zenu.png
+  tile_icon_path: assets/icon/app_icon_zenu.png
+  icons_background_color: transparent
+  languages: en-us
+  store: true
