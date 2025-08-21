@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.2+4
+version: 1.0.3+5
 
 environment:
   sdk: ^3.7.0
@@ -43,6 +43,7 @@ dependencies:
   intl: ^0.20.2
   animations: ^2.0.11
   provider: ^6.1.2
+  msix: ^3.16.12
 
 dev_dependencies:
   flutter_test:
@@ -59,7 +60,6 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.1
-  msix: ^3.16.12
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -123,11 +123,11 @@ msix_config:
   publisher_display_name: Yousof Shehada
   identity_name: YousofShehada.Zenu
   publisher: CN=BE46DC6D-FD4E-4ABB-A08C-68EABDEC1169
-  msix_version: 1.0.2.0
+  msix_version: 1.0.3.0
   description: Your Personal Wellness Reminder Assistant - Stay healthy with customizable reminders for exercise, eye rest, hydration, and stretching throughout your workday.
   logo_path: assets/icon/app_icon_zenu.png
   start_menu_icon_path: assets/icon/app_icon_zenu.png
   tile_icon_path: assets/icon/app_icon_zenu.png
   icons_background_color: transparent
-  languages: en-us
+  languages: en-us, de-de
   store: true

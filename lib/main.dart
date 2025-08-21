@@ -62,22 +62,38 @@ void main() async {
     runApp(
       MaterialApp(
         title: AppConfig.appName,
-        home: Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error, size: 64, color: Colors.red),
-                const SizedBox(height: 16),
-                const Text(
-                  'Failed to start app',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
+        home: Builder(
+          builder:
+              (context) => Scaffold(
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error, size: 64, color: Colors.red),
+                      const SizedBox(height: 16),
+                      Text(
+                        AppLocalizations.of(context)?.failedToStartApp ??
+                            'Failed to start app',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${AppLocalizations.of(context)?.error ?? 'Error'}: ${e.toString()}',
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Text('Error: ${e.toString()}'),
-              ],
-            ),
-          ),
+              ),
         ),
       ),
     );
@@ -122,6 +138,14 @@ class HealthReminderApp extends StatelessWidget {
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
+              builder: (context, widget) {
+                // Set localizations in notification service when app is built
+                final localizations = AppLocalizations.of(context);
+                if (localizations != null) {
+                  reminderService.setLocalizations(localizations);
+                }
+                return widget!;
+              },
               home: HomeScreen(
                 reminderService: reminderService,
                 themeService: themeService,

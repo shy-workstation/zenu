@@ -335,4 +335,126 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tapAddReminderToStart =>
       'Tap \"Add Reminder\" to create your first reminder';
+
+  @override
+  String get failedToStartApp => 'Failed to start app';
+
+  @override
+  String get notificationTimeToRestEyes =>
+      'Time to rest your eyes! Look away from your screen.';
+
+  @override
+  String get notificationTimeToStandUp =>
+      'Stand up and move around for a few minutes.';
+
+  @override
+  String get notificationTimeToDrinkWater => 'Don\'t forget to drink water!';
+
+  @override
+  String get notificationTimeToStretch => 'Take a moment to stretch your body.';
+
+  @override
+  String notificationTimeForPullUps(int count) {
+    return 'Time for $count pull-ups!';
+  }
+
+  @override
+  String notificationTimeForPushUps(int count) {
+    return 'Time for $count push-ups!';
+  }
+
+  @override
+  String notificationTimeForSquats(int count) {
+    return 'Time for $count squats!';
+  }
+
+  @override
+  String notificationTimeForJumpingJacks(int count) {
+    return 'Time for $count jumping jacks!';
+  }
+
+  @override
+  String notificationTimeForPlanks(int count) {
+    return 'Time for a $count second plank!';
+  }
+
+  @override
+  String notificationTimeForBurpees(int count) {
+    return 'Time for $count burpees!';
+  }
+
+  @override
+  String get healthReminderApp => 'Health Reminder App';
+
+  @override
+  String get healthReminders => 'Health Reminders';
+
+  @override
+  String get notificationsForHealthReminders =>
+      'Notifications for health reminders';
+
+  @override
+  String get allCompilationErrorsFixed => 'All compilation errors fixed';
+
+  @override
+  String get appCompilesAndRunsWithoutErrors =>
+      'The app compiles and runs without errors';
+
+  @override
+  String get providerIntegrationInProgress =>
+      'Provider integration in progress';
+
+  @override
+  String get fullUIFunctionalityComingSoon =>
+      'Full UI functionality coming soon';
+
+  @override
+  String get manualTestingConfirmedAppWorking =>
+      'Manual testing confirmed - App is working!';
+
+  @override
+  String get searchExercisesStretches =>
+      'Search exercises, stretches, wellness...';
+
+  @override
+  String get done => 'Done!';
+
+  @override
+  String get snooze10m => 'Snooze 10m';
+
+  @override
+  String get title => 'Title';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get unitHint => 'e.g., reps, ml, minutes';
+
+  @override
+  String get settingsAndReminderManagement =>
+      'Settings and reminder management';
+
+  @override
+  String get testReminder => 'Test Reminder';
+
+  @override
+  String get streak => 'Streak';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get nextIn => 'Next in';
+
+  @override
+  String reminderListAccessibility(int count) {
+    return 'Reminder list with $count reminders';
+  }
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get addHealthReminder => 'Add health reminder';
 }

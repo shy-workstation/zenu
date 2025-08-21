@@ -5,6 +5,7 @@ import '../models/statistics.dart';
 import 'notification_service.dart';
 import 'in_app_notification_service.dart';
 import 'data_service.dart';
+import '../l10n/app_localizations.dart';
 
 class ReminderService extends ChangeNotifier {
   final NotificationService _notificationService;
@@ -22,6 +23,10 @@ class ReminderService extends ChangeNotifier {
 
   void setInAppNotificationService(InAppNotificationService service) {
     _inAppNotificationService = service;
+  }
+
+  void setLocalizations(AppLocalizations localizations) {
+    _notificationService.setLocalizations(localizations);
   }
 
   // Method to manually trigger a reminder for testing

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/reminder_service.dart';
 import '../services/theme_service.dart';
+import '../l10n/app_localizations.dart';
 
 class SimpleHomeScreen extends StatefulWidget {
   final ReminderService reminderService;
@@ -26,7 +27,10 @@ class _SimpleHomeScreenState extends State<SimpleHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zenu - Health Reminder'),
+        title: Text(
+          AppLocalizations.of(context)?.zenuHealthReminder ??
+              'Zenu - Health Reminder',
+        ),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),

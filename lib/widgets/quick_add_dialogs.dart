@@ -33,7 +33,10 @@ class QuickAddDialogs {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Water reminder added! 💧'),
+          content: Text(
+            AppLocalizations.of(context)?.waterReminderAdded ??
+                'Water reminder added! 💧',
+          ),
           backgroundColor: reminder.color,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -74,7 +77,12 @@ class QuickAddDialogs {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${result['title']} reminder added! 💪'),
+          content: Text(
+            AppLocalizations.of(
+                  context,
+                )?.exerciseReminderAdded(result['title']) ??
+                '${result['title']} reminder added! 💪',
+          ),
           backgroundColor: reminder.color,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -113,7 +121,10 @@ class QuickAddDialogs {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Eye rest reminder added! 👁️'),
+          content: Text(
+            AppLocalizations.of(context)?.eyeRestReminderAdded ??
+                'Eye rest reminder added! 👁️',
+          ),
           backgroundColor: reminder.color,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -138,7 +149,10 @@ class QuickAddDialogs {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Custom reminder "${result.title}" added! ✨'),
+          content: Text(
+            AppLocalizations.of(context)?.customReminderAdded(result.title) ??
+                'Custom reminder "${result.title}" added! ✨',
+          ),
           backgroundColor: result.color,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -365,7 +379,10 @@ class _CustomReminderDialogState extends State<_CustomReminderDialog> {
             const SizedBox(height: 16),
 
             // Icon selection
-            const Text('Icon:', style: TextStyle(fontWeight: FontWeight.w600)),
+            Text(
+              AppLocalizations.of(context)?.icon ?? 'Icon:',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -401,7 +418,10 @@ class _CustomReminderDialogState extends State<_CustomReminderDialog> {
             const SizedBox(height: 16),
 
             // Color selection
-            const Text('Color:', style: TextStyle(fontWeight: FontWeight.w600)),
+            Text(
+              AppLocalizations.of(context)?.color ?? 'Color:',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -440,7 +460,7 @@ class _CustomReminderDialogState extends State<_CustomReminderDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
         ),
         ElevatedButton(
           onPressed:

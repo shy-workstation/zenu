@@ -433,5 +433,214 @@
   "tapAddReminderToStart": "Tap \"Add Reminder\" to create your first reminder",
   "@tapAddReminderToStart": {
     "description": "Empty state message on reminder management screen"
+  },
+  "failedToStartApp": "Failed to start app",
+  "@failedToStartApp": {
+    "description": "Error message when app fails to start"
+  },
+  "markComplete": "Mark Complete",
+  "@markComplete": {
+    "description": "Button to mark reminder as complete"
+  },
+  "icon": "Icon:",
+  "@icon": {
+    "description": "Icon selection label"
+  },
+  "color": "Color:",
+  "@color": {
+    "description": "Color selection label"
+  },
+  "unit": "Unit:",
+  "@unit": {
+    "description": "Unit selection label"
+  },
+  "min": "Min:",
+  "@min": {
+    "description": "Minimum value label"
+  },
+  "max": "Max:",
+  "@max": {
+    "description": "Maximum value label"
+  },
+  "step": "Step:",
+  "@step": {
+    "description": "Step value label"
+  },
+  "pleaseEnterTitle": "Please enter a title",
+  "@pleaseEnterTitle": {
+    "description": "Validation message for empty title"
+  },
+  "notificationTimeToRestEyes": "Time to rest your eyes! Look away from your screen.",
+  "@notificationTimeToRestEyes": {
+    "description": "Notification message for eye rest reminder"
+  },
+  "notificationTimeToStandUp": "Stand up and move around for a few minutes.",
+  "@notificationTimeToStandUp": {
+    "description": "Notification message for stand up reminder"
+  },
+  "notificationTimeToDrinkWater": "Don't forget to drink water!",
+  "@notificationTimeToDrinkWater": {
+    "description": "Notification message for water reminder"
+  },
+  "notificationTimeToStretch": "Take a moment to stretch your body.",
+  "@notificationTimeToStretch": {
+    "description": "Notification message for stretch reminder"
+  },
+  "notificationTimeForPullUps": "Time for {count} pull-ups!",
+  "@notificationTimeForPullUps": {
+    "description": "Notification message for pull-ups reminder",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "notificationTimeForPushUps": "Time for {count} push-ups!",
+  "@notificationTimeForPushUps": {
+    "description": "Notification message for push-ups reminder",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "notificationTimeForSquats": "Time for {count} squats!",
+  "@notificationTimeForSquats": {
+    "description": "Notification message for squats reminder",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "notificationTimeForJumpingJacks": "Time for {count} jumping jacks!",
+  "@notificationTimeForJumpingJacks": {
+    "description": "Notification message for jumping jacks reminder",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "notificationTimeForPlanks": "Time for a {count} second plank!",
+  "@notificationTimeForPlanks": {
+    "description": "Notification message for planks reminder",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "notificationTimeForBurpees": "Time for {count} burpees!",
+  "@notificationTimeForBurpees": {
+    "description": "Notification message for burpees reminder",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "healthReminderApp": "Health Reminder App",
+  "@healthReminderApp": {
+    "description": "App name in Windows notifications"
+  },
+  "healthReminders": "Health Reminders",
+  "@healthReminders": {
+    "description": "Notification channel name"
+  },
+  "notificationsForHealthReminders": "Notifications for health reminders",
+  "@notificationsForHealthReminders": {
+    "description": "Notification channel description"
+  },
+  "allCompilationErrorsFixed": "All compilation errors fixed",
+  "@allCompilationErrorsFixed": {
+    "description": "Development message - compilation errors fixed"
+  },
+  "appCompilesAndRunsWithoutErrors": "The app compiles and runs without errors",
+  "@appCompilesAndRunsWithoutErrors": {
+    "description": "Development message - app status"
+  },
+  "providerIntegrationInProgress": "Provider integration in progress",
+  "@providerIntegrationInProgress": {
+    "description": "Development message - integration progress"
+  },
+  "fullUIFunctionalityComingSoon": "Full UI functionality coming soon",
+  "@fullUIFunctionalityComingSoon": {
+    "description": "Development message - upcoming functionality"
+  },
+  "manualTestingConfirmedAppWorking": "Manual testing confirmed - App is working!",
+  "@manualTestingConfirmedAppWorking": {
+    "description": "Development message - testing confirmation"
+  },
+  "testAppFunctionality": "Test App Functionality",
+  "@testAppFunctionality": {
+    "description": "Button to test app functionality"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "searchExercisesStretches": "Search exercises, stretches, wellness...",
+  "@searchExercisesStretches": {
+    "description": "Search hint text"
+  },
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip button text"
+  },
+  "done": "Done!",
+  "@done": {
+    "description": "Done button text"
+  },
+  "zenuHealthReminder": "Zenu - Health Reminder",
+  "@zenuHealthReminder": {
+    "description": "App title in simple home screen"
+  },
+  "complete": "Complete",
+  "@complete": {
+    "description": "Complete button text"
+  },
+  "snooze10m": "Snooze 10m",
+  "@snooze10m": {
+    "description": "Snooze 10 minutes button text"
+  },
+  "title": "Title",
+  "@title": {
+    "description": "Title field label"
+  },
+  "description": "Description",
+  "@description": {
+    "description": "Description field label"
+  },
+  "unitHint": "e.g., reps, ml, minutes",
+  "@unitHint": {
+    "description": "Unit field hint text"
+  },
+  "settingsAndReminderManagement": "Settings and reminder management",
+  "@settingsAndReminderManagement": {
+    "description": "Tooltip for settings button"
+  },
+  "testReminder": "Test Reminder",
+  "@testReminder": {
+    "description": "Test reminder button tooltip"
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Today stats label"
+  },
+  "streak": "Streak",
+  "@streak": {
+    "description": "Streak stats label"
+  },
+  "active": "Active",
+  "@active": {
+    "description": "Active reminders stats label"
+  },
+  "nextIn": "Next in",
+  "@nextIn": {
+    "description": "Next reminder time stats label"
+  },
+  "reminderListAccessibility": "Reminder list with {count} reminders",
+  "@reminderListAccessibility": {
+    "description": "Accessibility label for reminder list",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings button tooltip"
+  },
+  "addHealthReminder": "Add health reminder",
+  "@addHealthReminder": {
+    "description": "Add reminder button tooltip"
   }
 }

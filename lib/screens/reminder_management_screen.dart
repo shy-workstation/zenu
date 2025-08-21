@@ -214,13 +214,16 @@ class ReminderManagementScreen extends StatelessWidget {
               },
               itemBuilder:
                   (context) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'edit',
                       child: Row(
                         children: [
                           Icon(Icons.edit, color: Colors.white70),
                           SizedBox(width: 12),
-                          Text('Edit', style: TextStyle(color: Colors.white)),
+                          Text(
+                            AppLocalizations.of(context)?.edit ?? 'Edit',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ],
                       ),
                     ),
@@ -237,13 +240,16 @@ class ReminderManagementScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'delete',
                       child: Row(
                         children: [
                           Icon(Icons.delete, color: Colors.red),
                           SizedBox(width: 12),
-                          Text('Delete', style: TextStyle(color: Colors.red)),
+                          Text(
+                            AppLocalizations.of(context)?.delete ?? 'Delete',
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ],
                       ),
                     ),
@@ -1111,9 +1117,14 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
 
   void _saveReminder() {
     if (_titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please enter a title')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)?.pleaseEnterTitle ??
+                'Please enter a title',
+          ),
+        ),
+      );
       return;
     }
 

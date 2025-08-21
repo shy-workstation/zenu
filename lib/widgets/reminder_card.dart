@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/reminder.dart';
 import '../services/reminder_service.dart';
+import '../l10n/app_localizations.dart';
 
 class ReminderCard extends StatelessWidget {
   final Reminder reminder;
@@ -109,7 +110,10 @@ class ReminderCard extends StatelessWidget {
                           reminderService,
                         ),
                     icon: const Icon(Icons.check_circle, size: 18),
-                    label: const Text('Mark Complete'),
+                    label: Text(
+                      AppLocalizations.of(context)?.markComplete ??
+                          'Mark Complete',
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: reminder.color,
                       foregroundColor: Colors.white,
@@ -125,7 +129,7 @@ class ReminderCard extends StatelessWidget {
                         reminderService,
                       ),
                   icon: const Icon(Icons.settings),
-                  tooltip: 'Settings',
+                  tooltip: AppLocalizations.of(context)?.settings ?? 'Settings',
                 ),
               ],
             ),
@@ -203,7 +207,10 @@ class ReminderCard extends StatelessWidget {
       reminderService.completeReminder(reminder);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${reminder.title} completed!'),
+          content: Text(
+            AppLocalizations.of(context)?.reminderCompleted(reminder.title) ??
+                '${reminder.title} completed!',
+          ),
           backgroundColor: reminder.color,
         ),
       );
@@ -252,7 +259,12 @@ class _ExerciseCompleteDialogState extends State<_ExerciseCompleteDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Complete ${widget.reminder.title}'),
+      title: Text(
+        AppLocalizations.of(
+              context,
+            )?.completeReminderTitle(widget.reminder.title) ??
+            'Complete ${widget.reminder.title}',
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -298,7 +310,7 @@ class _ExerciseCompleteDialogState extends State<_ExerciseCompleteDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -316,7 +328,7 @@ class _ExerciseCompleteDialogState extends State<_ExerciseCompleteDialog> {
               ),
             );
           },
-          child: const Text('Complete'),
+          child: Text(AppLocalizations.of(context)?.complete ?? 'Complete'),
         ),
       ],
     );
@@ -351,12 +363,18 @@ class _ReminderSettingsDialogState extends State<_ReminderSettingsDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('${widget.reminder.title} Settings'),
+      title: Text(
+        AppLocalizations.of(context)?.reminderSettings(widget.reminder.title) ??
+            '${widget.reminder.title} Settings',
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Interval (minutes)'),
+          Text(
+            AppLocalizations.of(context)?.intervalMinutes ??
+                'Interval (minutes)',
+          ),
           Slider(
             value: _intervalMinutes.toDouble(),
             min: 1,
@@ -368,7 +386,9 @@ class _ReminderSettingsDialogState extends State<_ReminderSettingsDialog> {
           ),
           if (widget.reminder.exerciseCount > 0) ...[
             const SizedBox(height: 16),
-            Text('Exercise Count'),
+            Text(
+              AppLocalizations.of(context)?.exerciseCount ?? 'Exercise Count',
+            ),
             Slider(
               value: _exerciseCount.toDouble(),
               min: 1,
@@ -384,7 +404,7 @@ class _ReminderSettingsDialogState extends State<_ReminderSettingsDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -400,7 +420,7 @@ class _ReminderSettingsDialogState extends State<_ReminderSettingsDialog> {
             }
             Navigator.of(context).pop();
           },
-          child: const Text('Save'),
+          child: Text(AppLocalizations.of(context)?.save ?? 'Save'),
         ),
       ],
     );

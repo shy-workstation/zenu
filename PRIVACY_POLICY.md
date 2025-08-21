@@ -190,6 +190,7 @@ Our privacy approach includes:
 ## **Contact Information**
 
 ### **Privacy Officer**
+
 - **Developer**: Yousof Shehada
 - **App**: Zenu - Personal Wellness Reminder Assistant
 - **Store ID**: 9PHV0W6NVW2S
@@ -198,6 +199,7 @@ Our privacy approach includes:
 ### **Questions or Concerns**
 
 For privacy-related questions:
+
 1. Check this Privacy Policy first
 2. Review app settings and data controls
 3. Contact through Microsoft Store if needed

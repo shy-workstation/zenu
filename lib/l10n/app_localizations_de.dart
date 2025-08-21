@@ -338,4 +338,127 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get tapAddReminderToStart =>
       'Tippen Sie auf \"Erinnerung hinzufügen\", um Ihre erste Erinnerung zu erstellen';
+
+  @override
+  String get failedToStartApp => 'App konnte nicht gestartet werden';
+
+  @override
+  String get notificationTimeToRestEyes =>
+      'Zeit für eine Augenpause! Schauen Sie vom Bildschirm weg.';
+
+  @override
+  String get notificationTimeToStandUp =>
+      'Stehen Sie auf und bewegen Sie sich ein paar Minuten.';
+
+  @override
+  String get notificationTimeToDrinkWater =>
+      'Vergessen Sie nicht, Wasser zu trinken!';
+
+  @override
+  String get notificationTimeToStretch =>
+      'Nehmen Sie sich einen Moment zum Dehnen.';
+
+  @override
+  String notificationTimeForPullUps(int count) {
+    return 'Zeit für $count Klimmzüge!';
+  }
+
+  @override
+  String notificationTimeForPushUps(int count) {
+    return 'Zeit für $count Liegestütze!';
+  }
+
+  @override
+  String notificationTimeForSquats(int count) {
+    return 'Zeit für $count Kniebeugen!';
+  }
+
+  @override
+  String notificationTimeForJumpingJacks(int count) {
+    return 'Zeit für $count Hampelmänner!';
+  }
+
+  @override
+  String notificationTimeForPlanks(int count) {
+    return 'Zeit für einen $count Sekunden Plank!';
+  }
+
+  @override
+  String notificationTimeForBurpees(int count) {
+    return 'Zeit für $count Burpees!';
+  }
+
+  @override
+  String get healthReminderApp => 'Gesundheitserinnerungs-App';
+
+  @override
+  String get healthReminders => 'Gesundheitserinnerungen';
+
+  @override
+  String get notificationsForHealthReminders =>
+      'Benachrichtigungen für Gesundheitserinnerungen';
+
+  @override
+  String get allCompilationErrorsFixed => 'Alle Kompilierungsfehler behoben';
+
+  @override
+  String get appCompilesAndRunsWithoutErrors =>
+      'Die App kompiliert und läuft ohne Fehler';
+
+  @override
+  String get providerIntegrationInProgress => 'Provider-Integration in Arbeit';
+
+  @override
+  String get fullUIFunctionalityComingSoon =>
+      'Vollständige UI-Funktionalität kommt bald';
+
+  @override
+  String get manualTestingConfirmedAppWorking =>
+      'Manueller Test bestätigt - App funktioniert!';
+
+  @override
+  String get searchExercisesStretches =>
+      'Suchen Sie nach Übungen, Dehnungen, Wellness...';
+
+  @override
+  String get done => 'Fertig!';
+
+  @override
+  String get snooze10m => '10 Min schlummern';
+
+  @override
+  String get title => 'Titel';
+
+  @override
+  String get description => 'Beschreibung';
+
+  @override
+  String get unitHint => 'z.B., Wiederholungen, ml, Minuten';
+
+  @override
+  String get settingsAndReminderManagement =>
+      'Einstellungen und Erinnerungsverwaltung';
+
+  @override
+  String get testReminder => 'Erinnerung testen';
+
+  @override
+  String get streak => 'Serie';
+
+  @override
+  String get active => 'Aktiv';
+
+  @override
+  String get nextIn => 'Nächste in';
+
+  @override
+  String reminderListAccessibility(int count) {
+    return 'Erinnerungsliste mit $count Erinnerungen';
+  }
+
+  @override
+  String get settings => 'Einstellungen';
+
+  @override
+  String get addHealthReminder => 'Gesundheitserinnerung hinzufügen';
 }
