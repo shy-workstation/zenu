@@ -67,6 +67,15 @@ lib/generated/
 /release/*.exe
 /release/*.dll
 
+# Exceptions for important release files
+!/release/Zenu.exe
+!/release/zenu_v*.exe
+!/release/*.md
+!/release/*.txt
+!/release/*.bat
+!/release/*.sh
+!/release/data/
+
 # Memory and coordination files
 /memory/
 /coordination/
