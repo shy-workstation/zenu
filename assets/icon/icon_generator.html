@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WellMinder Icon Generator</title>
+    <style>
+        .icon-container {
+            width: 512px;
+            height: 512px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border-radius: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .icon-content {
+            color: white;
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .icon-symbol {
+            font-size: 200px;
+            font-weight: bold;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        .icon-text {
+            font-size: 48px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        .instructions {
+            margin: 20px;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        <h2>WellMinder App Icon</h2>
+        <p>Right-click on the icon below and save it as "app_icon.png" in the assets/icon folder.</p>
+        <p>Or take a screenshot of the icon area and save it as a 512x512 PNG file.</p>
+    </div>
+    
+    <div class="icon-container" id="appIcon">
+        <div class="icon-content">
+            <div class="icon-symbol">W</div>
+            <div class="icon-text">M</div>
+        </div>
+    </div>
+
+    <script>
+        // Convert to canvas for easy saving
+        function downloadIcon() {
+            const iconDiv = document.getElementById('appIcon');
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+            gradient.addColorStop(0, '#4CAF50');
+            gradient.addColorStop(1, '#45a049');
+            
+            // Draw background
+            ctx.fillStyle = gradient;
+            ctx.roundRect(0, 0, 512, 512, 80);
+            ctx.fill();
+            
+            // Draw text
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Large W
+            ctx.font = 'bold 200px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.fillText('W', 256, 200);
+            
+            // Small M
+            ctx.font = '600 48px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.fillText('M', 256, 320);
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = 'app_icon.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Add click handler
+        document.getElementById('appIcon').addEventListener('click', downloadIcon);
+    </script>
+</body>
+</html>

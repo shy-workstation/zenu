@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Healthy App Icon Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .icon-preview {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .icon-preview img {
+            width: 128px;
+            height: 128px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .download-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #e8f5e8;
+            border-radius: 10px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #45A049;
+        }
+        .instructions {
+            text-align: left;
+            margin: 20px 0;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+        canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧘 Zenyu App Icon Generator</h1>
+        <p>Professional app icon for the "Zenyu" wellness reminder app</p>
+        
+        <div class="icon-preview">
+            <svg width="128" height="128" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#667EEA"/>
+                        <stop offset="50%" stop-color="#764BA2"/>
+                        <stop offset="100%" stop-color="#8E44AD"/>
+                    </linearGradient>
+                    <linearGradient id="leaf" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#FFFFFF"/>
+                        <stop offset="100%" stop-color="#F5F5F5"/>
+                    </linearGradient>
+                </defs>
+                <rect x="32" y="32" width="448" height="448" rx="90" ry="90" fill="url(#bg)"/>
+                <rect x="40" y="40" width="432" height="432" rx="85" ry="85" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+                <g transform="translate(256, 256)">
+                    <path d="M0 -100 Q-50 -50, -75 0 Q-50 50, 0 100 Q50 50, 75 0 Q50 -50, 0 -100 Z" fill="url(#leaf)"/>
+                    <path d="M0 -65 Q-32 -32, -48 0 Q-32 32, 0 65 Q32 32, 48 0 Q32 -32, 0 -65 Z" fill="rgba(255,255,255,0.7)"/>
+                    <circle cx="0" cy="0" r="18" fill="rgba(142,68,173,0.9)"/>
+                    <circle cx="0" cy="0" r="12" fill="rgba(255,255,255,0.3)"/>
+                </g>
+            </svg>
+        </div>
+        
+        <div class="download-section">
+            <h3>📥 Download App Icons</h3>
+            <p>Click the buttons below to download PNG versions in different sizes:</p>
+            
+            <button onclick="downloadIcon(512)">512×512 (Main Icon)</button>
+            <button onclick="downloadIcon(256)">256×256</button>
+            <button onclick="downloadIcon(128)">128×128</button>
+            <button onclick="downloadIcon(64)">64×64</button>
+            <button onclick="downloadIcon(48)">48×48</button>
+            <button onclick="downloadIcon(32)">32×32</button>
+            <button onclick="downloadIcon(16)">16×16</button>
+        </div>
+        
+        <div class="instructions">
+            <h4>📋 Instructions:</h4>
+            <ol>
+                <li>Click "512×512 (Main Icon)" to download the main app icon</li>
+                <li>Save it as <strong>app_icon.png</strong> in the <code>assets/icon/</code> folder</li>
+                <li>Run <code>flutter pub get</code> to install flutter_launcher_icons</li>
+                <li>Run <code>flutter pub run flutter_launcher_icons:main</code> to generate all icon sizes</li>
+                <li>The icons will be automatically placed in the correct platform folders</li>
+            </ol>
+        </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        function downloadIcon(size) {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Scale factor
+            const scale = size / 512;
+            
+            // Create Zenyu gradient background
+            const bgGradient = ctx.createLinearGradient(0, 0, size, size);
+            bgGradient.addColorStop(0, '#667EEA');
+            bgGradient.addColorStop(0.5, '#764BA2');
+            bgGradient.addColorStop(1, '#8E44AD');
+            
+            // Draw rounded rectangle background
+            const cornerRadius = 90 * scale;
+            const margin = 32 * scale;
+            drawRoundedRect(ctx, margin, margin, size - 2*margin, size - 2*margin, cornerRadius, bgGradient);
+            
+            // Draw zen leaf design
+            const centerX = size / 2;
+            const centerY = size / 2;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.scale(scale, scale);
+            
+            // Leaf gradient
+            const leafGradient = ctx.createLinearGradient(-75, -100, 75, 100);
+            leafGradient.addColorStop(0, '#FFFFFF');
+            leafGradient.addColorStop(1, '#F5F5F5');
+            
+            // Draw outer zen leaf
+            ctx.fillStyle = leafGradient;
+            ctx.beginPath();
+            drawZenLeaf(ctx, 100, 75);
+            ctx.fill();
+            
+            // Draw inner leaf
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.beginPath();
+            drawZenLeaf(ctx, 65, 48);
+            ctx.fill();
+            
+            // Draw central zen circle
+            ctx.fillStyle = 'rgba(142, 68, 173, 0.9)';
+            ctx.beginPath();
+            ctx.arc(0, 0, 18, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Inner highlight circle
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.beginPath();
+            ctx.arc(0, 0, 12, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.restore();
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = `zenyu_icon_${size}x${size}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+        }
+        
+        function drawRoundedRect(ctx, x, y, width, height, radius, fillStyle) {
+            ctx.fillStyle = fillStyle;
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        function drawZenLeaf(ctx, height, width) {
+            // Zen leaf path: symmetric leaf shape
+            ctx.moveTo(0, -height);
+            ctx.quadraticCurveTo(-width/2, -height/2, -width, 0);
+            ctx.quadraticCurveTo(-width/2, height/2, 0, height);
+            ctx.quadraticCurveTo(width/2, height/2, width, 0);
+            ctx.quadraticCurveTo(width/2, -height/2, 0, -height);
+        }
+    </script>
+</body>
+</html>
