@@ -10,6 +10,7 @@
 ## Major Changes in v1.0.2
 
 ### App Rebranding
+
 - **App Name:** Changed from "Zenyu" to "Zenu"
 - **App Icon:** Updated to use new `app_icon_zenu.png` design
 - **Executable:** Renamed to `Zenu.exe`
@@ -90,4 +91,4 @@
 - Visual C++ Redistributable (usually pre-installed)
 
 ---
-*Built with ❤️ for your wellness journey*
+Built with ❤️ for your wellness journey
