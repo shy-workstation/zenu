@@ -234,7 +234,8 @@ class ReminderManagementScreen extends StatelessWidget {
                           const Icon(Icons.copy, color: Colors.white70),
                           const SizedBox(width: 12),
                           Text(
-                            AppLocalizations.of(context)?.duplicate ?? 'Duplicate',
+                            AppLocalizations.of(context)?.duplicate ??
+                                'Duplicate',
                             style: const TextStyle(color: Colors.white),
                           ),
                         ],
@@ -476,16 +477,16 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                     // Title
                     _buildTextField(
                       controller: _titleController,
-                      label: 'Title',
-                      hint: 'Enter reminder title',
+                      label: AppLocalizations.of(context)?.title ?? 'Title',
+                      hint: AppLocalizations.of(context)?.title ?? 'Enter reminder title',
                     ),
                     const SizedBox(height: 16),
 
                     // Description
                     _buildTextField(
                       controller: _descriptionController,
-                      label: 'Description',
-                      hint: 'Enter reminder description',
+                      label: AppLocalizations.of(context)?.description ?? 'Description',
+                      hint: AppLocalizations.of(context)?.description ?? 'Enter reminder description',
                       maxLines: 2,
                     ),
                     const SizedBox(height: 16),
@@ -734,7 +735,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                 Icon(_selectedIcon, color: _selectedColor, size: 24),
                 const SizedBox(width: 12),
                 const Text(
-                  'Choose Icon',
+                  AppLocalizations.of(context)?.icon ?? 'Choose Icon',
                   style: TextStyle(color: Colors.white70),
                 ),
                 const Spacer(),
@@ -780,7 +781,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                 ),
                 const SizedBox(width: 12),
                 const Text(
-                  'Choose Color',
+                  AppLocalizations.of(context)?.color ?? 'Choose Color',
                   style: TextStyle(color: Colors.white70),
                 ),
                 const Spacer(),
@@ -1005,7 +1006,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
           (context) => AlertDialog(
             backgroundColor: const Color(0xFF2A2A3E),
             title: const Text(
-              'Choose Icon',
+              AppLocalizations.of(context)?.icon ?? 'Choose Icon',
               style: TextStyle(color: Colors.white),
             ),
             content: SizedBox(
@@ -1065,7 +1066,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
           (context) => AlertDialog(
             backgroundColor: const Color(0xFF2A2A3E),
             title: const Text(
-              'Choose Color',
+              AppLocalizations.of(context)?.color ?? 'Choose Color',
               style: TextStyle(color: Colors.white),
             ),
             content: SizedBox(

@@ -33,7 +33,8 @@ class NotificationService {
       await flutterLocalNotificationsPlugin.initialize(
         initializationSettings,
         onDidReceiveNotificationResponse: _onNotificationResponse,
-        onDidReceiveBackgroundNotificationResponse: _onBackgroundNotificationResponse,
+        onDidReceiveBackgroundNotificationResponse:
+            _onBackgroundNotificationResponse,
       );
       _instance = NotificationService._(flutterLocalNotificationsPlugin);
     }
@@ -60,11 +61,11 @@ class NotificationService {
 
   static void _handleNotificationAction(String? actionId, String? payload) {
     if (actionId == null || payload == null || _reminderService == null) return;
-    
+
     // Extract reminder ID from payload (format: "reminder_reminderId")
     if (!payload.startsWith('reminder_')) return;
     final reminderId = payload.substring(9);
-    
+
     if (actionId.startsWith('skip_')) {
       // User chose to skip the reminder - just reset the next reminder time
       final reminders = _reminderService!.reminders;
@@ -97,10 +98,7 @@ class NotificationService {
             'skip_${reminder.id}',
             _localizations?.skip ?? 'Skip',
           ),
-          AndroidNotificationAction(
-            'open_${reminder.id}',
-            'Open App',
-          ),
+          AndroidNotificationAction('open_${reminder.id}', 'Open App'),
         ],
       ),
       iOS: const DarwinNotificationDetails(
@@ -111,15 +109,13 @@ class NotificationService {
       windows: WindowsNotificationDetails(
         actions: [
           WindowsAction(
-            id: 'skip_${reminder.id}',
-            title: _localizations?.skip ?? 'Skip',
-            arguments: 'skip',
+            content: _localizations?.skip ?? 'Skip',
+            arguments: 'skip_${reminder.id}',
             activationType: WindowsActivationType.background,
           ),
           WindowsAction(
-            id: 'open_${reminder.id}',
-            title: 'Open App',
-            arguments: 'open',
+            content: 'Open App',
+            arguments: 'open_${reminder.id}',
             activationType: WindowsActivationType.foreground,
           ),
         ],

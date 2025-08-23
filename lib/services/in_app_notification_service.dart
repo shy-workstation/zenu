@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/reminder.dart';
+import '../l10n/app_localizations.dart';
 
 class InAppNotificationService {
   static final InAppNotificationService _instance =
@@ -334,7 +335,7 @@ class _ReminderDialogState extends State<ReminderDialog>
       child: Column(
         children: [
           Text(
-            'How much?',
+            AppLocalizations.of(context)?.exerciseCount ?? 'How much?',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
