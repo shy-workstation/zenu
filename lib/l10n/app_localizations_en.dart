@@ -21,10 +21,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get systemPaused => 'System Paused - Click to resume';
 
   @override
-  String get pauseSystem => 'Pause System';
+  String get pauseSystem => 'Pause Reminders';
 
   @override
-  String get startSystem => 'Start System';
+  String get startSystem => 'Start Reminders';
 
   @override
   String get addReminder => 'Add Reminder';

@@ -370,24 +370,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             ),
                           ),
                           
-                          // Bottom padding for floating button clearance
+                          // Bottom padding for gradient area
                           const SliverToBoxAdapter(
-                            child: SizedBox(height: 120),
+                            child: SizedBox(height: 160),
                           ),
                         ],
                       ),
 
-                  // Floating Start/Stop Button - Center Bottom
+                  // Bottom gradient blur with start/stop button
                   if (service.reminders.isNotEmpty)
                     Positioned(
-                      bottom: 80,
+                      bottom: 0,
                       left: 0,
                       right: 0,
-                      child: Center(
-                        child: AnimatedScale(
-                          duration: const Duration(milliseconds: 150),
-                          scale: 1.0,
-                          child: _buildSimpleStartStopButton(service),
+                      child: Container(
+                        height: 180,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: themeService.isDarkMode
+                                ? [
+                                    Colors.black.withValues(alpha: 0.0),
+                                    Colors.black.withValues(alpha: 0.3),
+                                    Colors.black.withValues(alpha: 0.7),
+                                    Colors.black.withValues(alpha: 0.9),
+                                  ]
+                                : [
+                                    Colors.white.withValues(alpha: 0.0),
+                                    Colors.white.withValues(alpha: 0.3),
+                                    Colors.white.withValues(alpha: 0.7),
+                                    Colors.white.withValues(alpha: 0.95),
+                                  ],
+                            stops: const [0.0, 0.3, 0.6, 1.0],
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            // Subtle separator line
+                            Container(
+                              height: 1,
+                              margin: const EdgeInsets.symmetric(horizontal: 40),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    themeService.borderColor.withValues(alpha: 0.0),
+                                    themeService.borderColor.withValues(alpha: 0.3),
+                                    themeService.borderColor.withValues(alpha: 0.3),
+                                    themeService.borderColor.withValues(alpha: 0.0),
+                                  ],
+                                  stops: const [0.0, 0.2, 0.8, 1.0],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            // Start/Stop Button
+                            AnimatedScale(
+                              duration: const Duration(milliseconds: 150),
+                              scale: 1.0,
+                              child: _buildSimpleStartStopButton(service),
+                            ),
+                            const SizedBox(height: 30),
+                          ],
                         ),
                       ),
                     ),
@@ -508,15 +553,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildSimpleStartStopButton(ReminderService service) {
     return Material(
-      elevation: 8,
-      borderRadius: BorderRadius.circular(24),
+      elevation: 4,
+      borderRadius: BorderRadius.circular(20),
       shadowColor:
           service.isRunning
-              ? const Color(0xFFEF4444).withValues(alpha: 0.3)
-              : const Color(0xFF10B981).withValues(alpha: 0.3),
+              ? const Color(0xFFEF4444).withValues(alpha: 0.2)
+              : const Color(0xFF10B981).withValues(alpha: 0.2),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -535,10 +580,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             BoxShadow(
               color:
                   service.isRunning
-                      ? const Color(0xFFEF4444).withValues(alpha: 0.2)
-                      : const Color(0xFF10B981).withValues(alpha: 0.2),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+                      ? const Color(0xFFEF4444).withValues(alpha: 0.15)
+                      : const Color(0xFF10B981).withValues(alpha: 0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -546,7 +591,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           duration: const Duration(milliseconds: 150),
           scale: 1.0,
           child: InkWell(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(20),
             onTapDown: (_) {}, // Handled by AnimatedScale
             onTapCancel: () {}, // Handled by AnimatedScale
             onTap: () {
@@ -559,7 +604,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               }
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 18),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -568,18 +613,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ? Icons.pause_rounded
                         : Icons.play_arrow_rounded,
                     color: Colors.white,
-                    size: 32,
+                    size: 24,
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Text(
                     service.isRunning
                         ? AppLocalizations.of(context)?.pauseSystem ?? 'PAUSE'
                         : AppLocalizations.of(context)?.startSystem ?? 'START',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],

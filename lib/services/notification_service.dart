@@ -10,7 +10,7 @@ class NotificationService {
   static NotificationService? _instance;
   static ReminderService? _reminderService;
   AppLocalizations? _localizations;
-  
+
   // Debounce mechanism to prevent duplicate activations
   static DateTime? _lastActivationTime;
   static const Duration _debounceDelay = Duration(milliseconds: 1000);
@@ -65,12 +65,15 @@ class NotificationService {
     _handleNotificationAction(response.actionId, response.payload);
   }
 
-  static void _handleNotificationAction(String? actionId, String? payload) async {
+  static void _handleNotificationAction(
+    String? actionId,
+    String? payload,
+  ) async {
     if (_reminderService == null) return;
 
     // Debounce rapid duplicate notifications
     final now = DateTime.now();
-    if (_lastActivationTime != null && 
+    if (_lastActivationTime != null &&
         now.difference(_lastActivationTime!) < _debounceDelay) {
       return; // Ignore duplicate activation within debounce period
     }
@@ -107,7 +110,7 @@ class NotificationService {
 
     final reminders = _reminderService!.reminders;
     final reminderIndex = reminders.indexWhere((r) => r.id == reminderId);
-    
+
     if (reminderIndex == -1) return;
 
     final reminder = reminders[reminderIndex];
@@ -115,21 +118,21 @@ class NotificationService {
     if (action == 'skip') {
       // Update debounce time
       _lastActivationTime = now;
-      
+
       // User chose to skip the reminder - just reset the next reminder time
       reminder.resetNextReminder();
       _reminderService!.saveData();
     } else if (action == 'open') {
       // Update debounce time
       _lastActivationTime = now;
-      
-      // User chose to open app - reset reminder time 
+
+      // User chose to open app - reset reminder time
       reminder.resetNextReminder();
       _reminderService!.saveData();
-      
+
       // Use professional window manager to bring app to foreground
       await _professionalWindowActivation();
-      
+
       // For "Open App", show the in-app reminder dialog
       _reminderService!.triggerTestReminder(reminder);
     }
@@ -141,24 +144,23 @@ class NotificationService {
     try {
       // Stop any ongoing flashing when user opens the app
       await _stopTaskbarFlashing();
-      
+
       // Restore if minimized
       if (await windowManager.isMinimized()) {
         await windowManager.restore();
       }
-      
+
       // Show and focus the window
       await windowManager.show();
       await windowManager.focus();
-      
+
       // Bring window to front (temporarily set always on top to bypass Windows focus stealing prevention)
       await windowManager.setAlwaysOnTop(true);
       await Future.delayed(const Duration(milliseconds: 100));
       await windowManager.setAlwaysOnTop(false);
-      
+
       // Final focus to ensure visibility
       await windowManager.focus();
-      
     } catch (e) {
       // Fallback to basic window manager methods
       try {
@@ -173,7 +175,7 @@ class NotificationService {
   /// Start flashing taskbar to get user attention (like Discord, Teams, etc.)
   static Future<void> _startTaskbarFlashing() async {
     if (!Platform.isWindows) return;
-    
+
     try {
       // Bring window to attention without flashing (flash method not available)
       if (!await windowManager.isFocused()) {
@@ -188,7 +190,7 @@ class NotificationService {
   /// Stop taskbar flashing
   static Future<void> _stopTaskbarFlashing() async {
     if (!Platform.isWindows) return;
-    
+
     try {
       // Window manager handles this automatically when window gets focus
       await windowManager.focus();
@@ -197,11 +199,10 @@ class NotificationService {
     }
   }
 
-
   Future<void> showReminderNotification(Reminder reminder) async {
     // Start flashing taskbar to get user attention (like Discord, Teams, etc.)
     await _startTaskbarFlashing();
-    
+
     final notificationDetails = NotificationDetails(
       android: AndroidNotificationDetails(
         'health_reminder_channel',

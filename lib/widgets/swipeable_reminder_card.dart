@@ -4,7 +4,6 @@ import '../models/reminder.dart';
 import '../services/reminder_service.dart';
 import '../services/theme_service.dart';
 import '../utils/accessibility_utils.dart';
-import '../utils/duration_formatter.dart';
 import 'pulsing_dot.dart';
 
 class SwipeableReminderCard extends StatelessWidget {
@@ -133,9 +132,10 @@ class SwipeableReminderCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: reminder.isEnabled 
-              ? themeService.cardColor 
-              : themeService.cardColor.withValues(alpha: 0.7),
+          color:
+              reminder.isEnabled
+                  ? themeService.cardColor
+                  : themeService.cardColor.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color:
@@ -146,266 +146,286 @@ class SwipeableReminderCard extends StatelessWidget {
                     : themeService.borderColor.withValues(alpha: 0.5),
             width: isRunning ? 2.5 : 2,
           ),
-        gradient:
-            isRunning && reminder.isEnabled
-                ? LinearGradient(
-                  colors: [
-                    reminder.color.withValues(alpha: 0.08),
-                    reminder.color.withValues(alpha: 0.02),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-                : null,
-        boxShadow: [
-          BoxShadow(
-            color:
-                isRunning
-                    ? reminder.color.withValues(alpha: 0.2)
-                    : themeService.shadowColor,
-            blurRadius: isRunning ? 20 : 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Pulsing indicator for active reminders
-          if (isRunning && reminder.isEnabled)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: PulsingDot(color: reminder.color, size: 10),
+          gradient:
+              isRunning && reminder.isEnabled
+                  ? LinearGradient(
+                    colors: [
+                      reminder.color.withValues(alpha: 0.08),
+                      reminder.color.withValues(alpha: 0.02),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                  : null,
+          boxShadow: [
+            BoxShadow(
+              color:
+                  isRunning
+                      ? reminder.color.withValues(alpha: 0.2)
+                      : themeService.shadowColor,
+              blurRadius: isRunning ? 20 : 15,
+              offset: const Offset(0, 5),
             ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Pulsing indicator for active reminders
+            if (isRunning && reminder.isEnabled)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: PulsingDot(color: reminder.color, size: 10),
+              ),
 
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header row with icon and toggle
-              Row(
-                children: [
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color:
-                          isRunning
-                              ? reminder.color.withValues(alpha: 0.2)
-                              : reminder.color.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow:
-                          isRunning
-                              ? [
-                                BoxShadow(
-                                  color: reminder.color.withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                              : null,
-                    ),
-                    child: Icon(reminder.icon, color: reminder.color, size: 24),
-                  ),
-                  const Spacer(),
-
-                  // Enhanced toggle with text and clear states
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        reminderService.toggleReminder(reminder.id);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          color: reminder.isEnabled 
-                              ? reminder.color.withValues(alpha: 0.15)
-                              : Colors.grey.withValues(alpha: 0.1),
-                          border: Border.all(
-                            color: reminder.isEnabled 
-                                ? reminder.color.withValues(alpha: 0.3)
-                                : Colors.grey.withValues(alpha: 0.3),
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              reminder.isEnabled ? Icons.check_circle : Icons.pause_circle_outline,
-                              size: 16,
-                              color: reminder.isEnabled ? reminder.color : Colors.grey,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              reminder.isEnabled ? 'Ein' : 'Aus',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: reminder.isEnabled ? reminder.color : Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header row with icon and toggle
+                Row(
+                  children: [
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color:
+                            isRunning
+                                ? reminder.color.withValues(alpha: 0.2)
+                                : reminder.color.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow:
+                            isRunning
+                                ? [
+                                  BoxShadow(
+                                    color: reminder.color.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
+                                : null,
+                      ),
+                      child: Icon(
+                        reminder.icon,
+                        color: reminder.color,
+                        size: 24,
                       ),
                     ),
-                  ),
-                ],
-              ),
+                    const Spacer(),
 
-              const SizedBox(height: 16),
-
-              // Title and description
-              Text(
-                reminder.title,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: themeService.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                reminder.description,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: themeService.textSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Time information with enhanced touch targets
-              Row(
-                children: [
-                  // Interval chip (enhanced touch target)
-                  Semantics(
-                    label:
-                        'Reminder interval ${_formatDuration(reminder.interval)}',
-                    hint: 'Double tap to change interval',
-                    child: Material(
+                    // Enhanced toggle with text and clear states
+                    Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () => _showTimerChangeDialog(context),
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          reminderService.toggleReminder(reminder.id);
+                        },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
-                            vertical: 8,
+                            vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: reminder.color.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
+                            color:
+                                reminder.isEnabled
+                                    ? reminder.color.withValues(alpha: 0.15)
+                                    : Colors.grey.withValues(alpha: 0.1),
                             border: Border.all(
-                              color: reminder.color.withValues(alpha: 0.2),
+                              color:
+                                  reminder.isEnabled
+                                      ? reminder.color.withValues(alpha: 0.3)
+                                      : Colors.grey.withValues(alpha: 0.3),
+                              width: 1.5,
                             ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                Icons.schedule_rounded,
+                                reminder.isEnabled
+                                    ? Icons.check_circle
+                                    : Icons.pause_circle_outline,
                                 size: 16,
-                                color: reminder.color,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                _formatDuration(reminder.interval),
-                                style: TextStyle(
-                                  color: reminder.color,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                color:
+                                    reminder.isEnabled
+                                        ? reminder.color
+                                        : Colors.grey,
                               ),
                               const SizedBox(width: 4),
-                              Icon(
-                                Icons.edit_rounded,
-                                size: 12,
-                                color: reminder.color.withValues(alpha: 0.7),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Time remaining (if running)
-                  if (isRunning && timeRemaining != null) ...[
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              reminder.color.withValues(alpha: 0.15),
-                              reminder.color.withValues(alpha: 0.05),
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: reminder.color.withValues(alpha: 0.3),
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                PulsingDot(color: reminder.color, size: 6),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Next in',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: reminder.color,
-                                  ),
+                              Text(
+                                reminder.isEnabled ? 'Ein' : 'Aus',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      reminder.isEnabled
+                                          ? reminder.color
+                                          : Colors.grey,
                                 ),
-                              ],
-                            ),
-                            Text(
-                              _formatTimeRemaining(timeRemaining),
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w800,
-                                color: reminder.color,
-                                fontFamily: 'monospace',
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ],
-                ],
-              ),
-
-              // Progress indicator for active reminders
-              if (isRunning && timeRemaining != null) ...[
-                const SizedBox(height: 12),
-                LinearProgressIndicator(
-                  value: _getProgressValue(timeRemaining),
-                  backgroundColor: reminder.color.withValues(alpha: 0.1),
-                  valueColor: AlwaysStoppedAnimation<Color>(reminder.color),
-                  minHeight: 4,
                 ),
+
+                const SizedBox(height: 16),
+
+                // Title and description
+                Text(
+                  reminder.title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: themeService.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  reminder.description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: themeService.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Time information with enhanced touch targets
+                Row(
+                  children: [
+                    // Interval chip (enhanced touch target)
+                    Semantics(
+                      label:
+                          'Reminder interval ${_formatDuration(reminder.interval)}',
+                      hint: 'Double tap to change interval',
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () => _showTimerChangeDialog(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: reminder.color.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: reminder.color.withValues(alpha: 0.2),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.schedule_rounded,
+                                  size: 16,
+                                  color: reminder.color,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _formatDuration(reminder.interval),
+                                  style: TextStyle(
+                                    color: reminder.color,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.edit_rounded,
+                                  size: 12,
+                                  color: reminder.color.withValues(alpha: 0.7),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Time remaining (if running)
+                    if (isRunning && timeRemaining != null) ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                reminder.color.withValues(alpha: 0.15),
+                                reminder.color.withValues(alpha: 0.05),
+                              ],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: reminder.color.withValues(alpha: 0.3),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  PulsingDot(color: reminder.color, size: 6),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Next in',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: reminder.color,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                _formatTimeRemaining(timeRemaining),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: reminder.color,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+
+                // Progress indicator for active reminders
+                if (isRunning && timeRemaining != null) ...[
+                  const SizedBox(height: 12),
+                  LinearProgressIndicator(
+                    value: _getProgressValue(timeRemaining),
+                    backgroundColor: reminder.color.withValues(alpha: 0.1),
+                    valueColor: AlwaysStoppedAnimation<Color>(reminder.color),
+                    minHeight: 4,
+                  ),
+                ],
               ],
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

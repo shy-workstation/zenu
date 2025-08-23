@@ -132,125 +132,126 @@ class _ReminderDialogState extends State<ReminderDialog>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                  // Animated icon
-                  AnimatedBuilder(
-                    animation: _pulseAnimation,
-                    builder:
-                        (context, child) => Transform.scale(
-                          scale: _pulseAnimation.value,
-                          child: Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: widget.reminder.color.withValues(
-                                alpha: 0.2,
-                              ),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: widget.reminder.color.withValues(
-                                    alpha: 0.4,
-                                  ),
-                                  blurRadius: 12,
-                                  spreadRadius: 2,
+                    // Animated icon
+                    AnimatedBuilder(
+                      animation: _pulseAnimation,
+                      builder:
+                          (context, child) => Transform.scale(
+                            scale: _pulseAnimation.value,
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: widget.reminder.color.withValues(
+                                  alpha: 0.2,
                                 ),
-                              ],
-                            ),
-                            child: Icon(
-                              widget.reminder.icon,
-                              size: 48,
-                              color: widget.reminder.color,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: widget.reminder.color.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                    blurRadius: 12,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                widget.reminder.icon,
+                                size: 48,
+                                color: widget.reminder.color,
+                              ),
                             ),
                           ),
-                        ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Title
-                  Text(
-                    widget.reminder.title,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      color: widget.reminder.color,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
 
-                  const SizedBox(height: 12),
+                    const SizedBox(height: 24),
 
-                  // Description
-                  Text(
-                    _getMotivationalMessage(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                    // Title
+                    Text(
+                      widget.reminder.title,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: widget.reminder.color,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
 
-                  if (_hasQuantity(widget.reminder.type)) ...[
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                    const SizedBox(height: 12),
+
+                    // Description
+                    Text(
+                      _getMotivationalMessage(),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
                       ),
-                      decoration: BoxDecoration(
-                        color: widget.reminder.color.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        '${_currentQuantity.round()} ${_getQuantityUnit(widget.reminder.type)}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: widget.reminder.color,
-                        ),
-                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ],
 
-                  if (_hasQuantity(widget.reminder.type)) ...[
-                    const SizedBox(height: 20),
-                    _buildQuantitySelector(),
-                  ],
-
-                  const SizedBox(height: 32),
-
-                  // Action buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildActionButton(
-                          label: 'Skip',
-                          icon: Icons.close_rounded,
-                          isPrimary: false,
-                          onTap:
-                              () => Navigator.of(
-                                context,
-                              ).pop(0), // 0 means skipped
+                    if (_hasQuantity(widget.reminder.type)) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        flex: 2,
-                        child: _buildActionButton(
-                          label: AppLocalizations.of(context)?.done ?? 'Done!',
-                          icon: Icons.check_rounded,
-                          isPrimary: true,
-                          onTap:
-                              () => Navigator.of(
-                                context,
-                              ).pop(_currentQuantity.round()),
+                        decoration: BoxDecoration(
+                          color: widget.reminder.color.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          '${_currentQuantity.round()} ${_getQuantityUnit(widget.reminder.type)}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: widget.reminder.color,
+                          ),
                         ),
                       ),
                     ],
-                  ),
-                ],
+
+                    if (_hasQuantity(widget.reminder.type)) ...[
+                      const SizedBox(height: 20),
+                      _buildQuantitySelector(),
+                    ],
+
+                    const SizedBox(height: 32),
+
+                    // Action buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildActionButton(
+                            label: 'Skip',
+                            icon: Icons.close_rounded,
+                            isPrimary: false,
+                            onTap:
+                                () => Navigator.of(
+                                  context,
+                                ).pop(0), // 0 means skipped
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          flex: 2,
+                          child: _buildActionButton(
+                            label:
+                                AppLocalizations.of(context)?.done ?? 'Done!',
+                            icon: Icons.check_rounded,
+                            isPrimary: true,
+                            onTap:
+                                () => Navigator.of(
+                                  context,
+                                ).pop(_currentQuantity.round()),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
             ),
           ),
         ),

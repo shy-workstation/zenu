@@ -125,13 +125,13 @@ abstract class AppLocalizations {
   /// Button to pause reminder system
   ///
   /// In en, this message translates to:
-  /// **'Pause System'**
+  /// **'Pause Reminders'**
   String get pauseSystem;
 
   /// Button to start reminder system
   ///
   /// In en, this message translates to:
-  /// **'Start System'**
+  /// **'Start Reminders'**
   String get startSystem;
 
   /// Add reminder button

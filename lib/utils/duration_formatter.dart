@@ -9,24 +9,24 @@ class DurationFormatter {
       final days = duration.inDays;
       final hours = duration.inHours % 24;
       if (hours == 0) {
-        return '${days} ${days == 1 ? 'Tag' : 'Tage'}';
+        return '$days ${days == 1 ? 'Tag' : 'Tage'}';
       }
-      return '${days} ${days == 1 ? 'Tag' : 'Tage'} ${hours} Std';
+      return '$days ${days == 1 ? 'Tag' : 'Tage'} $hours Std';
     }
-    
+
     if (duration.inHours > 0) {
       final hours = duration.inHours;
       final minutes = duration.inMinutes % 60;
       if (minutes == 0) {
-        return '${hours} ${hours == 1 ? 'Std' : 'Std'}';
+        return '$hours ${hours == 1 ? 'Std' : 'Std'}';
       }
-      return '${hours} Std ${minutes} Min';
+      return '$hours Std $minutes Min';
     }
-    
+
     if (duration.inMinutes > 0) {
       return '${duration.inMinutes} Min';
     }
-    
+
     return '${max(duration.inSeconds, 0)} Sek';
   }
 
@@ -36,11 +36,11 @@ class DurationFormatter {
     if (duration.inHours > 0) {
       return '${duration.inHours}h';
     }
-    
+
     if (duration.inMinutes > 0) {
       return '${duration.inMinutes}m';
     }
-    
+
     return '${max(duration.inSeconds, 0)}s';
   }
 
@@ -48,7 +48,7 @@ class DurationFormatter {
   /// Examples: "10 Min", "1 Min", "120 Min"
   static String formatDurationSettings(Duration duration) {
     final minutes = duration.inMinutes;
-    return '${minutes} Min';
+    return '$minutes Min';
   }
 
   /// Format interval for user-friendly display
@@ -56,9 +56,9 @@ class DurationFormatter {
   static String formatInterval(Duration interval) {
     if (interval.inHours > 0) {
       final hours = interval.inHours;
-      return 'Alle ${hours} ${hours == 1 ? 'Std' : 'Std'}';
+      return 'Alle $hours ${hours == 1 ? 'Std' : 'Std'}';
     }
-    
+
     return 'Alle ${interval.inMinutes} Min';
   }
 
@@ -68,11 +68,11 @@ class DurationFormatter {
     if (duration.isNegative) {
       return 'Überfällig';
     }
-    
+
     if (duration.inMinutes > 0) {
       return 'In ${duration.inMinutes} Min';
     }
-    
+
     return 'In ${max(duration.inSeconds, 0)} Sek';
   }
 
@@ -82,17 +82,17 @@ class DurationFormatter {
       final hours = duration.inHours;
       final minutes = duration.inMinutes % 60;
       if (minutes == 0) {
-        return '${hours} ${hours == 1 ? 'Stunde' : 'Stunden'}';
+        return '$hours ${hours == 1 ? 'Stunde' : 'Stunden'}';
       }
-      return '${hours} ${hours == 1 ? 'Stunde' : 'Stunden'} und ${minutes} ${minutes == 1 ? 'Minute' : 'Minuten'}';
+      return '$hours ${hours == 1 ? 'Stunde' : 'Stunden'} und $minutes ${minutes == 1 ? 'Minute' : 'Minuten'}';
     }
-    
+
     if (duration.inMinutes > 0) {
       final minutes = duration.inMinutes;
-      return '${minutes} ${minutes == 1 ? 'Minute' : 'Minuten'}';
+      return '$minutes ${minutes == 1 ? 'Minute' : 'Minuten'}';
     }
-    
+
     final seconds = max(duration.inSeconds, 0);
-    return '${seconds} ${seconds == 1 ? 'Sekunde' : 'Sekunden'}';
+    return '$seconds ${seconds == 1 ? 'Sekunde' : 'Sekunden'}';
   }
 }
