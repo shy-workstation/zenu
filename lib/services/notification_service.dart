@@ -126,12 +126,15 @@ class NotificationService {
       // User chose to open app - reset reminder time 
       reminder.resetNextReminder();
       _reminderService!.saveData();
+      // WindowsActivationType.foreground should bring the app to foreground automatically
+      print('App should be brought to foreground by Windows activation');
       // For "Open App", also show the in-app reminder dialog
       _reminderService!.triggerTestReminder(reminder);
     }
 
     print('Action completed successfully');
   }
+
 
   Future<void> showReminderNotification(Reminder reminder) async {
     final notificationDetails = NotificationDetails(
@@ -163,7 +166,7 @@ class NotificationService {
           WindowsAction(
             content: _localizations?.skip ?? 'Skip',
             arguments: 'skip_${reminder.id}',
-            activationType: WindowsActivationType.background,
+            activationType: WindowsActivationType.protocol,
           ),
           WindowsAction(
             content: 'Open App',
@@ -172,6 +175,9 @@ class NotificationService {
             afterActivationBehavior: WindowsAfterActivationBehavior.pendingUpdate,
           ),
         ],
+        // Set the main notification click to also activate foreground
+        arguments: 'open_${reminder.id}',
+        activationType: WindowsActivationType.foreground,
       ),
     );
 
