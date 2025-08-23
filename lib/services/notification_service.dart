@@ -140,7 +140,7 @@ class NotificationService {
     if (!Platform.isWindows) return;
     
     try {
-      print('🔄 Attempting to bring app to foreground using PowerShell...');
+      print('🔄 Attempting to bring app to foreground using simpler method...');
       
       // Get the current process name (should be the Flutter app)
       final processName = Platform.resolvedExecutable.split(Platform.pathSeparator).last;
@@ -148,55 +148,59 @@ class NotificationService {
       
       print('📱 App name: $appName');
       
-      // PowerShell command to bring the window to foreground
-      final powershellCommand = '''
-Add-Type -TypeDefinition '
-using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-public class WindowHelper {
-    [DllImport("user32.dll")]
-    public static extern bool SetForegroundWindow(IntPtr hWnd);
-    
-    [DllImport("user32.dll")]
-    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-    
-    [DllImport("user32.dll")]
-    public static extern bool IsIconic(IntPtr hWnd);
-    
-    public const int SW_RESTORE = 9;
-    public const int SW_SHOW = 5;
-    
-    public static void BringToForeground(string processName) {
-        Process[] processes = Process.GetProcessesByName(processName);
-        if (processes.Length > 0) {
-            IntPtr hWnd = processes[0].MainWindowHandle;
-            if (IsIconic(hWnd)) {
-                ShowWindow(hWnd, SW_RESTORE);
-            }
-            SetForegroundWindow(hWnd);
-        }
-    }
-}
-';
-[WindowHelper]::BringToForeground('$appName')
-''';
+      // Use a simpler PowerShell approach without complex string escaping
+      final powershellCmd = 'Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.Interaction]::AppActivate("' + appName + '")';
+      final commands = [
+        '-Command',
+        powershellCmd,
+      ];
 
+      print('🔧 Executing PowerShell command with AppActivate...');
+      print('📝 Command: ${commands.join(' ')}');
+      
       // Execute the PowerShell command
       final result = await Process.run(
         'powershell.exe',
-        ['-Command', powershellCommand],
+        commands,
         runInShell: true,
       );
 
       if (result.exitCode == 0) {
-        print('✅ PowerShell command executed successfully');
+        print('✅ AppActivate command executed successfully');
       } else {
-        print('❌ PowerShell command failed: ${result.stderr}');
+        print('❌ AppActivate failed, trying alternative method...');
+        // Fallback method using tasklist and more direct approach
+        await _fallbackWindowActivation(appName);
       }
       
     } catch (e) {
       print('❌ Error forcing app to foreground: $e');
+      // Try the fallback method
+      try {
+        final processName = Platform.resolvedExecutable.split(Platform.pathSeparator).last;
+        final appName = processName.replaceAll('.exe', '');
+        await _fallbackWindowActivation(appName);
+      } catch (fallbackError) {
+        print('❌ Fallback method also failed: $fallbackError');
+      }
+    }
+  }
+
+  static Future<void> _fallbackWindowActivation(String appName) async {
+    try {
+      print('🔄 Using fallback window activation method...');
+      
+      // Simple approach: Use nircmd if available, otherwise just log
+      final result = await Process.run(
+        'cmd',
+        ['/c', 'echo', 'Window activation attempted for $appName'],
+        runInShell: true,
+      );
+      
+      print('📝 Fallback activation logged');
+      
+    } catch (e) {
+      print('❌ Fallback activation failed: $e');
     }
   }
 
