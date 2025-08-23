@@ -1,5 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'dart:io';
+import 'dart:io' show Platform, Process, pid;
 import '../models/reminder.dart';
 import '../l10n/app_localizations.dart';
 import 'reminder_service.dart';
@@ -127,62 +127,63 @@ class NotificationService {
       // User chose to open app - reset reminder time 
       reminder.resetNextReminder();
       _reminderService!.saveData();
-      // Try to bring the app to foreground using multiple methods
-      await _forceAppToForeground();
-      // For "Open App", also show the in-app reminder dialog
+      
+      // Try simple window activation method
+      await _simpleWindowActivation();
+      
+      // For "Open App", show the in-app reminder dialog
       _reminderService!.triggerTestReminder(reminder);
+      
+      // Also try to flash the taskbar to get user's attention
+      await _flashTaskbar();
     }
 
     print('Action completed successfully');
   }
 
-  static Future<void> _forceAppToForeground() async {
+  static Future<void> _simpleWindowActivation() async {
     if (!Platform.isWindows) return;
     
     try {
-      print('🔄 Attempting to bring app to foreground using simpler method...');
+      print('🔄 Attempting simple window activation...');
       
-      // Get the current process name (should be the Flutter app)
-      final processName = Platform.resolvedExecutable.split(Platform.pathSeparator).last;
-      final appName = processName.replaceAll('.exe', '');
-      
-      print('📱 App name: $appName');
-      
-      // Use a simpler PowerShell approach without complex string escaping
-      final powershellCmd = 'Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.Interaction]::AppActivate("' + appName + '")';
-      final commands = [
-        '-Command',
-        powershellCmd,
-      ];
-
-      print('🔧 Executing PowerShell command with AppActivate...');
-      print('📝 Command: ${commands.join(' ')}');
-      
-      // Execute the PowerShell command
+      // Use a very simple PowerShell command to activate any window with "zenu" or "Flutter" in the title
       final result = await Process.run(
         'powershell.exe',
-        commands,
+        [
+          '-Command', 
+          'Get-Process | Where-Object { \$_.ProcessName -like "*zenu*" -or \$_.MainWindowTitle -like "*Flutter*" } | ForEach-Object { \$_.MainWindowHandle } | ForEach-Object { if (\$_ -ne 0) { [Microsoft.VisualBasic.Interaction]::AppActivate([System.Diagnostics.Process]::GetProcessById((Get-Process | Where-Object MainWindowHandle -eq \$_).Id).Id) } }'
+        ],
         runInShell: true,
       );
 
-      if (result.exitCode == 0) {
-        print('✅ AppActivate command executed successfully');
-      } else {
-        print('❌ AppActivate failed, trying alternative method...');
-        // Fallback method using tasklist and more direct approach
-        await _fallbackWindowActivation(appName);
-      }
+      print('📝 Simple activation result: ${result.exitCode}');
       
     } catch (e) {
-      print('❌ Error forcing app to foreground: $e');
-      // Try the fallback method
-      try {
-        final processName = Platform.resolvedExecutable.split(Platform.pathSeparator).last;
-        final appName = processName.replaceAll('.exe', '');
-        await _fallbackWindowActivation(appName);
-      } catch (fallbackError) {
-        print('❌ Fallback method also failed: $fallbackError');
-      }
+      print('❌ Simple activation failed: $e');
+    }
+  }
+
+  static Future<void> _flashTaskbar() async {
+    if (!Platform.isWindows) return;
+    
+    try {
+      print('🔄 Attempting to flash taskbar...');
+      
+      // Use PowerShell to flash the window in the taskbar to get attention
+      await Process.run(
+        'powershell.exe',
+        [
+          '-Command',
+          'Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Application]::DoEvents()'
+        ],
+        runInShell: true,
+      );
+      
+      print('✅ Taskbar flash attempted');
+      
+    } catch (e) {
+      print('❌ Taskbar flash failed: $e');
     }
   }
 
