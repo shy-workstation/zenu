@@ -416,7 +416,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
     _selectedColor = reminder?.color ?? Colors.blue;
     _intervalMinutes = reminder?.interval.inMinutes ?? 60;
     _minQuantity = reminder?.minQuantity ?? 1;
-    _maxQuantity = reminder?.maxQuantity ?? 10;
+    _maxQuantity = reminder?.maxQuantity ?? 100;
     _stepSize = reminder?.stepSize ?? 1;
     _unit = reminder?.unit ?? 'reps';
     _selectedType = reminder?.type ?? ReminderType.custom;

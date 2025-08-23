@@ -22,10 +22,10 @@ class QuickAddDialogs {
       icon: Icons.water_drop,
       color: const Color(0xFF06B6D4),
       isEnabled: true,
-      minQuantity: 1,
-      maxQuantity: 10,
-      stepSize: 1,
-      unit: 'glasses',
+      minQuantity: 0,
+      maxQuantity: 1000,
+      stepSize: 25,
+      unit: 'ml',
     );
 
     reminderService.addReminder(reminder);

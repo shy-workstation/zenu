@@ -22,9 +22,9 @@ class NotificationService {
           requestSoundPermission: true,
         ),
         windows: WindowsInitializationSettings(
-          appName: 'Zenu', // Will be localized in the UI context
-          appUserModelId: 'com.example.healthreminder',
-          guid: '12345678-1234-5678-9012-123456789012',
+          appName: 'Zenu',
+          appUserModelId: 'YousofShehada.Zenu',
+          guid: 'BE46DC6D-FD4E-4ABB-A08C-68EABDEC1169',
         ),
       );
 
