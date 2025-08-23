@@ -139,6 +139,9 @@ class NotificationService {
   /// This is the industry standard approach used by Discord, VS Code, etc.
   static Future<void> _professionalWindowActivation() async {
     try {
+      // Stop any ongoing flashing when user opens the app
+      await _stopTaskbarFlashing();
+      
       // Restore if minimized
       if (await windowManager.isMinimized()) {
         await windowManager.restore();
@@ -167,8 +170,39 @@ class NotificationService {
     }
   }
 
+  /// Start flashing taskbar to get user attention (like Discord, Teams, etc.)
+  static Future<void> _startTaskbarFlashing() async {
+    if (!Platform.isWindows) return;
+    
+    try {
+      // Use the professional window_manager method to flash taskbar
+      // This is exactly what Discord, Slack, VS Code, etc. use
+      if (!await windowManager.isFocused()) {
+        // Only flash if window is not focused (user is not currently using the app)
+        await windowManager.flash();
+      }
+    } catch (e) {
+      // Silent fallback failure
+    }
+  }
+
+  /// Stop taskbar flashing
+  static Future<void> _stopTaskbarFlashing() async {
+    if (!Platform.isWindows) return;
+    
+    try {
+      // Window manager handles this automatically when window gets focus
+      await windowManager.focus();
+    } catch (e) {
+      // Silent failure
+    }
+  }
+
 
   Future<void> showReminderNotification(Reminder reminder) async {
+    // Start flashing taskbar to get user attention (like Discord, Teams, etc.)
+    await _startTaskbarFlashing();
+    
     final notificationDetails = NotificationDetails(
       android: AndroidNotificationDetails(
         'health_reminder_channel',
