@@ -1,5 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:io' show Platform, Process, pid;
+import 'package:window_manager/window_manager.dart';
 import '../models/reminder.dart';
 import '../l10n/app_localizations.dart';
 import 'reminder_service.dart';
@@ -128,80 +129,58 @@ class NotificationService {
       reminder.resetNextReminder();
       _reminderService!.saveData();
       
-      // Try simple window activation method
-      await _simpleWindowActivation();
+      // Use professional window manager to bring app to foreground
+      await _professionalWindowActivation();
       
       // For "Open App", show the in-app reminder dialog
       _reminderService!.triggerTestReminder(reminder);
-      
-      // Also try to flash the taskbar to get user's attention
-      await _flashTaskbar();
     }
 
     print('Action completed successfully');
   }
 
-  static Future<void> _simpleWindowActivation() async {
-    if (!Platform.isWindows) return;
-    
+  /// Professional window activation using window_manager
+  /// This is the industry standard approach used by Discord, VS Code, etc.
+  static Future<void> _professionalWindowActivation() async {
     try {
-      print('🔄 Attempting simple window activation...');
+      print('🚀 Using professional window_manager activation...');
       
-      // Use a very simple PowerShell command to activate any window with "zenu" or "Flutter" in the title
-      final result = await Process.run(
-        'powershell.exe',
-        [
-          '-Command', 
-          'Get-Process | Where-Object { \$_.ProcessName -like "*zenu*" -or \$_.MainWindowTitle -like "*Flutter*" } | ForEach-Object { \$_.MainWindowHandle } | ForEach-Object { if (\$_ -ne 0) { [Microsoft.VisualBasic.Interaction]::AppActivate([System.Diagnostics.Process]::GetProcessById((Get-Process | Where-Object MainWindowHandle -eq \$_).Id).Id) } }'
-        ],
-        runInShell: true,
-      );
-
-      print('📝 Simple activation result: ${result.exitCode}');
+      // Method 1: Standard window manager activation
+      if (await windowManager.isMinimized()) {
+        print('📱 Window is minimized, restoring...');
+        await windowManager.restore();
+      }
+      
+      // Method 2: Show and focus the window
+      print('👁️ Showing window...');
+      await windowManager.show();
+      
+      print('🎯 Focusing window...');
+      await windowManager.focus();
+      
+      // Method 3: Bring window to front (this is the key method)
+      print('⬆️ Bringing window to front...');
+      await windowManager.setAlwaysOnTop(true);  // Temporarily set always on top
+      await Future.delayed(const Duration(milliseconds: 100)); // Small delay
+      await windowManager.setAlwaysOnTop(false); // Remove always on top
+      
+      // Method 4: Additional focus to ensure visibility
+      await windowManager.focus();
+      
+      print('✅ Professional window activation completed successfully!');
       
     } catch (e) {
-      print('❌ Simple activation failed: $e');
-    }
-  }
-
-  static Future<void> _flashTaskbar() async {
-    if (!Platform.isWindows) return;
-    
-    try {
-      print('🔄 Attempting to flash taskbar...');
+      print('❌ Professional window activation failed: $e');
       
-      // Use PowerShell to flash the window in the taskbar to get attention
-      await Process.run(
-        'powershell.exe',
-        [
-          '-Command',
-          'Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Application]::DoEvents()'
-        ],
-        runInShell: true,
-      );
-      
-      print('✅ Taskbar flash attempted');
-      
-    } catch (e) {
-      print('❌ Taskbar flash failed: $e');
-    }
-  }
-
-  static Future<void> _fallbackWindowActivation(String appName) async {
-    try {
-      print('🔄 Using fallback window activation method...');
-      
-      // Simple approach: Use nircmd if available, otherwise just log
-      final result = await Process.run(
-        'cmd',
-        ['/c', 'echo', 'Window activation attempted for $appName'],
-        runInShell: true,
-      );
-      
-      print('📝 Fallback activation logged');
-      
-    } catch (e) {
-      print('❌ Fallback activation failed: $e');
+      // Fallback to basic window manager methods
+      try {
+        print('🔄 Using basic fallback...');
+        await windowManager.show();
+        await windowManager.focus();
+        print('✅ Basic fallback completed');
+      } catch (fallbackError) {
+        print('❌ Even basic fallback failed: $fallbackError');
+      }
     }
   }
 
