@@ -28,12 +28,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String? _lastAnnouncedReminder;
   final FocusNode _mainFocusNode = FocusNode();
 
-
   @override
   void initState() {
     super.initState();
     _startClockTimer();
-
 
     // Announce when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -229,7 +227,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 ],
               ),
-              body:
+              body: Stack(
+                children: [
+                  // Main content
                   service.reminders.isEmpty
                       ? EmptyState(
                         onAddReminder:
@@ -238,21 +238,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       )
                       : CustomScrollView(
                         slivers: [
-                          // Morph Blob Control
+                          // Statistics at the top
                           SliverToBoxAdapter(
                             child: Container(
-                              margin: const EdgeInsets.fromLTRB(24, 40, 24, 40),
-                              child: Center(
-                                child: _buildSimpleStartStopButton(service),
+                              margin: const EdgeInsets.fromLTRB(24, 20, 24, 20),
+                              child: CompactStatsBar(
+                                reminderService: service,
+                                themeService: themeService,
                               ),
-                            ),
-                          ),
-
-                          // Compact Stats Bar
-                          SliverToBoxAdapter(
-                            child: CompactStatsBar(
-                              reminderService: service,
-                              themeService: themeService,
                             ),
                           ),
 
@@ -345,13 +338,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     },
                                   ),
                                   // Add bottom padding to prevent overflow
-                                  const SizedBox(height: 100),
+                                  const SizedBox(height: 120),
                                 ],
                               ),
                             ),
                           ),
                         ],
                       ),
+                  
+                  // Floating Start/Stop Button - Center Bottom
+                  if (service.reminders.isNotEmpty)
+                    Positioned(
+                      bottom: 80,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: _buildSimpleStartStopButton(service),
+                      ),
+                    ),
+                ],
+              ),
               floatingActionButton: SpeedDial(
                 icon: Icons.add,
                 activeIcon: Icons.close,
@@ -466,38 +472,50 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildSimpleStartStopButton(ReminderService service) {
-    return Center(
-      child: Material(
-        elevation: 4,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: service.isRunning
-                  ? [
+    return Material(
+      elevation: 8,
+      borderRadius: BorderRadius.circular(24),
+      shadowColor: service.isRunning 
+          ? const Color(0xFFEF4444).withValues(alpha: 0.3)
+          : const Color(0xFF10B981).withValues(alpha: 0.3),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors:
+                service.isRunning
+                    ? [
                       const Color(0xFFEF4444), // Red gradient for stop
                       const Color(0xFFDC2626),
                     ]
-                  : [
+                    : [
                       const Color(0xFF10B981), // Green gradient for start
                       const Color(0xFF059669),
                     ],
-            ),
           ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: () {
-              if (service.isRunning) {
-                service.stopReminders();
-              } else {
-                service.startReminders();
-              }
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          boxShadow: [
+            BoxShadow(
+              color: service.isRunning 
+                  ? const Color(0xFFEF4444).withValues(alpha: 0.2)
+                  : const Color(0xFF10B981).withValues(alpha: 0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: () {
+            if (service.isRunning) {
+              service.stopReminders();
+            } else {
+              service.startReminders();
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 18),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -506,16 +524,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ? Icons.pause_rounded
                         : Icons.play_arrow_rounded,
                     color: Colors.white,
-                    size: 28,
+                    size: 32,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                   Text(
-                    service.isRunning 
-                        ? AppLocalizations.of(context)?.pause ?? 'PAUSE'
-                        : AppLocalizations.of(context)?.start ?? 'START',
+                    service.isRunning
+                        ? AppLocalizations.of(context)?.pauseSystem ?? 'PAUSE'
+                        : AppLocalizations.of(context)?.startSystem ?? 'START',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.0,
                     ),
@@ -528,7 +546,4 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
   }
-
 }
-
-
