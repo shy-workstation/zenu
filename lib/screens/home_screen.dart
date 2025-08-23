@@ -389,49 +389,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
-                            colors: themeService.isDarkMode
-                                ? [
-                                    Colors.black.withValues(alpha: 0.0),
-                                    Colors.black.withValues(alpha: 0.3),
-                                    Colors.black.withValues(alpha: 0.7),
-                                    Colors.black.withValues(alpha: 0.9),
-                                  ]
-                                : [
-                                    Colors.white.withValues(alpha: 0.0),
-                                    Colors.white.withValues(alpha: 0.3),
-                                    Colors.white.withValues(alpha: 0.7),
-                                    Colors.white.withValues(alpha: 0.95),
-                                  ],
+                            colors: [
+                              themeService.backgroundColor.withValues(alpha: 0.0),
+                              themeService.backgroundColor.withValues(alpha: 0.5),
+                              themeService.backgroundColor.withValues(alpha: 0.8),
+                              themeService.backgroundColor.withValues(alpha: 0.95),
+                            ],
                             stops: const [0.0, 0.3, 0.6, 1.0],
                           ),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            // Subtle separator line
-                            Container(
-                              height: 1,
-                              margin: const EdgeInsets.symmetric(horizontal: 40),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    themeService.borderColor.withValues(alpha: 0.0),
-                                    themeService.borderColor.withValues(alpha: 0.3),
-                                    themeService.borderColor.withValues(alpha: 0.3),
-                                    themeService.borderColor.withValues(alpha: 0.0),
-                                  ],
-                                  stops: const [0.0, 0.2, 0.8, 1.0],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
                             // Start/Stop Button
                             AnimatedScale(
                               duration: const Duration(milliseconds: 150),
                               scale: 1.0,
                               child: _buildSimpleStartStopButton(service),
                             ),
-                            const SizedBox(height: 30),
+                            const SizedBox(height: 40),
                           ],
                         ),
                       ),
