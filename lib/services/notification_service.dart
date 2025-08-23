@@ -10,6 +10,10 @@ class NotificationService {
   static NotificationService? _instance;
   static ReminderService? _reminderService;
   AppLocalizations? _localizations;
+  
+  // Debounce mechanism to prevent duplicate activations
+  static DateTime? _lastActivationTime;
+  static const Duration _debounceDelay = Duration(milliseconds: 1000);
 
   NotificationService._(this._flutterLocalNotificationsPlugin);
 
@@ -62,12 +66,13 @@ class NotificationService {
   }
 
   static void _handleNotificationAction(String? actionId, String? payload) async {
-    // Debug logging
-    print('Notification action received - ActionId: $actionId, Payload: $payload');
-    
-    if (_reminderService == null) {
-      print('ERROR: ReminderService is null in notification handler');
-      return;
+    if (_reminderService == null) return;
+
+    // Debounce rapid duplicate notifications
+    final now = DateTime.now();
+    if (_lastActivationTime != null && 
+        now.difference(_lastActivationTime!) < _debounceDelay) {
+      return; // Ignore duplicate activation within debounce period
     }
 
     // Handle different platforms and response formats
@@ -80,7 +85,6 @@ class NotificationService {
       if (parts.length >= 2) {
         action = parts[0];
         reminderId = parts.sublist(1).join('_');
-        print('Extracted from actionId - Action: $action, ReminderId: $reminderId');
       }
     }
 
@@ -89,42 +93,36 @@ class NotificationService {
       if (payload.startsWith('reminder_')) {
         reminderId = payload.substring(9);
         action = 'open'; // Default to open when notification is tapped
-        print('Extracted from payload - Action: $action, ReminderId: $reminderId');
       } else if (payload.contains('_')) {
         // Windows might put the action in the payload
         final parts = payload.split('_');
         if (parts.length >= 2) {
           action = parts[0];
           reminderId = parts.sublist(1).join('_');
-          print('Extracted from payload with action - Action: $action, ReminderId: $reminderId');
         }
       }
     }
 
-    if (reminderId == null || action == null) {
-      print('ERROR: Could not extract reminder ID or action - ReminderId: $reminderId, Action: $action');
-      return;
-    }
-
-    print('Processing action: $action for reminder: $reminderId');
+    if (reminderId == null || action == null) return;
 
     final reminders = _reminderService!.reminders;
     final reminderIndex = reminders.indexWhere((r) => r.id == reminderId);
     
-    if (reminderIndex == -1) {
-      print('ERROR: Reminder not found with ID: $reminderId');
-      return;
-    }
+    if (reminderIndex == -1) return;
 
     final reminder = reminders[reminderIndex];
 
     if (action == 'skip') {
-      print('Skipping reminder: ${reminder.title}');
+      // Update debounce time
+      _lastActivationTime = now;
+      
       // User chose to skip the reminder - just reset the next reminder time
       reminder.resetNextReminder();
       _reminderService!.saveData();
     } else if (action == 'open') {
-      print('Opening app for reminder: ${reminder.title}');
+      // Update debounce time
+      _lastActivationTime = now;
+      
       // User chose to open app - reset reminder time 
       reminder.resetNextReminder();
       _reminderService!.saveData();
@@ -135,51 +133,36 @@ class NotificationService {
       // For "Open App", show the in-app reminder dialog
       _reminderService!.triggerTestReminder(reminder);
     }
-
-    print('Action completed successfully');
   }
 
   /// Professional window activation using window_manager
   /// This is the industry standard approach used by Discord, VS Code, etc.
   static Future<void> _professionalWindowActivation() async {
     try {
-      print('🚀 Using professional window_manager activation...');
-      
-      // Method 1: Standard window manager activation
+      // Restore if minimized
       if (await windowManager.isMinimized()) {
-        print('📱 Window is minimized, restoring...');
         await windowManager.restore();
       }
       
-      // Method 2: Show and focus the window
-      print('👁️ Showing window...');
+      // Show and focus the window
       await windowManager.show();
-      
-      print('🎯 Focusing window...');
       await windowManager.focus();
       
-      // Method 3: Bring window to front (this is the key method)
-      print('⬆️ Bringing window to front...');
-      await windowManager.setAlwaysOnTop(true);  // Temporarily set always on top
-      await Future.delayed(const Duration(milliseconds: 100)); // Small delay
-      await windowManager.setAlwaysOnTop(false); // Remove always on top
+      // Bring window to front (temporarily set always on top to bypass Windows focus stealing prevention)
+      await windowManager.setAlwaysOnTop(true);
+      await Future.delayed(const Duration(milliseconds: 100));
+      await windowManager.setAlwaysOnTop(false);
       
-      // Method 4: Additional focus to ensure visibility
+      // Final focus to ensure visibility
       await windowManager.focus();
-      
-      print('✅ Professional window activation completed successfully!');
       
     } catch (e) {
-      print('❌ Professional window activation failed: $e');
-      
       // Fallback to basic window manager methods
       try {
-        print('🔄 Using basic fallback...');
         await windowManager.show();
         await windowManager.focus();
-        print('✅ Basic fallback completed');
       } catch (fallbackError) {
-        print('❌ Even basic fallback failed: $fallbackError');
+        // Silent fallback failure
       }
     }
   }
