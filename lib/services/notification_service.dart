@@ -1,5 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'dart:io' show Platform, Process, pid;
+import 'dart:io' show Platform;
 import 'package:window_manager/window_manager.dart';
 import '../models/reminder.dart';
 import '../l10n/app_localizations.dart';
