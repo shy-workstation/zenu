@@ -251,39 +251,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             ),
                           ),
 
-                          // Reminders Grid with enhanced cards
+                          // Reminders Grid with container box
                           SliverPadding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
                             sliver: SliverToBoxAdapter(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Section Header
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 4),
-                                    child: Text(
-                                      '${service.reminders.length} ${service.reminders.length == 1 ? 'Erinnerung' : 'Erinnerungen'} konfiguriert',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700,
-                                        color: themeService.textPrimary,
-                                        letterSpacing: -0.5,
-                                      ),
-                                    ),
+                              child: Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: themeService.isDarkMode 
+                                      ? Colors.black.withValues(alpha: 0.2)
+                                      : Colors.grey.shade50,
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: themeService.isDarkMode
+                                        ? Colors.white.withValues(alpha: 0.08)
+                                        : Colors.grey.shade200,
+                                    width: 1,
                                   ),
-                                  const SizedBox(height: 24),
-                                  // Responsive Grid Layout
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Responsive Grid Layout
                                   LayoutBuilder(
                                     builder: (context, constraints) {
                                       // Strict 12-column responsive grid system
                                       int columns = 1;
                                       double maxWidth = constraints.maxWidth;
-                                      
+
                                       // Desktop: 3 columns (1280px+)
                                       if (maxWidth >= 1200) {
                                         columns = 3;
                                       }
-                                      // Tablet: 2 columns (768px - 1199px) 
+                                      // Tablet: 2 columns (768px - 1199px)
                                       else if (maxWidth >= 768) {
                                         columns = 2;
                                       }
@@ -293,15 +293,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       }
 
                                       const double spacing = 16.0;
-                                      final double itemWidth = (maxWidth - (columns - 1) * spacing) / columns;
+                                      final double itemWidth =
+                                          (maxWidth - (columns - 1) * spacing) /
+                                          columns;
 
                                       // Create rows with equal-height cards
                                       final List<Widget> rows = [];
-                                      final List<Reminder> reminders = service.reminders;
-                                      
-                                      for (int i = 0; i < reminders.length; i += columns) {
+                                      final List<Reminder> reminders =
+                                          service.reminders;
+
+                                      for (
+                                        int i = 0;
+                                        i < reminders.length;
+                                        i += columns
+                                      ) {
                                         final rowItems = <Widget>[];
-                                        
+
                                         for (int j = 0; j < columns; j++) {
                                           if (i + j < reminders.length) {
                                             rowItems.add(
@@ -317,37 +324,59 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             );
                                           } else {
                                             // Empty placeholder for consistent grid
-                                            rowItems.add(SizedBox(width: itemWidth));
+                                            rowItems.add(
+                                              SizedBox(width: itemWidth),
+                                            );
                                           }
                                         }
-                                        
+
                                         rows.add(
                                           Padding(
-                                            padding: EdgeInsets.only(bottom: i + columns < reminders.length ? 16 : 0),
+                                            padding: EdgeInsets.only(
+                                              bottom:
+                                                  i + columns < reminders.length
+                                                      ? 16
+                                                      : 0,
+                                            ),
                                             child: Row(
-                                              children: rowItems
-                                                  .expand((widget) => [widget, if (widget != rowItems.last) const SizedBox(width: spacing)])
-                                                  .toList(),
+                                              children:
+                                                  rowItems
+                                                      .expand(
+                                                        (widget) => [
+                                                          widget,
+                                                          if (widget !=
+                                                              rowItems.last)
+                                                            const SizedBox(
+                                                              width: spacing,
+                                                            ),
+                                                        ],
+                                                      )
+                                                      .toList(),
                                             ),
                                           ),
                                         );
                                       }
 
                                       return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: rows,
                                       );
                                     },
                                   ),
-                                  // Add bottom padding to prevent overflow
-                                  const SizedBox(height: 120),
                                 ],
                               ),
                             ),
+                            ),
+                          ),
+                          
+                          // Bottom padding for floating button clearance
+                          const SliverToBoxAdapter(
+                            child: SizedBox(height: 120),
                           ),
                         ],
                       ),
-                  
+
                   // Floating Start/Stop Button - Center Bottom
                   if (service.reminders.isNotEmpty)
                     Positioned(
@@ -356,10 +385,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       right: 0,
                       child: Center(
                         child: AnimatedScale(
-          duration: const Duration(milliseconds: 150),
-          scale: 1.0,
-          child: _buildSimpleStartStopButton(service),
-        ),
+                          duration: const Duration(milliseconds: 150),
+                          scale: 1.0,
+                          child: _buildSimpleStartStopButton(service),
+                        ),
                       ),
                     ),
                 ],
@@ -481,9 +510,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Material(
       elevation: 8,
       borderRadius: BorderRadius.circular(24),
-      shadowColor: service.isRunning 
-          ? const Color(0xFFEF4444).withValues(alpha: 0.3)
-          : const Color(0xFF10B981).withValues(alpha: 0.3),
+      shadowColor:
+          service.isRunning
+              ? const Color(0xFFEF4444).withValues(alpha: 0.3)
+              : const Color(0xFF10B981).withValues(alpha: 0.3),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
@@ -503,9 +533,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           boxShadow: [
             BoxShadow(
-              color: service.isRunning 
-                  ? const Color(0xFFEF4444).withValues(alpha: 0.2)
-                  : const Color(0xFF10B981).withValues(alpha: 0.2),
+              color:
+                  service.isRunning
+                      ? const Color(0xFFEF4444).withValues(alpha: 0.2)
+                      : const Color(0xFF10B981).withValues(alpha: 0.2),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -517,7 +548,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: InkWell(
             borderRadius: BorderRadius.circular(24),
             onTapDown: (_) {}, // Handled by AnimatedScale
-            onTapCancel: () {}, // Handled by AnimatedScale  
+            onTapCancel: () {}, // Handled by AnimatedScale
             onTap: () {
               // Haptic feedback for better user experience
               HapticFeedback.mediumImpact();
@@ -527,11 +558,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 service.startReminders();
               }
             },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 18),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 18),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Icon(
                     service.isRunning
                         ? Icons.pause_rounded
@@ -559,5 +590,4 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
   }
-
 }
