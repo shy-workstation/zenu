@@ -734,9 +734,9 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
               children: [
                 Icon(_selectedIcon, color: _selectedColor, size: 24),
                 const SizedBox(width: 12),
-                const Text(
+                Text(
                   AppLocalizations.of(context)?.icon ?? 'Choose Icon',
-                  style: TextStyle(color: Colors.white70),
+                  style: const TextStyle(color: Colors.white70),
                 ),
                 const Spacer(),
                 const Icon(Icons.arrow_drop_down, color: Colors.white54),
@@ -780,9 +780,9 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
+                Text(
                   AppLocalizations.of(context)?.color ?? 'Choose Color',
-                  style: TextStyle(color: Colors.white70),
+                  style: const TextStyle(color: Colors.white70),
                 ),
                 const Spacer(),
                 const Icon(Icons.arrow_drop_down, color: Colors.white54),
@@ -1005,9 +1005,9 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
       builder:
           (context) => AlertDialog(
             backgroundColor: const Color(0xFF2A2A3E),
-            title: const Text(
+            title: Text(
               AppLocalizations.of(context)?.icon ?? 'Choose Icon',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
             content: SizedBox(
               width: double.maxFinite,
@@ -1065,9 +1065,9 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
       builder:
           (context) => AlertDialog(
             backgroundColor: const Color(0xFF2A2A3E),
-            title: const Text(
+            title: Text(
               AppLocalizations.of(context)?.color ?? 'Choose Color',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
             content: SizedBox(
               width: double.maxFinite,

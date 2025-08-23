@@ -660,8 +660,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         },
                         child:
                             service.isRunning
-                                ? _buildPauseIcon()
-                                : _buildPlayIcon(),
+                                ? _buildRunningContent()
+                                : _buildStoppedContent(),
                       ),
                     ),
                   ), // Close Container
@@ -674,24 +674,51 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildPlayIcon() {
-    return CustomPaint(
-      key: const ValueKey('play'),
-      size: const Size(30, 30), // Reduced from 50x50 to 30x30
-      painter: _PlayIconPainter(),
+  Widget _buildStoppedContent() {
+    return Column(
+      key: const ValueKey('stopped'),
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.play_arrow_rounded,
+          color: Colors.white,
+          size: 32,
+        ),
+        SizedBox(height: 4),
+        Text(
+          'START',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildPauseIcon() {
-    return SizedBox(
-      key: const ValueKey('pause'),
-      width: 30, // Reduced from 50 to 30
-      height: 30, // Reduced from 50 to 30
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 8, // Reduced from 12 to 8
+  Widget _buildRunningContent() {
+    return Column(
+      key: const ValueKey('running'),
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.pause_rounded,
+          color: Colors.white,
+          size: 32,
+        ),
+        SizedBox(height: 4),
+        Text(
+          'PAUSE',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
+        ),
+      ],
             height: 24, // Reduced from 40 to 24
             decoration: BoxDecoration(
               color: Colors.white,

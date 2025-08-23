@@ -76,8 +76,13 @@ class NotificationService {
         _reminderService!.saveData();
       }
     } else if (actionId.startsWith('open_')) {
-      // User chose to open app - this will bring the app to foreground
-      // The in-app notification will handle the interaction
+      // User chose to open app - trigger the in-app notification dialog
+      final reminders = _reminderService!.reminders;
+      final reminderIndex = reminders.indexWhere((r) => r.id == reminderId);
+      if (reminderIndex != -1) {
+        final reminder = reminders[reminderIndex];
+        _reminderService!.triggerTestReminder(reminder);
+      }
     }
   }
 
@@ -111,12 +116,13 @@ class NotificationService {
           WindowsAction(
             content: _localizations?.skip ?? 'Skip',
             arguments: 'skip_${reminder.id}',
-            activationType: WindowsActivationType.background,
+            activationType: WindowsActivationType.protocol,
           ),
           WindowsAction(
             content: 'Open App',
             arguments: 'open_${reminder.id}',
             activationType: WindowsActivationType.foreground,
+            afterActivationBehavior: WindowsAfterActivationBehavior.pendingUpdate,
           ),
         ],
       ),

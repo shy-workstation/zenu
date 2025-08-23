@@ -53,17 +53,45 @@ class ReminderService extends ChangeNotifier {
       _statistics.resetDailyStats();
       _statistics.resetWeeklyStats();
 
-      // Update reminders with saved data
+      // Update reminders with saved data and migrate water reminders
       for (var savedReminder in savedReminders) {
         final index = _reminders.indexWhere((r) => r.id == savedReminder['id']);
         if (index != -1) {
           _reminders[index] = Reminder.fromJson(savedReminder);
         } else {
           // This is a new reminder that was saved but not in our default list
-          _reminders.add(Reminder.fromJson(savedReminder));
+          final reminder = Reminder.fromJson(savedReminder);
+          
+          // Migrate old water reminders to new 0-1000 ml range
+          if (reminder.type == ReminderType.water && 
+              reminder.maxQuantity == 10 && 
+              reminder.unit == 'glasses') {
+            final migratedReminder = Reminder(
+              id: reminder.id,
+              type: reminder.type,
+              title: reminder.title,
+              description: reminder.description,
+              interval: reminder.interval,
+              icon: reminder.icon,
+              color: reminder.color,
+              isEnabled: reminder.isEnabled,
+              nextReminder: reminder.nextReminder,
+              exerciseCount: reminder.exerciseCount,
+              totalCompleted: reminder.totalCompleted,
+              minQuantity: 0,
+              maxQuantity: 1000,
+              stepSize: 25,
+              unit: 'ml',
+            );
+            _reminders.add(migratedReminder);
+          } else {
+            _reminders.add(reminder);
+          }
         }
       }
 
+      // Save migrated data
+      await saveData();
       notifyListeners();
     } catch (e) {
       // Error loading data, continue with defaults
