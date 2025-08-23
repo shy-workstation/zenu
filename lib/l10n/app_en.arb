@@ -643,5 +643,13 @@
   "addHealthReminder": "Add health reminder",
   "@addHealthReminder": {
     "description": "Add reminder button tooltip"
+  },
+  "start": "START",
+  "@start": {
+    "description": "Start button text"
+  },
+  "pause": "PAUSE",
+  "@pause": {
+    "description": "Pause button text"
   }
 }

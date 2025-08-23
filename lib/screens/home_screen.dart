@@ -28,47 +28,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String? _lastAnnouncedReminder;
   final FocusNode _mainFocusNode = FocusNode();
 
-  // Animation controllers for the interactive button
-  late AnimationController _pulseController;
-  late AnimationController _glowController;
-  late AnimationController _energyController;
-  late Animation<double> _pulseAnimation;
-  late Animation<double> _glowAnimation;
-  late Animation<double> _energyAnimation;
 
   @override
   void initState() {
     super.initState();
     _startClockTimer();
 
-    // Initialize animation controllers
-    _pulseController = AnimationController(
-      duration: const Duration(seconds: 3), // Slower, smoother pulse
-      vsync: this,
-    );
-    _glowController = AnimationController(
-      duration: const Duration(milliseconds: 2000), // Smoother glow
-      vsync: this,
-    );
-    _energyController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.05, // Reduced intensity for subtlety
-    ).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-
-    _glowAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
-    );
-
-    _energyAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _energyController, curve: Curves.easeOutCirc),
-    );
 
     // Announce when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -83,9 +48,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void dispose() {
     _clockTimer?.cancel();
     _mainFocusNode.dispose();
-    _pulseController.dispose();
-    _glowController.dispose();
-    _energyController.dispose();
     super.dispose();
   }
 
@@ -281,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             child: Container(
                               margin: const EdgeInsets.fromLTRB(24, 40, 24, 40),
                               child: Center(
-                                child: _buildMorphBlobButton(service),
+                                child: _buildSimpleStartStopButton(service),
                               ),
                             ),
                           ),
@@ -503,262 +465,70 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // Could show a bottom sheet with reminder templates
   }
 
-  Widget _buildMorphBlobButton(ReminderService service) {
-    // Control animations based on service state
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (service.isRunning) {
-        _pulseController.repeat(reverse: true);
-        _glowController.repeat(reverse: true);
-        _energyController.repeat();
-      } else {
-        _pulseController.stop();
-        _glowController.stop();
-        _energyController.stop();
-        _pulseController.reset();
-        _glowController.reset();
-        _energyController.reset();
-      }
-    });
-
+  Widget _buildSimpleStartStopButton(ReminderService service) {
     return Center(
-      child: AnimatedBuilder(
-        animation: Listenable.merge([
-          _pulseAnimation,
-          _glowAnimation,
-          _energyAnimation,
-        ]),
-        builder: (context, child) {
-          return GestureDetector(
+      child: Material(
+        elevation: 4,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: service.isRunning
+                  ? [
+                      const Color(0xFFEF4444), // Red gradient for stop
+                      const Color(0xFFDC2626),
+                    ]
+                  : [
+                      const Color(0xFF10B981), // Green gradient for start
+                      const Color(0xFF059669),
+                    ],
+            ),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
             onTap: () {
-              // Toggle the service
               if (service.isRunning) {
                 service.stopReminders();
               } else {
                 service.startReminders();
               }
             },
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Energy glow effect from bottom
-                if (service.isRunning)
-                  AnimatedBuilder(
-                    animation: _energyAnimation,
-                    builder: (context, child) {
-                      return Positioned(
-                        bottom: 0,
-                        child: Container(
-                          width: 120 + (30 * _energyAnimation.value),
-                          height: 60 + (20 * _energyAnimation.value),
-                          decoration: BoxDecoration(
-                            gradient: RadialGradient(
-                              colors: [
-                                const Color(0xFFFFE140).withValues(
-                                  alpha: 0.4 * (1 - _energyAnimation.value),
-                                ),
-                                const Color(0xFFFA709A).withValues(
-                                  alpha: 0.2 * (1 - _energyAnimation.value),
-                                ),
-                                Colors.transparent,
-                              ],
-                              stops: [0.0, 0.3, 1.0],
-                            ),
-                            borderRadius: BorderRadius.circular(60),
-                          ),
-                        ),
-                      );
-                    },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    service.isRunning
+                        ? Icons.pause_rounded
+                        : Icons.play_arrow_rounded,
+                    color: Colors.white,
+                    size: 28,
                   ),
-                // Main morph blob button
-                Transform.scale(
-                  scale:
-                      service.isRunning
-                          ? (0.98 + 0.02 * _pulseAnimation.value)
-                          : 1.0,
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors:
-                            service.isRunning
-                                ? [
-                                  Color.lerp(
-                                    const Color(0xFFFA709A),
-                                    const Color(0xFFFEE140),
-                                    _glowAnimation.value * 0.3,
-                                  )!,
-                                  Color.lerp(
-                                    const Color(0xFFFEE140),
-                                    const Color(0xFFFA709A),
-                                    _glowAnimation.value * 0.3,
-                                  )!,
-                                ]
-                                : [
-                                  const Color(0xFF00F2FE),
-                                  const Color(0xFF4FACFE),
-                                ],
-                      ),
-                      borderRadius:
-                          service.isRunning
-                              ? BorderRadius.only(
-                                topLeft: Radius.circular(
-                                  45 + 5 * _pulseAnimation.value,
-                                ),
-                                topRight: Radius.circular(
-                                  30 + 10 * _pulseAnimation.value,
-                                ),
-                                bottomLeft: Radius.circular(
-                                  20 + 15 * _pulseAnimation.value,
-                                ),
-                                bottomRight: Radius.circular(
-                                  55 + 3 * _pulseAnimation.value,
-                                ),
-                              )
-                              : BorderRadius.circular(
-                                60,
-                              ), // Perfect circle when stopped
-                      boxShadow: [
-                        BoxShadow(
-                          color:
-                              service.isRunning
-                                  ? const Color(0xFFFA709A).withValues(
-                                    alpha: 0.2 + 0.15 * _glowAnimation.value,
-                                  )
-                                  : const Color(
-                                    0xFF4FACFE,
-                                  ).withValues(alpha: 0.25),
-                          blurRadius:
-                              service.isRunning
-                                  ? 12 + 8 * _glowAnimation.value
-                                  : 12,
-                          spreadRadius:
-                              service.isRunning
-                                  ? 0.5 + 0.8 * _glowAnimation.value
-                                  : 0.5,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                  const SizedBox(width: 12),
+                  Text(
+                    service.isRunning 
+                        ? AppLocalizations.of(context)?.pause ?? 'PAUSE'
+                        : AppLocalizations.of(context)?.start ?? 'START',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
                     ),
-                    child: Center(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(
-                          milliseconds: 600,
-                        ), // Even smoother transition
-                        transitionBuilder: (child, animation) {
-                          return ScaleTransition(
-                            scale: animation.drive(
-                              Tween(
-                                begin: 0.7,
-                                end: 1.0,
-                              ).chain(CurveTween(curve: Curves.easeOutBack)),
-                            ),
-                            child: child,
-                          );
-                        },
-                        child:
-                            service.isRunning
-                                ? _buildRunningContent()
-                                : _buildStoppedContent(),
-                      ),
-                    ),
-                  ), // Close Container
-                ), // Close Transform.scale
-              ], // Close Stack children
-            ), // Close Stack
-          );
-        },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildStoppedContent() {
-    return Column(
-      key: const ValueKey('stopped'),
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.play_arrow_rounded,
-          color: Colors.white,
-          size: 32,
-        ),
-        SizedBox(height: 4),
-        Text(
-          'START',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRunningContent() {
-    return Column(
-      key: const ValueKey('running'),
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.pause_rounded,
-          color: Colors.white,
-          size: 32,
-        ),
-        SizedBox(height: 4),
-        Text(
-          'PAUSE',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
-      ],
-            height: 24, // Reduced from 40 to 24
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(width: 6), // Reduced from 8 to 6
-          Container(
-            width: 8, // Reduced from 12 to 8
-            height: 24, // Reduced from 40 to 24
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-// Custom painter for the play triangle
-class _PlayIconPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = Colors.white
-          ..style = PaintingStyle.fill;
 
-    final path =
-        Path()
-          ..moveTo(size.width * 0.25, size.height * 0.2)
-          ..lineTo(size.width * 0.75, size.height * 0.5)
-          ..lineTo(size.width * 0.25, size.height * 0.8)
-          ..close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
-}

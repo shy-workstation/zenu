@@ -76,12 +76,15 @@ class NotificationService {
         _reminderService!.saveData();
       }
     } else if (actionId.startsWith('open_')) {
-      // User chose to open app - trigger the in-app notification dialog
+      // User chose to open app - this action brings the app to foreground
+      // The WindowsActivationType.foreground automatically handles opening the app
+      // We just need to reset the reminder time so it doesn't trigger again immediately
       final reminders = _reminderService!.reminders;
       final reminderIndex = reminders.indexWhere((r) => r.id == reminderId);
       if (reminderIndex != -1) {
         final reminder = reminders[reminderIndex];
-        _reminderService!.triggerTestReminder(reminder);
+        reminder.resetNextReminder();
+        _reminderService!.saveData();
       }
     }
   }
@@ -122,7 +125,6 @@ class NotificationService {
             content: 'Open App',
             arguments: 'open_${reminder.id}',
             activationType: WindowsActivationType.foreground,
-            afterActivationBehavior: WindowsAfterActivationBehavior.pendingUpdate,
           ),
         ],
       ),

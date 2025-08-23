@@ -147,5 +147,7 @@
   "nextIn": "Nächste in",
   "reminderListAccessibility": "Erinnerungsliste mit {count} Erinnerungen",
   "settings": "Einstellungen",
-  "addHealthReminder": "Gesundheitserinnerung hinzufügen"
+  "addHealthReminder": "Gesundheitserinnerung hinzufügen",
+  "start": "STARTEN",
+  "pause": "PAUSIEREN"
 }
