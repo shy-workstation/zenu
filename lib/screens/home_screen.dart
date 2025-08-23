@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import '../utils/state_management.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -388,7 +389,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       left: 0,
                       right: 0,
                       child: Center(
-                        child: _buildSimpleStartStopButton(service),
+                        child: AnimatedScale(
+          duration: const Duration(milliseconds: 150),
+          scale: 1.0,
+          child: _buildSimpleStartStopButton(service),
+        ),
                       ),
                     ),
                 ],
@@ -540,15 +545,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ],
         ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(24),
-          onTap: () {
-            if (service.isRunning) {
-              service.stopReminders();
-            } else {
-              service.startReminders();
-            }
-          },
+        child: AnimatedScale(
+          duration: const Duration(milliseconds: 150),
+          scale: 1.0,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(24),
+            onTapDown: (_) {}, // Handled by AnimatedScale
+            onTapCancel: () {}, // Handled by AnimatedScale  
+            onTap: () {
+              // Haptic feedback for better user experience
+              HapticFeedback.mediumImpact();
+              if (service.isRunning) {
+                service.stopReminders();
+              } else {
+                service.startReminders();
+              }
+            },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 18),
             child: Row(
@@ -577,7 +589,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
         ),
-      ),
+        ),
     );
   }
 

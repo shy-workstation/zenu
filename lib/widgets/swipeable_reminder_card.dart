@@ -4,6 +4,7 @@ import '../models/reminder.dart';
 import '../services/reminder_service.dart';
 import '../services/theme_service.dart';
 import '../utils/accessibility_utils.dart';
+import '../utils/duration_formatter.dart';
 import 'pulsing_dot.dart';
 
 class SwipeableReminderCard extends StatelessWidget {
