@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:io';
 import '../models/reminder.dart';
 import '../l10n/app_localizations.dart';
 import 'reminder_service.dart';
@@ -59,7 +60,7 @@ class NotificationService {
     _handleNotificationAction(response.actionId, response.payload);
   }
 
-  static void _handleNotificationAction(String? actionId, String? payload) {
+  static void _handleNotificationAction(String? actionId, String? payload) async {
     // Debug logging
     print('Notification action received - ActionId: $actionId, Payload: $payload');
     
@@ -126,13 +127,77 @@ class NotificationService {
       // User chose to open app - reset reminder time 
       reminder.resetNextReminder();
       _reminderService!.saveData();
-      // WindowsActivationType.foreground should bring the app to foreground automatically
-      print('App should be brought to foreground by Windows activation');
+      // Try to bring the app to foreground using multiple methods
+      await _forceAppToForeground();
       // For "Open App", also show the in-app reminder dialog
       _reminderService!.triggerTestReminder(reminder);
     }
 
     print('Action completed successfully');
+  }
+
+  static Future<void> _forceAppToForeground() async {
+    if (!Platform.isWindows) return;
+    
+    try {
+      print('🔄 Attempting to bring app to foreground using PowerShell...');
+      
+      // Get the current process name (should be the Flutter app)
+      final processName = Platform.resolvedExecutable.split(Platform.pathSeparator).last;
+      final appName = processName.replaceAll('.exe', '');
+      
+      print('📱 App name: $appName');
+      
+      // PowerShell command to bring the window to foreground
+      final powershellCommand = '''
+Add-Type -TypeDefinition '
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+public class WindowHelper {
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+    
+    [DllImport("user32.dll")]
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    
+    [DllImport("user32.dll")]
+    public static extern bool IsIconic(IntPtr hWnd);
+    
+    public const int SW_RESTORE = 9;
+    public const int SW_SHOW = 5;
+    
+    public static void BringToForeground(string processName) {
+        Process[] processes = Process.GetProcessesByName(processName);
+        if (processes.Length > 0) {
+            IntPtr hWnd = processes[0].MainWindowHandle;
+            if (IsIconic(hWnd)) {
+                ShowWindow(hWnd, SW_RESTORE);
+            }
+            SetForegroundWindow(hWnd);
+        }
+    }
+}
+';
+[WindowHelper]::BringToForeground('$appName')
+''';
+
+      // Execute the PowerShell command
+      final result = await Process.run(
+        'powershell.exe',
+        ['-Command', powershellCommand],
+        runInShell: true,
+      );
+
+      if (result.exitCode == 0) {
+        print('✅ PowerShell command executed successfully');
+      } else {
+        print('❌ PowerShell command failed: ${result.stderr}');
+      }
+      
+    } catch (e) {
+      print('❌ Error forcing app to foreground: $e');
+    }
   }
 
 
@@ -172,12 +237,8 @@ class NotificationService {
             content: 'Open App',
             arguments: 'open_${reminder.id}',
             activationType: WindowsActivationType.foreground,
-            afterActivationBehavior: WindowsAfterActivationBehavior.pendingUpdate,
           ),
         ],
-        // Set the main notification click to also activate foreground
-        arguments: 'open_${reminder.id}',
-        activationType: WindowsActivationType.foreground,
       ),
     );
 
