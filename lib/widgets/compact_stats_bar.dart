@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/reminder_service.dart';
 import '../services/theme_service.dart';
+import '../utils/duration_formatter.dart';
 
 class CompactStatsBar extends StatelessWidget {
   final ReminderService reminderService;
@@ -96,11 +97,7 @@ class CompactStatsBar extends StatelessWidget {
 
     final timeRemaining = nextReminder.nextReminder!.difference(DateTime.now());
 
-    if (timeRemaining.inMinutes > 0) {
-      return '${timeRemaining.inMinutes}m';
-    } else {
-      return '${timeRemaining.inSeconds}s';
-    }
+    return DurationFormatter.formatDurationCompact(timeRemaining);
   }
 }
 

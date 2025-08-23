@@ -308,32 +308,67 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   // Responsive Grid Layout
                                   LayoutBuilder(
                                     builder: (context, constraints) {
-                                      // Calculate number of columns based on available width
+                                      // Strict 12-column responsive grid system
                                       int columns = 1;
-                                      if (constraints.maxWidth > 800) {
+                                      double maxWidth = constraints.maxWidth;
+                                      
+                                      // Desktop: 3 columns (1280px+)
+                                      if (maxWidth >= 1200) {
                                         columns = 3;
-                                      } else if (constraints.maxWidth > 600) {
+                                      }
+                                      // Tablet: 2 columns (768px - 1199px) 
+                                      else if (maxWidth >= 768) {
                                         columns = 2;
                                       }
+                                      // Mobile: 1 column (< 768px)
+                                      else {
+                                        columns = 1;
+                                      }
 
-                                      return Wrap(
-                                        spacing: 12,
-                                        runSpacing: 16,
-                                        children:
-                                            service.reminders.map((reminder) {
-                                              return SizedBox(
-                                                width:
-                                                    (constraints.maxWidth -
-                                                        (columns - 1) * 12) /
-                                                    columns,
+                                      const double spacing = 16.0;
+                                      final double itemWidth = (maxWidth - (columns - 1) * spacing) / columns;
+
+                                      // Create rows with equal-height cards
+                                      final List<Widget> rows = [];
+                                      final List<Reminder> reminders = service.reminders;
+                                      
+                                      for (int i = 0; i < reminders.length; i += columns) {
+                                        final rowItems = <Widget>[];
+                                        
+                                        for (int j = 0; j < columns; j++) {
+                                          if (i + j < reminders.length) {
+                                            rowItems.add(
+                                              SizedBox(
+                                                width: itemWidth,
                                                 child: SwipeableReminderCard(
-                                                  reminder: reminder,
+                                                  reminder: reminders[i + j],
                                                   reminderService: service,
                                                   themeService: themeService,
                                                   currentTime: _currentTime,
                                                 ),
-                                              );
-                                            }).toList(),
+                                              ),
+                                            );
+                                          } else {
+                                            // Empty placeholder for consistent grid
+                                            rowItems.add(SizedBox(width: itemWidth));
+                                          }
+                                        }
+                                        
+                                        rows.add(
+                                          Padding(
+                                            padding: EdgeInsets.only(bottom: i + columns < reminders.length ? 16 : 0),
+                                            child: Row(
+                                              children: rowItems
+                                                  .expand((widget) => [widget, if (widget != rowItems.last) const SizedBox(width: spacing)])
+                                                  .toList(),
+                                            ),
+                                          ),
+                                        );
+                                      }
+
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: rows,
                                       );
                                     },
                                   ),
