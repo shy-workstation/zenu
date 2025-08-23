@@ -15,11 +15,11 @@
   "@systemPaused": {
     "description": "Status when system is paused"
   },
-  "pauseSystem": "Pause System",
+  "pauseSystem": "Pause Reminders",
   "@pauseSystem": {
     "description": "Button to pause reminder system"
   },
-  "startSystem": "Start System",
+  "startSystem": "Start Reminders",
   "@startSystem": {
     "description": "Button to start reminder system"
   },

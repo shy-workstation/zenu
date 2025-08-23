@@ -282,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Active Reminders',
+                                              'Aktive Erinnerungen',
                                               style: TextStyle(
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w700,
@@ -516,9 +516,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 18),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
                   Icon(
                     service.isRunning
                         ? Icons.pause_rounded
@@ -539,11 +539,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
                 ],
-              ),
             ),
           ),
         ),
       ),
     );
   }
+
 }

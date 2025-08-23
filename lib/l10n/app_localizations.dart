@@ -308,6 +308,12 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get delete;
 
+  /// No description provided for @duplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate'**
+  String get duplicate;
+
   /// Edit button text
   ///
   /// In en, this message translates to:
@@ -895,6 +901,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add health reminder'**
   String get addHealthReminder;
+
+  /// Start button text
+  ///
+  /// In en, this message translates to:
+  /// **'START'**
+  String get start;
+
+  /// Pause button text
+  ///
+  /// In en, this message translates to:
+  /// **'PAUSE'**
+  String get pause;
 }
 
 class _AppLocalizationsDelegate

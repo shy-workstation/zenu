@@ -124,22 +124,27 @@ class SwipeableReminderCard extends StatelessWidget {
     bool isRunning,
     Duration? timeRemaining,
   ) {
-    return AnimatedContainer(
+    return AnimatedOpacity(
       duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: themeService.cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color:
-              isRunning
-                  ? reminder.color.withValues(alpha: 0.6)
-                  : reminder.isEnabled
-                  ? reminder.color.withValues(alpha: 0.2)
-                  : themeService.borderColor,
-          width: isRunning ? 2.5 : 2,
-        ),
+      opacity: reminder.isEnabled ? 1.0 : 0.6,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: reminder.isEnabled 
+              ? themeService.cardColor 
+              : themeService.cardColor.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color:
+                isRunning
+                    ? reminder.color.withValues(alpha: 0.6)
+                    : reminder.isEnabled
+                    ? reminder.color.withValues(alpha: 0.2)
+                    : themeService.borderColor.withValues(alpha: 0.5),
+            width: isRunning ? 2.5 : 2,
+          ),
         gradient:
             isRunning && reminder.isEnabled
                 ? LinearGradient(
@@ -202,32 +207,49 @@ class SwipeableReminderCard extends StatelessWidget {
                   ),
                   const Spacer(),
 
-                  // Enhanced toggle with better touch target
-                  Container(
-                    padding: const EdgeInsets.all(4), // Increases touch target
-                    child: Switch(
-                      value: reminder.isEnabled,
-                      onChanged: (value) {
+                  // Enhanced toggle with text and clear states
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
                         HapticFeedback.lightImpact();
                         reminderService.toggleReminder(reminder.id);
                       },
-                      thumbColor: WidgetStateProperty.resolveWith<Color>((
-                        states,
-                      ) {
-                        if (states.contains(WidgetState.selected)) {
-                          return reminder.color;
-                        }
-                        return Colors.grey;
-                      }),
-                      trackColor: WidgetStateProperty.resolveWith<Color>((
-                        states,
-                      ) {
-                        if (states.contains(WidgetState.selected)) {
-                          return reminder.color.withValues(alpha: 0.5);
-                        }
-                        return Colors.grey.withValues(alpha: 0.3);
-                      }),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          color: reminder.isEnabled 
+                              ? reminder.color.withValues(alpha: 0.15)
+                              : Colors.grey.withValues(alpha: 0.1),
+                          border: Border.all(
+                            color: reminder.isEnabled 
+                                ? reminder.color.withValues(alpha: 0.3)
+                                : Colors.grey.withValues(alpha: 0.3),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              reminder.isEnabled ? Icons.check_circle : Icons.pause_circle_outline,
+                              size: 16,
+                              color: reminder.isEnabled ? reminder.color : Colors.grey,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              reminder.isEnabled ? 'Ein' : 'Aus',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: reminder.isEnabled ? reminder.color : Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],

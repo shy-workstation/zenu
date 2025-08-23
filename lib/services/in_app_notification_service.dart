@@ -128,9 +128,10 @@ class _ReminderDialogState extends State<ReminderDialog>
             color: Colors.transparent,
             child: Padding(
               padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                   // Animated icon
                   AnimatedBuilder(
                     animation: _pulseAnimation,
@@ -249,6 +250,7 @@ class _ReminderDialogState extends State<ReminderDialog>
                   ),
                 ],
               ),
+            ),
             ),
           ),
         ),

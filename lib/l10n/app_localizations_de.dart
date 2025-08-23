@@ -118,6 +118,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get delete => 'Löschen';
 
   @override
+  String get duplicate => 'Duplizieren';
+
+  @override
   String get edit => 'Bearbeiten';
 
   @override
@@ -461,4 +464,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get addHealthReminder => 'Gesundheitserinnerung hinzufügen';
+
+  @override
+  String get start => 'STARTEN';
+
+  @override
+  String get pause => 'PAUSIEREN';
 }

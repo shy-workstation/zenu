@@ -24,36 +24,36 @@ class CompactStatsBar extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         children: [
           _CompactStatCard(
-            icon: Icons.today,
-            value: _getTodayCompletions().toString(),
-            label: 'Today',
-            color: const Color(0xFF10B981),
+            icon: Icons.timer,
+            value: _getNextReminderTime(),
+            label: 'Nächste in',
+            color: const Color(0xFF8B5CF6),
             themeService: themeService,
+            isTime: true,
           ),
           const SizedBox(width: 12),
           _CompactStatCard(
-            icon: Icons.local_fire_department,
-            value: _getStreak().toString(),
-            label: 'Streak',
-            color: const Color(0xFFF97316),
+            icon: Icons.today,
+            value: _getTodayCompletions().toString(),
+            label: 'Heute',
+            color: const Color(0xFF10B981),
             themeService: themeService,
           ),
           const SizedBox(width: 12),
           _CompactStatCard(
             icon: Icons.notifications_active,
             value: _getActiveCount().toString(),
-            label: 'Active',
+            label: 'Aktiv',
             color: const Color(0xFF3B82F6),
             themeService: themeService,
           ),
           const SizedBox(width: 12),
           _CompactStatCard(
-            icon: Icons.timer,
-            value: _getNextReminderTime(),
-            label: 'Next in',
-            color: const Color(0xFF8B5CF6),
+            icon: Icons.local_fire_department,
+            value: _getStreak().toString(),
+            label: 'Serie',
+            color: const Color(0xFFF97316),
             themeService: themeService,
-            isTime: true,
           ),
         ],
       ),
@@ -79,14 +79,14 @@ class CompactStatsBar extends StatelessWidget {
   }
 
   String _getNextReminderTime() {
-    if (!reminderService.isRunning) return '--';
+    if (!reminderService.isRunning) return 'Pausiert';
 
     final enabledReminders =
         reminderService.reminders
             .where((r) => r.isEnabled && r.nextReminder != null)
             .toList();
 
-    if (enabledReminders.isEmpty) return '--';
+    if (enabledReminders.isEmpty) return 'Keine';
 
     final nextReminder = enabledReminders.reduce((a, b) {
       final aDiff = a.nextReminder!.difference(DateTime.now());

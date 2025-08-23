@@ -175,11 +175,10 @@ class NotificationService {
     if (!Platform.isWindows) return;
     
     try {
-      // Use the professional window_manager method to flash taskbar
-      // This is exactly what Discord, Slack, VS Code, etc. use
+      // Bring window to attention without flashing (flash method not available)
       if (!await windowManager.isFocused()) {
-        // Only flash if window is not focused (user is not currently using the app)
-        await windowManager.flash();
+        // Show and focus window to get user attention
+        await windowManager.show();
       }
     } catch (e) {
       // Silent fallback failure

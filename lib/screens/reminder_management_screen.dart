@@ -478,15 +478,21 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                     _buildTextField(
                       controller: _titleController,
                       label: AppLocalizations.of(context)?.title ?? 'Title',
-                      hint: AppLocalizations.of(context)?.title ?? 'Enter reminder title',
+                      hint:
+                          AppLocalizations.of(context)?.title ??
+                          'Enter reminder title',
                     ),
                     const SizedBox(height: 16),
 
                     // Description
                     _buildTextField(
                       controller: _descriptionController,
-                      label: AppLocalizations.of(context)?.description ?? 'Description',
-                      hint: AppLocalizations.of(context)?.description ?? 'Enter reminder description',
+                      label:
+                          AppLocalizations.of(context)?.description ??
+                          'Description',
+                      hint:
+                          AppLocalizations.of(context)?.description ??
+                          'Enter reminder description',
                       maxLines: 2,
                     ),
                     const SizedBox(height: 16),
