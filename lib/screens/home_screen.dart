@@ -4,6 +4,7 @@ import 'dart:async';
 import '../utils/state_management.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../l10n/app_localizations.dart';
+import '../models/reminder.dart';
 import '../services/reminder_service.dart';
 import '../services/theme_service.dart';
 import '../widgets/empty_state.dart';
@@ -258,52 +259,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // Section Header
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: const Color(
-                                            0xFF10B981,
-                                          ).withValues(alpha: 0.15),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        child: const Icon(
-                                          Icons.notifications_active_rounded,
-                                          color: Color(0xFF10B981),
-                                          size: 20,
-                                        ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 4),
+                                    child: Text(
+                                      '${service.reminders.length} ${service.reminders.length == 1 ? 'Erinnerung' : 'Erinnerungen'} konfiguriert',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                        color: themeService.textPrimary,
+                                        letterSpacing: -0.5,
                                       ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Aktive Erinnerungen',
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w700,
-                                                color: themeService.textPrimary,
-                                                letterSpacing: -0.5,
-                                              ),
-                                            ),
-                                            Text(
-                                              '${service.reminders.length} reminder${service.reminders.length == 1 ? '' : 's'} configured',
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w500,
-                                                color:
-                                                    themeService.textSecondary,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                   const SizedBox(height: 24),
                                   // Responsive Grid Layout
@@ -586,10 +552,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
                 ],
+              ),
             ),
           ),
         ),
-        ),
+      ),
     );
   }
 
