@@ -88,7 +88,7 @@ class _SimpleHomeScreenState extends State<SimpleHomeScreen> {
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Manual testing confirmed - App is working!'),
+                    content: Text(AppLocalizations.of(context)?.manualTestingConfirmedAppWorking ?? 'Manual testing confirmed - App is working!'),
                     backgroundColor: Colors.green,
                   ),
                 );

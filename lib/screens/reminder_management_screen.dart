@@ -234,7 +234,7 @@ class ReminderManagementScreen extends StatelessWidget {
                           Icon(Icons.copy, color: Colors.white70),
                           SizedBox(width: 12),
                           Text(
-                            'Duplicate',
+                            AppLocalizations.of(context)?.duplicate ?? 'Duplicate',
                             style: TextStyle(color: Colors.white),
                           ),
                         ],

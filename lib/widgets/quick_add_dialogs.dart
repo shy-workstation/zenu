@@ -105,7 +105,7 @@ class QuickAddDialogs {
       title: '👁️ ${localizations?.restYourEyes ?? 'Rest Your Eyes'}',
       description:
           localizations?.lookAwayFromScreen ??
-          'Look away from screen - 20/20/20 rule',
+          'Look away from screen and blink',
       interval: const Duration(minutes: 20),
       icon: Icons.remove_red_eye,
       color: const Color(0xFF3B82F6),

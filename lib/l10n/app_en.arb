@@ -140,6 +140,7 @@
     "description": "Reset button"
   },
   "delete": "Delete",
+  "duplicate": "Duplicate",
   "@delete": {
     "description": "Delete button"
   },

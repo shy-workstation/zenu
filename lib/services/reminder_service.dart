@@ -128,11 +128,14 @@ class ReminderService extends ChangeNotifier {
   }
 
   void _triggerReminder(Reminder reminder) {
-    // Pause the timer while waiting for user interaction
-    _pauseTimer();
-
-    // Try in-app notification first, fallback to system notification
+    // Always show system notification first (works even when app is minimized)
+    _notificationService.showReminderNotification(reminder);
+    
+    // Also show in-app notification if available (when app is open)
     if (_inAppNotificationService != null) {
+      // Pause the timer while waiting for user interaction
+      _pauseTimer();
+      
       _inAppNotificationService!.showReminderDialog(reminder, (quantity) {
         if (quantity > 0) {
           // User confirmed completion with specific quantity
@@ -146,8 +149,7 @@ class ReminderService extends ChangeNotifier {
         _resumeTimer();
       });
     } else {
-      // Fallback to system notification - no pause needed
-      _notificationService.showReminderNotification(reminder);
+      // No in-app notification service available, just reset reminder time
       reminder.resetNextReminder();
       notifyListeners();
     }

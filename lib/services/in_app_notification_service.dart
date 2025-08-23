@@ -235,7 +235,7 @@ class _ReminderDialogState extends State<ReminderDialog>
                       Expanded(
                         flex: 2,
                         child: _buildActionButton(
-                          label: 'Done!',
+                          label: AppLocalizations.of(context)?.done ?? 'Done!',
                           icon: Icons.check_rounded,
                           isPrimary: true,
                           onTap:
