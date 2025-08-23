@@ -1,10 +1,12 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../models/reminder.dart';
 import '../l10n/app_localizations.dart';
+import 'reminder_service.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
   static NotificationService? _instance;
+  static ReminderService? _reminderService;
   AppLocalizations? _localizations;
 
   NotificationService._(this._flutterLocalNotificationsPlugin);
@@ -28,7 +30,11 @@ class NotificationService {
         ),
       );
 
-      await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+      await flutterLocalNotificationsPlugin.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse: _onNotificationResponse,
+        onDidReceiveBackgroundNotificationResponse: _onBackgroundNotificationResponse,
+      );
       _instance = NotificationService._(flutterLocalNotificationsPlugin);
     }
 
@@ -37,6 +43,41 @@ class NotificationService {
 
   void setLocalizations(AppLocalizations localizations) {
     _localizations = localizations;
+  }
+
+  void setReminderService(ReminderService reminderService) {
+    _reminderService = reminderService;
+  }
+
+  static void _onNotificationResponse(NotificationResponse response) {
+    _handleNotificationAction(response.actionId, response.payload);
+  }
+
+  @pragma('vm:entry-point')
+  static void _onBackgroundNotificationResponse(NotificationResponse response) {
+    _handleNotificationAction(response.actionId, response.payload);
+  }
+
+  static void _handleNotificationAction(String? actionId, String? payload) {
+    if (actionId == null || payload == null || _reminderService == null) return;
+    
+    // Extract reminder ID from payload (format: "reminder_reminderId")
+    if (!payload.startsWith('reminder_')) return;
+    final reminderId = payload.substring(9);
+    
+    if (actionId.startsWith('skip_')) {
+      // User chose to skip the reminder - just reset the next reminder time
+      final reminders = _reminderService!.reminders;
+      final reminderIndex = reminders.indexWhere((r) => r.id == reminderId);
+      if (reminderIndex != -1) {
+        final reminder = reminders[reminderIndex];
+        reminder.resetNextReminder();
+        _reminderService!.saveData();
+      }
+    } else if (actionId.startsWith('open_')) {
+      // User chose to open app - this will bring the app to foreground
+      // The in-app notification will handle the interaction
+    }
   }
 
   Future<void> showReminderNotification(Reminder reminder) async {
@@ -51,11 +92,37 @@ class NotificationService {
         priority: Priority.high,
         sound: RawResourceAndroidNotificationSound('notification'),
         enableVibration: true,
+        actions: [
+          AndroidNotificationAction(
+            'skip_${reminder.id}',
+            _localizations?.skip ?? 'Skip',
+          ),
+          AndroidNotificationAction(
+            'open_${reminder.id}',
+            'Open App',
+          ),
+        ],
       ),
       iOS: const DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
+      ),
+      windows: WindowsNotificationDetails(
+        actions: [
+          WindowsAction(
+            id: 'skip_${reminder.id}',
+            title: _localizations?.skip ?? 'Skip',
+            arguments: 'skip',
+            activationType: WindowsActivationType.background,
+          ),
+          WindowsAction(
+            id: 'open_${reminder.id}',
+            title: 'Open App',
+            arguments: 'open',
+            activationType: WindowsActivationType.foreground,
+          ),
+        ],
       ),
     );
 
@@ -64,6 +131,7 @@ class NotificationService {
       reminder.title,
       _getNotificationBody(reminder),
       notificationDetails,
+      payload: 'reminder_${reminder.id}',
     );
   }
 

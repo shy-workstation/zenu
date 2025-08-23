@@ -27,6 +27,7 @@ class ReminderService extends ChangeNotifier {
 
   void setLocalizations(AppLocalizations localizations) {
     _notificationService.setLocalizations(localizations);
+    _notificationService.setReminderService(this);
   }
 
   // Method to manually trigger a reminder for testing
