@@ -227,15 +227,15 @@ class ReminderManagementScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'duplicate',
                       child: Row(
                         children: [
-                          Icon(Icons.copy, color: Colors.white70),
-                          SizedBox(width: 12),
+                          const Icon(Icons.copy, color: Colors.white70),
+                          const SizedBox(width: 12),
                           Text(
                             AppLocalizations.of(context)?.duplicate ?? 'Duplicate',
-                            style: TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ],
                       ),
@@ -626,9 +626,9 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
             _intervalMinutes = template.defaultInterval.inMinutes;
 
             // Validate and ensure consistent quantity values
-            _minQuantity = template.minQuantity.clamp(1, 100).toInt();
+            _minQuantity = template.minQuantity.clamp(0, 1000).toInt();
             _maxQuantity =
-                template.maxQuantity.clamp(_minQuantity, 100).toInt();
+                template.maxQuantity.clamp(_minQuantity, 1000).toInt();
             _stepSize =
                 template.stepSize.clamp(1, _maxQuantity - _minQuantity).toInt();
             _unit = template.unit;
@@ -892,8 +892,8 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                   const Text('Min:', style: TextStyle(color: Colors.white70)),
                   Expanded(
                     child: Slider(
-                      value: _minQuantity.clamp(1, _maxQuantity - 1).toDouble(),
-                      min: 1,
+                      value: _minQuantity.clamp(0, _maxQuantity - 1).toDouble(),
+                      min: 0,
                       max: (_maxQuantity - 1).clamp(2, 999).toDouble(),
                       divisions: ((_maxQuantity - 2).clamp(1, 998)).toInt(),
                       label: _minQuantity.toString(),
@@ -901,7 +901,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                       onChanged: (value) {
                         setState(() {
                           _minQuantity = value.round().clamp(
-                            1,
+                            0,
                             _maxQuantity - 1,
                           );
                         });
@@ -926,7 +926,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                     child: Slider(
                       value:
                           _maxQuantity.clamp(_minQuantity + 1, 1000).toDouble(),
-                      min: (_minQuantity + 1).clamp(2, 999).toDouble(),
+                      min: (_minQuantity + 1).clamp(1, 999).toDouble(),
                       max: 1000,
                       divisions: (999 - _minQuantity).clamp(1, 998),
                       label: _maxQuantity.toString(),
