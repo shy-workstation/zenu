@@ -60,33 +60,77 @@ class NotificationService {
   }
 
   static void _handleNotificationAction(String? actionId, String? payload) {
-    if (actionId == null || payload == null || _reminderService == null) return;
+    // Debug logging
+    print('Notification action received - ActionId: $actionId, Payload: $payload');
+    
+    if (_reminderService == null) {
+      print('ERROR: ReminderService is null in notification handler');
+      return;
+    }
 
-    // Extract reminder ID from payload (format: "reminder_reminderId")
-    if (!payload.startsWith('reminder_')) return;
-    final reminderId = payload.substring(9);
+    // Handle different platforms and response formats
+    String? reminderId;
+    String? action;
 
-    if (actionId.startsWith('skip_')) {
-      // User chose to skip the reminder - just reset the next reminder time
-      final reminders = _reminderService!.reminders;
-      final reminderIndex = reminders.indexWhere((r) => r.id == reminderId);
-      if (reminderIndex != -1) {
-        final reminder = reminders[reminderIndex];
-        reminder.resetNextReminder();
-        _reminderService!.saveData();
-      }
-    } else if (actionId.startsWith('open_')) {
-      // User chose to open app - this action brings the app to foreground
-      // The WindowsActivationType.foreground automatically handles opening the app
-      // We just need to reset the reminder time so it doesn't trigger again immediately
-      final reminders = _reminderService!.reminders;
-      final reminderIndex = reminders.indexWhere((r) => r.id == reminderId);
-      if (reminderIndex != -1) {
-        final reminder = reminders[reminderIndex];
-        reminder.resetNextReminder();
-        _reminderService!.saveData();
+    // Try to extract action and reminderId from actionId (Android format)
+    if (actionId != null && actionId.contains('_')) {
+      final parts = actionId.split('_');
+      if (parts.length >= 2) {
+        action = parts[0];
+        reminderId = parts.sublist(1).join('_');
+        print('Extracted from actionId - Action: $action, ReminderId: $reminderId');
       }
     }
+
+    // If no actionId, check payload (notification tap without action)
+    if (action == null && payload != null) {
+      if (payload.startsWith('reminder_')) {
+        reminderId = payload.substring(9);
+        action = 'open'; // Default to open when notification is tapped
+        print('Extracted from payload - Action: $action, ReminderId: $reminderId');
+      } else if (payload.contains('_')) {
+        // Windows might put the action in the payload
+        final parts = payload.split('_');
+        if (parts.length >= 2) {
+          action = parts[0];
+          reminderId = parts.sublist(1).join('_');
+          print('Extracted from payload with action - Action: $action, ReminderId: $reminderId');
+        }
+      }
+    }
+
+    if (reminderId == null || action == null) {
+      print('ERROR: Could not extract reminder ID or action - ReminderId: $reminderId, Action: $action');
+      return;
+    }
+
+    print('Processing action: $action for reminder: $reminderId');
+
+    final reminders = _reminderService!.reminders;
+    final reminderIndex = reminders.indexWhere((r) => r.id == reminderId);
+    
+    if (reminderIndex == -1) {
+      print('ERROR: Reminder not found with ID: $reminderId');
+      return;
+    }
+
+    final reminder = reminders[reminderIndex];
+
+    if (action == 'skip') {
+      print('Skipping reminder: ${reminder.title}');
+      // User chose to skip the reminder - just reset the next reminder time
+      reminder.resetNextReminder();
+      _reminderService!.saveData();
+    } else if (action == 'open') {
+      print('Opening app for reminder: ${reminder.title}');
+      // User chose to open app - reset reminder time 
+      reminder.resetNextReminder();
+      _reminderService!.saveData();
+      // For "Open App", also show the in-app reminder dialog
+      _reminderService!.triggerTestReminder(reminder);
+    }
+
+    print('Action completed successfully');
   }
 
   Future<void> showReminderNotification(Reminder reminder) async {
@@ -119,12 +163,13 @@ class NotificationService {
           WindowsAction(
             content: _localizations?.skip ?? 'Skip',
             arguments: 'skip_${reminder.id}',
-            activationType: WindowsActivationType.protocol,
+            activationType: WindowsActivationType.background,
           ),
           WindowsAction(
             content: 'Open App',
             arguments: 'open_${reminder.id}',
             activationType: WindowsActivationType.foreground,
+            afterActivationBehavior: WindowsAfterActivationBehavior.pendingUpdate,
           ),
         ],
       ),
