@@ -240,18 +240,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       )
                       : CustomScrollView(
                         slivers: [
-                          // Statistics at the top
-                          SliverToBoxAdapter(
-                            child: Container(
-                              margin: const EdgeInsets.fromLTRB(24, 20, 24, 20),
-                              child: CompactStatsBar(
-                                reminderService: service,
-                                themeService: themeService,
-                              ),
-                            ),
+                          // Top spacing
+                          const SliverToBoxAdapter(
+                            child: SizedBox(height: 20),
                           ),
-
-                          // Reminders Grid with container box
+                          
+                          // Reminders Grid with container box (stats moved to bottom)
                           SliverPadding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
                             sliver: SliverToBoxAdapter(
@@ -384,18 +378,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       left: 0,
                       right: 0,
                       child: Container(
-                        height: 180,
+                        height: 140,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
                               themeService.backgroundColor.withValues(alpha: 0.0),
-                              themeService.backgroundColor.withValues(alpha: 0.5),
-                              themeService.backgroundColor.withValues(alpha: 0.8),
+                              themeService.backgroundColor.withValues(alpha: 0.0),
+                              themeService.backgroundColor.withValues(alpha: 0.7),
                               themeService.backgroundColor.withValues(alpha: 0.95),
                             ],
-                            stops: const [0.0, 0.3, 0.6, 1.0],
+                            stops: const [0.0, 0.4, 0.7, 1.0],
                           ),
                         ),
                         child: Column(
@@ -407,14 +401,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               scale: 1.0,
                               child: _buildSimpleStartStopButton(service),
                             ),
-                            const SizedBox(height: 40),
+                            const SizedBox(height: 20),
                           ],
                         ),
                       ),
                     ),
                 ],
               ),
-              floatingActionButton: SpeedDial(
+              floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+              floatingActionButton: Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Stats button on the left
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: FloatingActionButton(
+                        heroTag: "stats",
+                        backgroundColor: const Color(0xFF8B5CF6),
+                        onPressed: () {
+                          _showStatsBottomSheet(context, service, themeService);
+                        },
+                        child: const Icon(Icons.bar_chart_rounded, color: Colors.white),
+                      ),
+                    ),
+                    // Add reminder button on the right
+                    SpeedDial(
                 icon: Icons.add,
                 activeIcon: Icons.close,
                 backgroundColor: const Color(0xFF6366F1),
@@ -505,10 +518,50 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                 ],
               ),
+                  ],
+                ),
+              ),
             );
           },
         );
       },
+    );
+  }
+
+  void _showStatsBottomSheet(BuildContext context, ReminderService service, ThemeService themeService) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: 200,
+        decoration: BoxDecoration(
+          color: themeService.cardColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: themeService.borderColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: CompactStatsBar(
+                reminderService: service,
+                themeService: themeService,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
