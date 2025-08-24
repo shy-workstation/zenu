@@ -408,23 +408,55 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                 ],
               ),
-              floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
               floatingActionButton: Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.only(bottom: 10, left: 16, right: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Stats button on the left
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16),
-                      child: FloatingActionButton(
-                        heroTag: "stats",
-                        backgroundColor: const Color(0xFF8B5CF6),
-                        onPressed: () {
-                          _showStatsBottomSheet(context, service, themeService);
-                        },
-                        child: const Icon(Icons.bar_chart_rounded, color: Colors.white),
-                      ),
+                    // Stats button on the left with SpeedDial for consistency
+                    SpeedDial(
+                      icon: Icons.bar_chart_rounded,
+                      activeIcon: Icons.close,
+                      backgroundColor: const Color(0xFF8B5CF6),
+                      foregroundColor: Colors.white,
+                      activeForegroundColor: Colors.white,
+                      activeBackgroundColor: Colors.grey[600],
+                      buttonSize: const Size(56, 56),
+                      iconTheme: const IconThemeData(size: 24),
+                      overlayColor: Colors.black,
+                      overlayOpacity: 0.4,
+                      direction: SpeedDialDirection.up,
+                      children: [
+                        SpeedDialChild(
+                          child: const Icon(Icons.today, color: Colors.white),
+                          backgroundColor: const Color(0xFF10B981),
+                          label: 'Heute',
+                          labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+                          onTap: () => _showStatsDetail(context, service, themeService, 'today'),
+                        ),
+                        SpeedDialChild(
+                          child: const Icon(Icons.timer, color: Colors.white),
+                          backgroundColor: const Color(0xFF8B5CF6),
+                          label: 'Nächste',
+                          labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+                          onTap: () => _showStatsDetail(context, service, themeService, 'next'),
+                        ),
+                        SpeedDialChild(
+                          child: const Icon(Icons.notifications_active, color: Colors.white),
+                          backgroundColor: const Color(0xFF3B82F6),
+                          label: 'Aktiv',
+                          labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+                          onTap: () => _showStatsDetail(context, service, themeService, 'active'),
+                        ),
+                        SpeedDialChild(
+                          child: const Icon(Icons.local_fire_department, color: Colors.white),
+                          backgroundColor: const Color(0xFFF97316),
+                          label: 'Serie',
+                          labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+                          onTap: () => _showStatsDetail(context, service, themeService, 'streak'),
+                        ),
+                      ],
                     ),
                     // Add reminder button on the right
                     SpeedDial(
@@ -434,8 +466,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 foregroundColor: Colors.white,
                 activeForegroundColor: Colors.white,
                 activeBackgroundColor: Colors.grey[600],
-                buttonSize: const Size(64, 64),
-                iconTheme: const IconThemeData(size: 28),
+                buttonSize: const Size(56, 56),
+                iconTheme: const IconThemeData(size: 24),
                 label:
                     service.reminders.isEmpty
                         ? Text(
@@ -528,39 +560,84 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  void _showStatsBottomSheet(BuildContext context, ReminderService service, ThemeService themeService) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: 200,
-        decoration: BoxDecoration(
-          color: themeService.cardColor,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        child: Column(
+  void _showStatsDetail(BuildContext context, ReminderService service, ThemeService themeService, String statType) {
+    String title = '';
+    String value = '';
+    Color color = Colors.blue;
+    IconData icon = Icons.info;
+    
+    switch (statType) {
+      case 'today':
+        title = 'Heute';
+        int total = 0;
+        for (var entry in service.statistics.dailyCompletions.values) {
+          total += entry;
+        }
+        value = '$total erledigt';
+        color = const Color(0xFF10B981);
+        icon = Icons.today;
+        break;
+      case 'next':
+        title = 'Nächste Erinnerung';
+        if (service.isRunning) {
+          final enabledReminders = service.reminders.where((r) => r.isEnabled && r.nextReminder != null).toList();
+          if (enabledReminders.isNotEmpty) {
+            final nextReminder = enabledReminders.reduce((a, b) {
+              final aDiff = a.nextReminder!.difference(DateTime.now());
+              final bDiff = b.nextReminder!.difference(DateTime.now());
+              return aDiff.inSeconds < bDiff.inSeconds ? a : b;
+            });
+            final timeRemaining = nextReminder.nextReminder!.difference(DateTime.now());
+            value = 'In ${timeRemaining.inMinutes} Min';
+            title = nextReminder.title;
+          } else {
+            value = 'Keine aktiv';
+          }
+        } else {
+          value = 'System pausiert';
+        }
+        color = const Color(0xFF8B5CF6);
+        icon = Icons.timer;
+        break;
+      case 'active':
+        title = 'Aktive Erinnerungen';
+        final count = service.reminders.where((r) => r.isEnabled).length;
+        value = '$count aktiv';
+        color = const Color(0xFF3B82F6);
+        icon = Icons.notifications_active;
+        break;
+      case 'streak':
+        title = 'Serie';
+        final today = 0;
+        for (var entry in service.statistics.dailyCompletions.values) {
+          today;
+        }
+        value = today > 0 ? '1 Tag' : 'Keine Serie';
+        color = const Color(0xFFF97316);
+        icon = Icons.local_fire_department;
+        break;
+    }
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
           children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: themeService.borderColor,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: CompactStatsBar(
-                reminderService: service,
-                themeService: themeService,
-              ),
+            Icon(icon, color: Colors.white),
+            const SizedBox(width: 12),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(value, style: const TextStyle(fontSize: 12)),
+              ],
             ),
           ],
         ),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
