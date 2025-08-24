@@ -63,7 +63,7 @@ import 'app_localizations_en.dart';
 /// property.
 abstract class AppLocalizations {
   AppLocalizations(String locale)
-    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -86,16 +86,16 @@ abstract class AppLocalizations {
   /// of delegates is preferred or required.
   static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
       <LocalizationsDelegate<dynamic>>[
-        delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ];
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('de'),
-    Locale('en'),
+    Locale('en')
   ];
 
   /// Main app title
@@ -125,13 +125,13 @@ abstract class AppLocalizations {
   /// Button to pause reminder system
   ///
   /// In en, this message translates to:
-  /// **'Pause System'**
+  /// **'Pause Reminders'**
   String get pauseSystem;
 
   /// Button to start reminder system
   ///
   /// In en, this message translates to:
-  /// **'Start System'**
+  /// **'Start Reminders'**
   String get startSystem;
 
   /// Add reminder button
@@ -307,6 +307,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get delete;
+
+  /// No description provided for @duplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate'**
+  String get duplicate;
 
   /// Edit button text
   ///
@@ -895,6 +901,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add health reminder'**
   String get addHealthReminder;
+
+  /// Start button text
+  ///
+  /// In en, this message translates to:
+  /// **'START'**
+  String get start;
+
+  /// Pause button text
+  ///
+  /// In en, this message translates to:
+  /// **'PAUSE'**
+  String get pause;
 }
 
 class _AppLocalizationsDelegate
@@ -924,9 +942,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   }
 
   throw FlutterError(
-    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-    'an issue with the localizations generation tool. Please file an issue '
-    'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
-  );
+      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+      'an issue with the localizations generation tool. Please file an issue '
+      'on GitHub with a reproducible sample app and the gen-l10n configuration '
+      'that was used.');
 }

@@ -3,14 +3,16 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i6;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i7;
-import 'package:zenu/models/reminder.dart' as _i5;
+import 'package:mockito/src/dummies.dart' as _i9;
+import 'package:zenu/l10n/app_localizations.dart' as _i4;
+import 'package:zenu/models/reminder.dart' as _i7;
 import 'package:zenu/models/statistics.dart' as _i2;
-import 'package:zenu/services/data_service.dart' as _i6;
+import 'package:zenu/services/data_service.dart' as _i8;
 import 'package:zenu/services/notification_service.dart' as _i3;
+import 'package:zenu/services/reminder_service.dart' as _i5;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -41,93 +43,107 @@ class MockNotificationService extends _i1.Mock
   }
 
   @override
-  _i4.Future<void> showReminderNotification(_i5.Reminder? reminder) =>
+  void setLocalizations(_i4.AppLocalizations? localizations) =>
+      super.noSuchMethod(
+        Invocation.method(#setLocalizations, [localizations]),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void setReminderService(_i5.ReminderService? reminderService) =>
+      super.noSuchMethod(
+        Invocation.method(#setReminderService, [reminderService]),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i6.Future<void> showReminderNotification(_i7.Reminder? reminder) =>
       (super.noSuchMethod(
             Invocation.method(#showReminderNotification, [reminder]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i4.Future<void> cancelNotification(int? id) =>
+  _i6.Future<void> cancelNotification(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#cancelNotification, [id]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i4.Future<void> cancelAllNotifications() =>
+  _i6.Future<void> cancelAllNotifications() =>
       (super.noSuchMethod(
             Invocation.method(#cancelAllNotifications, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i6.Future<void>);
 }
 
 /// A class which mocks [DataService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockDataService extends _i1.Mock implements _i6.DataService {
+class MockDataService extends _i1.Mock implements _i8.DataService {
   MockDataService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<List<Map<String, dynamic>>> loadReminders() =>
+  _i6.Future<List<Map<String, dynamic>>> loadReminders() =>
       (super.noSuchMethod(
             Invocation.method(#loadReminders, []),
-            returnValue: _i4.Future<List<Map<String, dynamic>>>.value(
+            returnValue: _i6.Future<List<Map<String, dynamic>>>.value(
               <Map<String, dynamic>>[],
             ),
           )
-          as _i4.Future<List<Map<String, dynamic>>>);
+          as _i6.Future<List<Map<String, dynamic>>>);
 
   @override
-  _i4.Future<void> saveReminders(List<_i5.Reminder>? reminders) =>
+  _i6.Future<void> saveReminders(List<_i7.Reminder>? reminders) =>
       (super.noSuchMethod(
             Invocation.method(#saveReminders, [reminders]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i4.Future<_i2.Statistics> loadStatistics() =>
+  _i6.Future<_i2.Statistics> loadStatistics() =>
       (super.noSuchMethod(
             Invocation.method(#loadStatistics, []),
-            returnValue: _i4.Future<_i2.Statistics>.value(
+            returnValue: _i6.Future<_i2.Statistics>.value(
               _FakeStatistics_0(this, Invocation.method(#loadStatistics, [])),
             ),
           )
-          as _i4.Future<_i2.Statistics>);
+          as _i6.Future<_i2.Statistics>);
 
   @override
-  _i4.Future<void> saveStatistics(_i2.Statistics? statistics) =>
+  _i6.Future<void> saveStatistics(_i2.Statistics? statistics) =>
       (super.noSuchMethod(
             Invocation.method(#saveStatistics, [statistics]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i4.Future<void> clearAll() =>
+  _i6.Future<void> clearAll() =>
       (super.noSuchMethod(
             Invocation.method(#clearAll, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i6.Future<void>);
 
   @override
   String getCacheStats() =>
       (super.noSuchMethod(
             Invocation.method(#getCacheStats, []),
-            returnValue: _i7.dummyValue<String>(
+            returnValue: _i9.dummyValue<String>(
               this,
               Invocation.method(#getCacheStats, []),
             ),

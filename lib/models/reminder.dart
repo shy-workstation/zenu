@@ -70,7 +70,7 @@ class Reminder {
     this.exerciseCount = 0,
     this.totalCompleted = 0,
     this.minQuantity = 1,
-    this.maxQuantity = 10,
+    this.maxQuantity = 100,
     this.stepSize = 1,
     this.unit = 'reps',
   });
@@ -118,7 +118,7 @@ class Reminder {
       exerciseCount: json['exerciseCount'] ?? 0,
       totalCompleted: json['totalCompleted'] ?? 0,
       minQuantity: json['minQuantity'] ?? 1,
-      maxQuantity: json['maxQuantity'] ?? 10,
+      maxQuantity: json['maxQuantity'] ?? 100,
       stepSize: json['stepSize'] ?? 1,
       unit: json['unit'] ?? 'reps',
     );

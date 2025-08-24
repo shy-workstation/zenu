@@ -52,7 +52,7 @@ class ReminderTemplateService {
       description: 'Stay hydrated!',
       icon: Icons.local_drink,
       color: Colors.blue,
-      minQuantity: 100,
+      minQuantity: 0,
       maxQuantity: 1000,
       stepSize: 25,
       unit: 'ml',

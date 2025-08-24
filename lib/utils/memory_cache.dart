@@ -1,5 +1,5 @@
-import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'global_timer_service.dart';
 
 /// Memory cache for frequently accessed data
 class MemoryCache {
@@ -8,17 +8,21 @@ class MemoryCache {
   MemoryCache._internal();
 
   final Map<String, _CacheEntry> _cache = {};
-  Timer? _cleanupTimer;
+  String? _cleanupTimerSubscriptionId;
 
   static const Duration _defaultTtl = Duration(minutes: 10);
   static const int _maxEntries = 100;
 
   /// Initialize cleanup timer
   void initialize() {
-    _cleanupTimer?.cancel();
-    _cleanupTimer = Timer.periodic(
+    if (_cleanupTimerSubscriptionId != null) {
+      GlobalTimerService.instance.unsubscribe(_cleanupTimerSubscriptionId!);
+    }
+
+    _cleanupTimerSubscriptionId = GlobalTimerService.instance.subscribe(
       const Duration(minutes: 5),
-      (_) => _cleanup(),
+      _cleanup,
+      id: 'memory_cache_cleanup',
     );
   }
 
@@ -122,7 +126,10 @@ class MemoryCache {
   final int _missCount = 0;
 
   void dispose() {
-    _cleanupTimer?.cancel();
+    if (_cleanupTimerSubscriptionId != null) {
+      GlobalTimerService.instance.unsubscribe(_cleanupTimerSubscriptionId!);
+      _cleanupTimerSubscriptionId = null;
+    }
     _cache.clear();
   }
 }

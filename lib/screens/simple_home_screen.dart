@@ -87,8 +87,13 @@ class _SimpleHomeScreenState extends State<SimpleHomeScreen> {
             ElevatedButton.icon(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Manual testing confirmed - App is working!'),
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(
+                            context,
+                          )?.manualTestingConfirmedAppWorking ??
+                          'Manual testing confirmed - App is working!',
+                    ),
                     backgroundColor: Colors.green,
                   ),
                 );

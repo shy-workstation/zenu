@@ -6,6 +6,7 @@ import '../utils/memory_cache.dart';
 import '../utils/error_handler.dart';
 import '../utils/performance_utils.dart';
 import 'cache_service.dart';
+import 'batched_data_service.dart';
 
 class DataService {
   static const String _remindersKey = 'reminders';
@@ -15,6 +16,7 @@ class DataService {
   static SharedPreferences? _prefs;
   static final MemoryCache _cache = MemoryCache();
   static final CacheService _cacheService = CacheService();
+  static final BatchedDataService _batchedService = BatchedDataService.instance;
 
   DataService._();
 
@@ -24,6 +26,7 @@ class DataService {
       _prefs = await SharedPreferences.getInstance();
       _cache.initialize();
       _cacheService.initialize();
+      await _batchedService.initialize();
     }
     return _instance!;
   }
@@ -64,10 +67,10 @@ class DataService {
         final List<Map<String, dynamic>> remindersJson =
             reminders.map((r) => r.toJson()).toList();
 
-        // Save to SharedPreferences asynchronously
-        await _prefs?.setString(_remindersKey, jsonEncode(remindersJson));
+        // Use batched data service for optimized I/O
+        _batchedService.scheduleWrite(_remindersKey, jsonEncode(remindersJson));
 
-        // Update both cache systems
+        // Update cache systems
         _cache.set(
           _remindersKey,
           remindersJson,
@@ -80,7 +83,7 @@ class DataService {
         );
 
         ErrorHandler.logInfo(
-          'Successfully saved ${reminders.length} reminders',
+          'Successfully scheduled save for ${reminders.length} reminders',
         );
       } catch (e, stackTrace) {
         await ErrorHandler.handleError(
@@ -128,13 +131,13 @@ class DataService {
   Future<void> saveStatistics(Statistics statistics) async {
     await PerformanceUtils.measureAsync('DataService.saveStatistics', () async {
       try {
-        // Save to SharedPreferences asynchronously
-        await _prefs?.setString(
+        // Use batched data service for optimized I/O
+        _batchedService.scheduleWrite(
           _statisticsKey,
           jsonEncode(statistics.toJson()),
         );
 
-        // Update both cache systems
+        // Update cache systems
         _cache.set(
           _statisticsKey,
           statistics,
@@ -188,5 +191,15 @@ class DataService {
   void clearCache() {
     _cache.clear();
     ErrorHandler.logInfo('Manual cache clear completed');
+  }
+
+  /// Force flush pending writes (call before app closes)
+  Future<void> flushPendingWrites() async {
+    await _batchedService.flushPendingWrites();
+  }
+
+  /// Get batched data service statistics
+  Map<String, dynamic> getBatchedStats() {
+    return _batchedService.getStats();
   }
 }

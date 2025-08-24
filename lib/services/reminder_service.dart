@@ -6,13 +6,15 @@ import 'notification_service.dart';
 import 'in_app_notification_service.dart';
 import 'data_service.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/global_timer_service.dart';
 
 class ReminderService extends ChangeNotifier {
   final NotificationService _notificationService;
   final DataService _dataService;
   InAppNotificationService? _inAppNotificationService;
 
-  Timer? _mainTimer;
+  String? _timerSubscriptionId;
+  bool _isTimerPaused = false; // Track if timer is paused for popup
   List<Reminder> _reminders = [];
   Statistics _statistics = Statistics();
   bool _isRunning = false;
@@ -27,6 +29,7 @@ class ReminderService extends ChangeNotifier {
 
   void setLocalizations(AppLocalizations localizations) {
     _notificationService.setLocalizations(localizations);
+    _notificationService.setReminderService(this);
   }
 
   // Method to manually trigger a reminder for testing
@@ -52,17 +55,45 @@ class ReminderService extends ChangeNotifier {
       _statistics.resetDailyStats();
       _statistics.resetWeeklyStats();
 
-      // Update reminders with saved data
+      // Update reminders with saved data and migrate water reminders
       for (var savedReminder in savedReminders) {
         final index = _reminders.indexWhere((r) => r.id == savedReminder['id']);
         if (index != -1) {
           _reminders[index] = Reminder.fromJson(savedReminder);
         } else {
           // This is a new reminder that was saved but not in our default list
-          _reminders.add(Reminder.fromJson(savedReminder));
+          final reminder = Reminder.fromJson(savedReminder);
+
+          // Migrate old water reminders to new 0-1000 ml range
+          if (reminder.type == ReminderType.water &&
+              reminder.maxQuantity == 10 &&
+              reminder.unit == 'glasses') {
+            final migratedReminder = Reminder(
+              id: reminder.id,
+              type: reminder.type,
+              title: reminder.title,
+              description: reminder.description,
+              interval: reminder.interval,
+              icon: reminder.icon,
+              color: reminder.color,
+              isEnabled: reminder.isEnabled,
+              nextReminder: reminder.nextReminder,
+              exerciseCount: reminder.exerciseCount,
+              totalCompleted: reminder.totalCompleted,
+              minQuantity: 0,
+              maxQuantity: 1000,
+              stepSize: 25,
+              unit: 'ml',
+            );
+            _reminders.add(migratedReminder);
+          } else {
+            _reminders.add(reminder);
+          }
         }
       }
 
+      // Save migrated data
+      await saveData();
       notifyListeners();
     } catch (e) {
       // Error loading data, continue with defaults
@@ -90,16 +121,25 @@ class ReminderService extends ChangeNotifier {
       }
     }
 
-    // Start the main timer
-    _mainTimer = Timer.periodic(const Duration(seconds: 1), _checkReminders);
+    // Subscribe to global timer service
+    _timerSubscriptionId = GlobalTimerService.instance.subscribe(
+      const Duration(seconds: 1),
+      _checkReminders,
+      id: 'reminder_service',
+    );
 
     notifyListeners();
   }
 
   void stopReminders() {
     _isRunning = false;
-    _mainTimer?.cancel();
-    _mainTimer = null;
+    _isTimerPaused = false; // Reset pause flag when stopping
+
+    // Unsubscribe from global timer
+    if (_timerSubscriptionId != null) {
+      GlobalTimerService.instance.unsubscribe(_timerSubscriptionId!);
+      _timerSubscriptionId = null;
+    }
 
     // Clear next reminder times
     for (var reminder in _reminders) {
@@ -109,7 +149,12 @@ class ReminderService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _checkReminders(Timer timer) {
+  void _checkReminders() {
+    // Don't process reminders if system is paused for popup
+    if (_isTimerPaused) {
+      return;
+    }
+
     final now = DateTime.now();
     bool hasChanges = false;
 
@@ -128,11 +173,14 @@ class ReminderService extends ChangeNotifier {
   }
 
   void _triggerReminder(Reminder reminder) {
-    // Pause the timer while waiting for user interaction
-    _pauseTimer();
+    // Always show system notification first (works even when app is minimized)
+    _notificationService.showReminderNotification(reminder);
 
-    // Try in-app notification first, fallback to system notification
+    // Also show in-app notification if available (when app is open)
     if (_inAppNotificationService != null) {
+      // Pause the timer while waiting for user interaction
+      _pauseTimer();
+
       _inAppNotificationService!.showReminderDialog(reminder, (quantity) {
         if (quantity > 0) {
           // User confirmed completion with specific quantity
@@ -146,21 +194,24 @@ class ReminderService extends ChangeNotifier {
         _resumeTimer();
       });
     } else {
-      // Fallback to system notification - no pause needed
-      _notificationService.showReminderNotification(reminder);
+      // No in-app notification service available, just reset reminder time
       reminder.resetNextReminder();
       notifyListeners();
     }
   }
 
   void _pauseTimer() {
-    _mainTimer?.cancel();
-    _mainTimer = null;
+    if (_timerSubscriptionId != null && !_isTimerPaused) {
+      // Timer is managed by GlobalTimerService, just set the pause flag
+      _isTimerPaused = true;
+      print('Timer paused for reminder popup'); // Debug log
+    }
   }
 
   void _resumeTimer() {
-    if (_isRunning && _mainTimer == null) {
-      _mainTimer = Timer.periodic(const Duration(seconds: 1), _checkReminders);
+    if (_isRunning && _isTimerPaused) {
+      _isTimerPaused = false;
+      print('Timer resumed after reminder popup'); // Debug log
     }
   }
 
@@ -301,7 +352,11 @@ class ReminderService extends ChangeNotifier {
 
   @override
   void dispose() {
-    _mainTimer?.cancel();
+    // Unsubscribe from global timer
+    if (_timerSubscriptionId != null) {
+      GlobalTimerService.instance.unsubscribe(_timerSubscriptionId!);
+      _timerSubscriptionId = null;
+    }
     super.dispose();
   }
 }

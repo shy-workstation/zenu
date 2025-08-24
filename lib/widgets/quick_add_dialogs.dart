@@ -22,10 +22,10 @@ class QuickAddDialogs {
       icon: Icons.water_drop,
       color: const Color(0xFF06B6D4),
       isEnabled: true,
-      minQuantity: 1,
-      maxQuantity: 10,
-      stepSize: 1,
-      unit: 'glasses',
+      minQuantity: 0,
+      maxQuantity: 1000,
+      stepSize: 25,
+      unit: 'ml',
     );
 
     reminderService.addReminder(reminder);
@@ -105,7 +105,7 @@ class QuickAddDialogs {
       title: '👁️ ${localizations?.restYourEyes ?? 'Rest Your Eyes'}',
       description:
           localizations?.lookAwayFromScreen ??
-          'Look away from screen - 20/20/20 rule',
+          'Look away from screen and blink',
       interval: const Duration(minutes: 20),
       icon: Icons.remove_red_eye,
       color: const Color(0xFF3B82F6),

@@ -3,8 +3,8 @@
   "healthDashboard": "Gesundheits-Dashboard",
   "systemActive": "System aktiv - Überwacht Ihre Gesundheit",
   "systemPaused": "System pausiert - Klicken zum Fortsetzen",
-  "pauseSystem": "System pausieren",
-  "startSystem": "System starten",
+  "pauseSystem": "Erinnerungen pausieren",
+  "startSystem": "Erinnerungen starten",
   "addReminder": "Erinnerung hinzufügen",
   "waterReminder": "Wasser-Erinnerung",
   "exerciseReminder": "Übungs-Erinnerung",
@@ -34,6 +34,7 @@
   "cancel": "Abbrechen",
   "reset": "Zurücksetzen",
   "delete": "Löschen",
+  "duplicate": "Duplizieren",
   "edit": "Bearbeiten",
   "save": "Speichern",
   "complete": "Abschließen",
@@ -146,5 +147,7 @@
   "nextIn": "Nächste in",
   "reminderListAccessibility": "Erinnerungsliste mit {count} Erinnerungen",
   "settings": "Einstellungen",
-  "addHealthReminder": "Gesundheitserinnerung hinzufügen"
+  "addHealthReminder": "Gesundheitserinnerung hinzufügen",
+  "start": "STARTEN",
+  "pause": "PAUSIEREN"
 }

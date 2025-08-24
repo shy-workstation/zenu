@@ -2,8 +2,8 @@
 class AppConfig {
   // App Information
   static const String appName = 'Zenu';
-  static const String version = '1.0.2';
-  static const String buildNumber = '3';
+  static const String version = '1.0.4';
+  static const String buildNumber = '6';
 
   // Performance Settings
   static const Duration animationDuration = Duration(milliseconds: 300);

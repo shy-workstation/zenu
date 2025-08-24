@@ -3,16 +3,17 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i8;
+import 'dart:async' as _i9;
 import 'dart:ui' as _i4;
 
 import 'package:flutter/material.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:zenu/l10n/app_localizations.dart' as _i8;
 import 'package:zenu/models/reminder.dart' as _i6;
 import 'package:zenu/models/statistics.dart' as _i2;
 import 'package:zenu/services/in_app_notification_service.dart' as _i7;
 import 'package:zenu/services/reminder_service.dart' as _i5;
-import 'package:zenu/services/theme_service.dart' as _i9;
+import 'package:zenu/services/theme_service.dart' as _i10;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -92,28 +93,35 @@ class MockReminderService extends _i1.Mock implements _i5.ReminderService {
       );
 
   @override
+  void setLocalizations(_i8.AppLocalizations? localizations) =>
+      super.noSuchMethod(
+        Invocation.method(#setLocalizations, [localizations]),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   void triggerTestReminder(_i6.Reminder? reminder) => super.noSuchMethod(
     Invocation.method(#triggerTestReminder, [reminder]),
     returnValueForMissingStub: null,
   );
 
   @override
-  _i8.Future<void> loadData() =>
+  _i9.Future<void> loadData() =>
       (super.noSuchMethod(
             Invocation.method(#loadData, []),
-            returnValue: _i8.Future<void>.value(),
-            returnValueForMissingStub: _i8.Future<void>.value(),
+            returnValue: _i9.Future<void>.value(),
+            returnValueForMissingStub: _i9.Future<void>.value(),
           )
-          as _i8.Future<void>);
+          as _i9.Future<void>);
 
   @override
-  _i8.Future<void> saveData() =>
+  _i9.Future<void> saveData() =>
       (super.noSuchMethod(
             Invocation.method(#saveData, []),
-            returnValue: _i8.Future<void>.value(),
-            returnValueForMissingStub: _i8.Future<void>.value(),
+            returnValue: _i9.Future<void>.value(),
+            returnValueForMissingStub: _i9.Future<void>.value(),
           )
-          as _i8.Future<void>);
+          as _i9.Future<void>);
 
   @override
   void startReminders() => super.noSuchMethod(
@@ -217,7 +225,7 @@ class MockReminderService extends _i1.Mock implements _i5.ReminderService {
 /// A class which mocks [ThemeService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockThemeService extends _i1.Mock implements _i9.ThemeService {
+class MockThemeService extends _i1.Mock implements _i10.ThemeService {
   MockThemeService() {
     _i1.throwOnMissingStub(this);
   }
@@ -300,13 +308,13 @@ class MockThemeService extends _i1.Mock implements _i9.ThemeService {
           as bool);
 
   @override
-  _i8.Future<void> toggleTheme() =>
+  _i9.Future<void> toggleTheme() =>
       (super.noSuchMethod(
             Invocation.method(#toggleTheme, []),
-            returnValue: _i8.Future<void>.value(),
-            returnValueForMissingStub: _i8.Future<void>.value(),
+            returnValue: _i9.Future<void>.value(),
+            returnValueForMissingStub: _i9.Future<void>.value(),
           )
-          as _i8.Future<void>);
+          as _i9.Future<void>);
 
   @override
   void addListener(_i4.VoidCallback? listener) => super.noSuchMethod(

@@ -227,15 +227,16 @@ class ReminderManagementScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'duplicate',
                       child: Row(
                         children: [
-                          Icon(Icons.copy, color: Colors.white70),
-                          SizedBox(width: 12),
+                          const Icon(Icons.copy, color: Colors.white70),
+                          const SizedBox(width: 12),
                           Text(
-                            'Duplicate',
-                            style: TextStyle(color: Colors.white),
+                            AppLocalizations.of(context)?.duplicate ??
+                                'Duplicate',
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ],
                       ),
@@ -416,7 +417,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
     _selectedColor = reminder?.color ?? Colors.blue;
     _intervalMinutes = reminder?.interval.inMinutes ?? 60;
     _minQuantity = reminder?.minQuantity ?? 1;
-    _maxQuantity = reminder?.maxQuantity ?? 10;
+    _maxQuantity = reminder?.maxQuantity ?? 100;
     _stepSize = reminder?.stepSize ?? 1;
     _unit = reminder?.unit ?? 'reps';
     _selectedType = reminder?.type ?? ReminderType.custom;
@@ -476,16 +477,22 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                     // Title
                     _buildTextField(
                       controller: _titleController,
-                      label: 'Title',
-                      hint: 'Enter reminder title',
+                      label: AppLocalizations.of(context)?.title ?? 'Title',
+                      hint:
+                          AppLocalizations.of(context)?.title ??
+                          'Enter reminder title',
                     ),
                     const SizedBox(height: 16),
 
                     // Description
                     _buildTextField(
                       controller: _descriptionController,
-                      label: 'Description',
-                      hint: 'Enter reminder description',
+                      label:
+                          AppLocalizations.of(context)?.description ??
+                          'Description',
+                      hint:
+                          AppLocalizations.of(context)?.description ??
+                          'Enter reminder description',
                       maxLines: 2,
                     ),
                     const SizedBox(height: 16),
@@ -626,9 +633,9 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
             _intervalMinutes = template.defaultInterval.inMinutes;
 
             // Validate and ensure consistent quantity values
-            _minQuantity = template.minQuantity.clamp(1, 100).toInt();
+            _minQuantity = template.minQuantity.clamp(0, 1000).toInt();
             _maxQuantity =
-                template.maxQuantity.clamp(_minQuantity, 100).toInt();
+                template.maxQuantity.clamp(_minQuantity, 1000).toInt();
             _stepSize =
                 template.stepSize.clamp(1, _maxQuantity - _minQuantity).toInt();
             _unit = template.unit;
@@ -733,9 +740,9 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
               children: [
                 Icon(_selectedIcon, color: _selectedColor, size: 24),
                 const SizedBox(width: 12),
-                const Text(
-                  'Choose Icon',
-                  style: TextStyle(color: Colors.white70),
+                Text(
+                  AppLocalizations.of(context)?.icon ?? 'Choose Icon',
+                  style: const TextStyle(color: Colors.white70),
                 ),
                 const Spacer(),
                 const Icon(Icons.arrow_drop_down, color: Colors.white54),
@@ -779,9 +786,9 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
-                  'Choose Color',
-                  style: TextStyle(color: Colors.white70),
+                Text(
+                  AppLocalizations.of(context)?.color ?? 'Choose Color',
+                  style: const TextStyle(color: Colors.white70),
                 ),
                 const Spacer(),
                 const Icon(Icons.arrow_drop_down, color: Colors.white54),
@@ -892,8 +899,8 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                   const Text('Min:', style: TextStyle(color: Colors.white70)),
                   Expanded(
                     child: Slider(
-                      value: _minQuantity.clamp(1, _maxQuantity - 1).toDouble(),
-                      min: 1,
+                      value: _minQuantity.clamp(0, _maxQuantity - 1).toDouble(),
+                      min: 0,
                       max: (_maxQuantity - 1).clamp(2, 999).toDouble(),
                       divisions: ((_maxQuantity - 2).clamp(1, 998)).toInt(),
                       label: _minQuantity.toString(),
@@ -901,7 +908,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                       onChanged: (value) {
                         setState(() {
                           _minQuantity = value.round().clamp(
-                            1,
+                            0,
                             _maxQuantity - 1,
                           );
                         });
@@ -926,7 +933,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                     child: Slider(
                       value:
                           _maxQuantity.clamp(_minQuantity + 1, 1000).toDouble(),
-                      min: (_minQuantity + 1).clamp(2, 999).toDouble(),
+                      min: (_minQuantity + 1).clamp(1, 999).toDouble(),
                       max: 1000,
                       divisions: (999 - _minQuantity).clamp(1, 998),
                       label: _maxQuantity.toString(),
@@ -1004,9 +1011,9 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
       builder:
           (context) => AlertDialog(
             backgroundColor: const Color(0xFF2A2A3E),
-            title: const Text(
-              'Choose Icon',
-              style: TextStyle(color: Colors.white),
+            title: Text(
+              AppLocalizations.of(context)?.icon ?? 'Choose Icon',
+              style: const TextStyle(color: Colors.white),
             ),
             content: SizedBox(
               width: double.maxFinite,
@@ -1064,9 +1071,9 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
       builder:
           (context) => AlertDialog(
             backgroundColor: const Color(0xFF2A2A3E),
-            title: const Text(
-              'Choose Color',
-              style: TextStyle(color: Colors.white),
+            title: Text(
+              AppLocalizations.of(context)?.color ?? 'Choose Color',
+              style: const TextStyle(color: Colors.white),
             ),
             content: SizedBox(
               width: double.maxFinite,

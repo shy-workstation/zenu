@@ -15,11 +15,11 @@
   "@systemPaused": {
     "description": "Status when system is paused"
   },
-  "pauseSystem": "Pause System",
+  "pauseSystem": "Pause Reminders",
   "@pauseSystem": {
     "description": "Button to pause reminder system"
   },
-  "startSystem": "Start System",
+  "startSystem": "Start Reminders",
   "@startSystem": {
     "description": "Button to start reminder system"
   },
@@ -140,6 +140,7 @@
     "description": "Reset button"
   },
   "delete": "Delete",
+  "duplicate": "Duplicate",
   "@delete": {
     "description": "Delete button"
   },
@@ -642,5 +643,13 @@
   "addHealthReminder": "Add health reminder",
   "@addHealthReminder": {
     "description": "Add reminder button tooltip"
+  },
+  "start": "START",
+  "@start": {
+    "description": "Start button text"
+  },
+  "pause": "PAUSE",
+  "@pause": {
+    "description": "Pause button text"
   }
 }

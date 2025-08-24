@@ -21,10 +21,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get systemPaused => 'System pausiert - Klicken zum Fortsetzen';
 
   @override
-  String get pauseSystem => 'System pausieren';
+  String get pauseSystem => 'Erinnerungen pausieren';
 
   @override
-  String get startSystem => 'System starten';
+  String get startSystem => 'Erinnerungen starten';
 
   @override
   String get addReminder => 'Erinnerung hinzufügen';
@@ -116,6 +116,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get delete => 'Löschen';
+
+  @override
+  String get duplicate => 'Duplizieren';
 
   @override
   String get edit => 'Bearbeiten';
@@ -461,4 +464,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get addHealthReminder => 'Gesundheitserinnerung hinzufügen';
+
+  @override
+  String get start => 'STARTEN';
+
+  @override
+  String get pause => 'PAUSIEREN';
 }
