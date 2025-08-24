@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../models/reminder.dart';
 import '../models/statistics.dart';
@@ -204,14 +205,14 @@ class ReminderService extends ChangeNotifier {
     if (_timerSubscriptionId != null && !_isTimerPaused) {
       // Timer is managed by GlobalTimerService, just set the pause flag
       _isTimerPaused = true;
-      print('Timer paused for reminder popup'); // Debug log
+      debugPrint('Timer paused for reminder popup'); // Debug log
     }
   }
 
   void _resumeTimer() {
     if (_isRunning && _isTimerPaused) {
       _isTimerPaused = false;
-      print('Timer resumed after reminder popup'); // Debug log
+      debugPrint('Timer resumed after reminder popup'); // Debug log
     }
   }
 

@@ -26,8 +26,8 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
   late Animation<double> _scaleAnimation;
 
   Timer? _particleTimer;
-  List<EnergyParticle> _particles = [];
-  List<AmbientDot> _ambientDots = [];
+  final List<EnergyParticle> _particles = [];
+  final List<AmbientDot> _ambientDots = [];
 
   @override
   void initState() {
@@ -149,8 +149,7 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
           scale: _scaleAnimation.value,
           child: SizedBox(
             width: widget.size * 2,
-            height:
-                widget.size *
+            height: widget.size *
                 1.2, // Further reduced height to cut more bottom area
             child: ClipRect(
               // Clip to hide bottom effects
@@ -167,8 +166,7 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
 
                   // Main button - positioned higher to account for reduced height
                   Positioned(
-                    bottom:
-                        widget.size *
+                    bottom: widget.size *
                         0.1, // Position button 10px from bottom of reduced container
                     child: GestureDetector(
                       onTapDown: _onTapDown,
@@ -180,30 +178,29 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha: 0.1),
                             width: 1,
                           ),
                           gradient: RadialGradient(
                             center: Alignment.center,
-                            colors:
-                                widget.isRunning
-                                    ? [
-                                      const Color(0xFFF9CA24),
-                                      const Color(0xFFF0932B),
-                                    ]
-                                    : [
-                                      const Color(0xFF1A4073),
-                                      const Color(0xFF1A4073),
-                                    ],
+                            colors: widget.isRunning
+                                ? [
+                                    const Color(0xFFF9CA24),
+                                    const Color(0xFFF0932B),
+                                  ]
+                                : [
+                                    const Color(0xFF1A4073),
+                                    const Color(0xFF1A4073),
+                                  ],
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color:
-                                  widget.isRunning
-                                      ? const Color(
-                                        0xFFF9CA24,
-                                      ).withOpacity(_breathingAnimation.value)
-                                      : Colors.black.withOpacity(0.2),
+                              color: widget.isRunning
+                                  ? const Color(
+                                      0xFFF9CA24,
+                                    ).withValues(
+                                      alpha: _breathingAnimation.value)
+                                  : Colors.black.withValues(alpha: 0.2),
                               blurRadius: widget.isRunning ? 20 : 10,
                               spreadRadius: widget.isRunning ? 2 : 0,
                             ),
@@ -213,13 +210,12 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
                           child: Text(
                             widget.isRunning ? 'STOP' : 'START',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(
-                                widget.isRunning ? 0.9 : 0.5,
+                              color: Colors.white.withValues(
+                                alpha: widget.isRunning ? 0.9 : 0.5,
                               ),
                               fontSize: 16, // Increased from 14 to 16
-                              fontWeight:
-                                  FontWeight
-                                      .w500, // Increased from w400 to w500 for better visibility
+                              fontWeight: FontWeight
+                                  .w500, // Increased from w400 to w500 for better visibility
                               letterSpacing: 2,
                             ),
                           ),
@@ -253,7 +249,8 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
             width: 2,
             height: 2,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(widget.isRunning ? 0.3 : 0.2),
+              color:
+                  Colors.white.withValues(alpha: widget.isRunning ? 0.3 : 0.2),
               shape: BoxShape.circle,
             ),
           ),
@@ -285,10 +282,9 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
         final x = cos(particle.startAngle) * currentDistance;
         final y = sin(particle.startAngle) * currentDistance;
 
-        final opacity =
-            progress < 0.1
-                ? progress * 6
-                : progress > 0.9
+        final opacity = progress < 0.1
+            ? progress * 6
+            : progress > 0.9
                 ? (1 - progress) * 10
                 : 0.6;
 
@@ -299,7 +295,7 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
             width: 3,
             height: 3,
             decoration: BoxDecoration(
-              color: const Color(0xFFF9CA24).withOpacity(opacity),
+              color: const Color(0xFFF9CA24).withValues(alpha: opacity),
               shape: BoxShape.circle,
             ),
           ),
