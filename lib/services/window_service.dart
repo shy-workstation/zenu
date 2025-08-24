@@ -16,7 +16,7 @@ class WindowService {
 
   // Default window settings
   static const double _defaultWidth = 1280;
-  static const double _defaultHeight = 720;
+  static const double _defaultHeight = 900;
   static const double _minWidth = 400;
   static const double _minHeight = 300;
 

@@ -92,6 +92,7 @@ class AppLifecycleManager with WidgetsBindingObserver {
   void _handleAppDetached() {
     ErrorHandler.logInfo('App detached');
     _saveAppState();
+    _flushPendingData();
   }
 
   void _handleAppHidden() {
@@ -125,6 +126,22 @@ class AppLifecycleManager with WidgetsBindingObserver {
         e,
         stackTrace,
         context: 'AppLifecycleManager._cleanupResources',
+        severity: ErrorSeverity.warning,
+      );
+    }
+  }
+
+  Future<void> _flushPendingData() async {
+    try {
+      ErrorHandler.logInfo('Flushing pending data before app shutdown');
+      final dataService = await DataService.getInstance();
+      await dataService.flushPendingWrites();
+      ErrorHandler.logInfo('Pending data flush completed');
+    } catch (e, stackTrace) {
+      await ErrorHandler.handleError(
+        e,
+        stackTrace,
+        context: 'AppLifecycleManager._flushPendingData',
         severity: ErrorSeverity.warning,
       );
     }

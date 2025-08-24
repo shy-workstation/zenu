@@ -16,10 +16,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.3+5
+version: 1.0.4+6
 
 environment:
-  sdk: ^3.7.0
+  sdk: '>=3.0.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -45,6 +45,8 @@ dependencies:
   provider: ^6.1.2
   msix: ^3.16.12
   window_manager: ^0.4.2  # Professional window management for desktop apps
+  get_it: ^8.2.0  # Dependency injection
+  equatable: ^2.0.5  # Value equality for entities
 
 dev_dependencies:
   flutter_test:
@@ -124,7 +126,7 @@ msix_config:
   publisher_display_name: Yousof Shehada
   identity_name: YousofShehada.Zenu
   publisher: CN=BE46DC6D-FD4E-4ABB-A08C-68EABDEC1169
-  msix_version: 1.0.3.0
+  msix_version: 1.0.4.0
   description: Your Personal Wellness Reminder Assistant - Stay healthy with customizable reminders for exercise, eye rest, hydration, and stretching throughout your workday.
   logo_path: assets/icon/app_icon_zenu.png
   start_menu_icon_path: assets/icon/app_icon_zenu.png

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'dart:async';
 import '../utils/state_management.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../l10n/app_localizations.dart';
@@ -8,11 +6,12 @@ import '../models/reminder.dart';
 import '../services/reminder_service.dart';
 import '../services/theme_service.dart';
 import '../widgets/empty_state.dart';
-import '../widgets/compact_stats_bar.dart';
+import '../widgets/energy_start_stop_button.dart';
 import '../widgets/swipeable_reminder_card.dart';
 import '../widgets/quick_add_dialogs.dart';
 import 'statistics_screen.dart';
 import 'reminder_management_screen.dart';
+import '../utils/global_timer_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final ReminderService? reminderService;
@@ -25,7 +24,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  Timer? _clockTimer;
+  String? _clockTimerSubscriptionId;
   DateTime _currentTime = DateTime.now();
   String? _lastAnnouncedReminder;
   final FocusNode _mainFocusNode = FocusNode();
@@ -46,22 +45,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _clockTimer?.cancel();
+    if (_clockTimerSubscriptionId != null) {
+      GlobalTimerService.instance.unsubscribe(_clockTimerSubscriptionId!);
+      _clockTimerSubscriptionId = null;
+    }
     _mainFocusNode.dispose();
     super.dispose();
   }
 
   void _startClockTimer() {
-    _clockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted) {
-        setState(() {
-          _currentTime = DateTime.now();
-        });
+    _clockTimerSubscriptionId = GlobalTimerService.instance.subscribe(
+      const Duration(seconds: 1),
+      () {
+        if (mounted) {
+          setState(() {
+            _currentTime = DateTime.now();
+          });
 
-        // Announce upcoming reminders for accessibility
-        _checkForUpcomingReminders();
-      }
-    });
+          // Announce upcoming reminders for accessibility
+          _checkForUpcomingReminders();
+        }
+      },
+      id: 'home_screen_clock',
+    );
   }
 
   void _checkForUpcomingReminders() {
@@ -114,7 +120,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       label: 'Settings and reminder management',
                       hint: 'Double tap to open settings',
                       child: Material(
-                        color: Colors.orange,
+                        color: const Color(
+                          0xFF8B5CF6,
+                        ), // Changed from orange to purple to match app theme
                         borderRadius: BorderRadius.circular(12),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
@@ -122,14 +130,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder:
-                                    (context) => Provider<ReminderService>(
-                                      value: service,
-                                      child: Provider<ThemeService>(
-                                        value: themeService,
-                                        child: const ReminderManagementScreen(),
-                                      ),
-                                    ),
+                                builder: (context) => Provider<ReminderService>(
+                                  value: service,
+                                  child: Provider<ThemeService>(
+                                    value: themeService,
+                                    child: const ReminderManagementScreen(),
+                                  ),
+                                ),
                               ),
                             );
                           },
@@ -139,7 +146,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             ), // Increased from 12 to 16
                             child: const Icon(
                               Icons.settings,
-                              color: Colors.white,
+                              color: Colors
+                                  .white, // Changed back to white for better contrast on purple background
                               size: 20,
                             ),
                           ),
@@ -151,10 +159,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Container(
                     margin: const EdgeInsets.only(right: 8),
                     child: Semantics(
-                      label:
-                          themeService.isDarkMode
-                              ? 'Switch to light mode'
-                              : 'Switch to dark mode',
+                      label: themeService.isDarkMode
+                          ? 'Switch to light mode'
+                          : 'Switch to dark mode',
                       hint: 'Double tap to toggle theme',
                       child: Material(
                         color: Colors.transparent,
@@ -189,13 +196,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (context) => Provider<ReminderService>(
-                                    value: service,
-                                    child: StatisticsScreen(
-                                      reminderService: service,
-                                    ),
-                                  ),
+                              builder: (context) => Provider<ReminderService>(
+                                value: service,
+                                child: StatisticsScreen(
+                                  reminderService: service,
+                                ),
+                              ),
                             ),
                           );
                         },
@@ -234,107 +240,126 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   // Main content
                   service.reminders.isEmpty
                       ? EmptyState(
-                        onAddReminder:
-                            () => _showQuickAddMenu(context, service),
-                        primaryColor: const Color(0xFF6366F1),
-                      )
+                          onAddReminder: () =>
+                              _showQuickAddMenu(context, service),
+                          primaryColor: const Color(0xFF6366F1),
+                        )
                       : CustomScrollView(
-                        slivers: [
-                          // Top spacing
-                          const SliverToBoxAdapter(
-                            child: SizedBox(height: 20),
-                          ),
-                          
-                          // Reminders Grid with container box (stats moved to bottom)
-                          SliverPadding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            sliver: SliverToBoxAdapter(
-                              child: Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: themeService.isDarkMode 
-                                      ? Colors.black.withValues(alpha: 0.2)
-                                      : Colors.grey.shade50,
-                                  borderRadius: BorderRadius.circular(24),
-                                  border: Border.all(
+                          slivers: [
+                            // Top spacing
+                            const SliverToBoxAdapter(
+                                child: SizedBox(height: 20)),
+
+                            // Reminders Grid with container box (stats moved to bottom)
+                            SliverPadding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24),
+                              sliver: SliverToBoxAdapter(
+                                child: Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
                                     color: themeService.isDarkMode
-                                        ? Colors.white.withValues(alpha: 0.08)
-                                        : Colors.grey.shade200,
-                                    width: 1,
+                                        ? Colors.black.withValues(alpha: 0.2)
+                                        : Colors.grey.shade50,
+                                    borderRadius: BorderRadius.circular(24),
+                                    border: Border.all(
+                                      color: themeService.isDarkMode
+                                          ? Colors.white.withValues(
+                                              alpha: 0.08,
+                                            )
+                                          : Colors.grey.shade200,
+                                      width: 1,
+                                    ),
                                   ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Responsive Grid Layout
-                                  LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      // Strict 12-column responsive grid system
-                                      int columns = 1;
-                                      double maxWidth = constraints.maxWidth;
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Responsive Grid Layout
+                                      LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          // Strict 12-column responsive grid system
+                                          int columns = 1;
+                                          double maxWidth =
+                                              constraints.maxWidth;
 
-                                      // Desktop: 3 columns (1280px+)
-                                      if (maxWidth >= 1200) {
-                                        columns = 3;
-                                      }
-                                      // Tablet: 2 columns (768px - 1199px)
-                                      else if (maxWidth >= 768) {
-                                        columns = 2;
-                                      }
-                                      // Mobile: 1 column (< 768px)
-                                      else {
-                                        columns = 1;
-                                      }
-
-                                      const double spacing = 16.0;
-                                      final double itemWidth =
-                                          (maxWidth - (columns - 1) * spacing) /
-                                          columns;
-
-                                      // Create rows with equal-height cards
-                                      final List<Widget> rows = [];
-                                      final List<Reminder> reminders =
-                                          service.reminders;
-
-                                      for (
-                                        int i = 0;
-                                        i < reminders.length;
-                                        i += columns
-                                      ) {
-                                        final rowItems = <Widget>[];
-
-                                        for (int j = 0; j < columns; j++) {
-                                          if (i + j < reminders.length) {
-                                            rowItems.add(
-                                              SizedBox(
-                                                width: itemWidth,
-                                                child: SwipeableReminderCard(
-                                                  reminder: reminders[i + j],
-                                                  reminderService: service,
-                                                  themeService: themeService,
-                                                  currentTime: _currentTime,
-                                                ),
-                                              ),
-                                            );
-                                          } else {
-                                            // Empty placeholder for consistent grid
-                                            rowItems.add(
-                                              SizedBox(width: itemWidth),
-                                            );
+                                          // Desktop: 3 columns (1280px+)
+                                          if (maxWidth >= 1200) {
+                                            columns = 3;
                                           }
-                                        }
+                                          // Tablet: 2 columns (768px - 1199px)
+                                          else if (maxWidth >= 768) {
+                                            columns = 2;
+                                          }
+                                          // Mobile: 1 column (< 768px)
+                                          else {
+                                            columns = 1;
+                                          }
 
-                                        rows.add(
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                              bottom:
-                                                  i + columns < reminders.length
+                                          const double spacing = 16.0;
+                                          final double itemWidth = (maxWidth -
+                                                  (columns - 1) * spacing) /
+                                              columns;
+
+                                          // Create rows with equal-height cards
+                                          final List<Widget> rows = [];
+                                          // Sort reminders: enabled ones first, then disabled
+                                          final List<Reminder> reminders =
+                                              List.from(service.reminders)
+                                                ..sort((
+                                                  a,
+                                                  b,
+                                                ) {
+                                                  if (a.isEnabled &&
+                                                      !b.isEnabled) {
+                                                    return -1;
+                                                  }
+                                                  if (!a.isEnabled &&
+                                                      b.isEnabled) {
+                                                    return 1;
+                                                  }
+                                                  return 0;
+                                                });
+
+                                          for (int i = 0;
+                                              i < reminders.length;
+                                              i += columns) {
+                                            final rowItems = <Widget>[];
+
+                                            for (int j = 0; j < columns; j++) {
+                                              if (i + j < reminders.length) {
+                                                rowItems.add(
+                                                  SizedBox(
+                                                    width: itemWidth,
+                                                    child:
+                                                        SwipeableReminderCard(
+                                                      reminder:
+                                                          reminders[i + j],
+                                                      reminderService: service,
+                                                      themeService:
+                                                          themeService,
+                                                      currentTime: _currentTime,
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                // Empty placeholder for consistent grid
+                                                rowItems.add(
+                                                  SizedBox(width: itemWidth),
+                                                );
+                                              }
+                                            }
+
+                                            rows.add(
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                  bottom: i + columns <
+                                                          reminders.length
                                                       ? 16
                                                       : 0,
-                                            ),
-                                            child: Row(
-                                              children:
-                                                  rowItems
+                                                ),
+                                                child: Row(
+                                                  children: rowItems
                                                       .expand(
                                                         (widget) => [
                                                           widget,
@@ -346,30 +371,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                         ],
                                                       )
                                                       .toList(),
-                                            ),
-                                          ),
-                                        );
-                                      }
+                                                ),
+                                              ),
+                                            );
+                                          }
 
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: rows,
-                                      );
-                                    },
+                                          return Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: rows,
+                                          );
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
+
+                            // Bottom padding for gradient area
+                            const SliverToBoxAdapter(
+                              child: SizedBox(height: 260),
                             ),
-                          ),
-                          
-                          // Bottom padding for gradient area
-                          const SliverToBoxAdapter(
-                            child: SizedBox(height: 160),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
 
                   // Bottom gradient blur with start/stop button
                   if (service.reminders.isNotEmpty)
@@ -378,178 +403,168 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       left: 0,
                       right: 0,
                       child: Container(
-                        height: 140,
+                        height: 240,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              themeService.backgroundColor.withValues(alpha: 0.0),
-                              themeService.backgroundColor.withValues(alpha: 0.0),
-                              themeService.backgroundColor.withValues(alpha: 0.7),
-                              themeService.backgroundColor.withValues(alpha: 0.95),
+                              themeService.backgroundColor.withValues(
+                                alpha: 0.0,
+                              ),
+                              themeService.backgroundColor.withValues(
+                                alpha: 0.0,
+                              ),
+                              themeService.backgroundColor.withValues(
+                                alpha: 0.7,
+                              ),
+                              themeService.backgroundColor.withValues(
+                                alpha: 0.95,
+                              ),
                             ],
                             stops: const [0.0, 0.4, 0.7, 1.0],
                           ),
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            // Start/Stop Button
-                            AnimatedScale(
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: 10,
+                            ), // Exactly 10px from bottom
+                            child: AnimatedScale(
                               duration: const Duration(milliseconds: 150),
                               scale: 1.0,
                               child: _buildSimpleStartStopButton(service),
                             ),
-                            const SizedBox(height: 20),
-                          ],
+                          ),
                         ),
                       ),
                     ),
                 ],
               ),
-              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
               floatingActionButton: Padding(
-                padding: const EdgeInsets.only(bottom: 10, left: 16, right: 16),
+                padding: const EdgeInsets.only(
+                  bottom: 10,
+                  left: 10,
+                  right: 10,
+                ), // 10px from bottom and sides
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Stats button on the left with SpeedDial for consistency
-                    SpeedDial(
-                      icon: Icons.bar_chart_rounded,
-                      activeIcon: Icons.close,
+                    // Stats button on the left - shows info directly
+                    FloatingActionButton(
+                      heroTag: "stats",
+                      onPressed: () =>
+                          _showStatsOverlay(context, service, themeService),
                       backgroundColor: const Color(0xFF8B5CF6),
+                      foregroundColor: Colors.white,
+                      child: const Icon(Icons.bar_chart_rounded, size: 24),
+                    ),
+                    // Add reminder button on the right
+                    SpeedDial(
+                      icon: Icons.add,
+                      activeIcon: Icons.close,
+                      backgroundColor: const Color(0xFF6366F1),
                       foregroundColor: Colors.white,
                       activeForegroundColor: Colors.white,
                       activeBackgroundColor: Colors.grey[600],
                       buttonSize: const Size(56, 56),
                       iconTheme: const IconThemeData(size: 24),
+                      label: service.reminders.isEmpty
+                          ? Text(
+                              AppLocalizations.of(context)?.addReminder ??
+                                  'Add Reminder',
+                            )
+                          : null,
+                      tooltip: 'Add health reminder',
                       overlayColor: Colors.black,
                       overlayOpacity: 0.4,
-                      direction: SpeedDialDirection.up,
                       children: [
                         SpeedDialChild(
-                          child: const Icon(Icons.today, color: Colors.white),
-                          backgroundColor: const Color(0xFF10B981),
-                          label: 'Heute',
-                          labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                          onTap: () => _showStatsDetail(context, service, themeService, 'today'),
+                          child: const Icon(
+                            Icons.water_drop,
+                            color: Colors.white,
+                          ),
+                          backgroundColor: const Color(0xFF06B6D4),
+                          label: AppLocalizations.of(context)?.waterReminder ??
+                              'Water Reminder',
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          onTap: () => QuickAddDialogs.showWaterReminderDialog(
+                            context,
+                            service,
+                          ),
                         ),
                         SpeedDialChild(
-                          child: const Icon(Icons.timer, color: Colors.white),
-                          backgroundColor: const Color(0xFF8B5CF6),
-                          label: 'Nächste',
-                          labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                          onTap: () => _showStatsDetail(context, service, themeService, 'next'),
+                          child: const Icon(
+                            Icons.fitness_center,
+                            color: Colors.white,
+                          ),
+                          backgroundColor: const Color(0xFFEF4444),
+                          label:
+                              AppLocalizations.of(context)?.exerciseReminder ??
+                                  'Exercise Reminder',
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          onTap: () =>
+                              QuickAddDialogs.showExerciseReminderDialog(
+                            context,
+                            service,
+                          ),
                         ),
                         SpeedDialChild(
-                          child: const Icon(Icons.notifications_active, color: Colors.white),
+                          child: const Icon(
+                            Icons.remove_red_eye,
+                            color: Colors.white,
+                          ),
                           backgroundColor: const Color(0xFF3B82F6),
-                          label: 'Aktiv',
-                          labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                          onTap: () => _showStatsDetail(context, service, themeService, 'active'),
+                          label:
+                              AppLocalizations.of(context)?.eyeRestReminder ??
+                                  'Eye Rest Reminder',
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          onTap: () =>
+                              QuickAddDialogs.showEyeRestReminderDialog(
+                            context,
+                            service,
+                          ),
                         ),
                         SpeedDialChild(
-                          child: const Icon(Icons.local_fire_department, color: Colors.white),
-                          backgroundColor: const Color(0xFFF97316),
-                          label: 'Serie',
-                          labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                          onTap: () => _showStatsDetail(context, service, themeService, 'streak'),
+                          child: const Icon(
+                            Icons.add_circle_outline,
+                            color: Colors.white,
+                          ),
+                          backgroundColor: const Color(0xFF8B5CF6),
+                          label: AppLocalizations.of(context)?.customReminder ??
+                              'Custom Reminder',
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          onTap: () => QuickAddDialogs.showCustomReminderDialog(
+                            context,
+                            service,
+                          ),
                         ),
+                        if (service.isRunning && service.reminders.isNotEmpty)
+                          SpeedDialChild(
+                            child: const Icon(
+                              Icons.science,
+                              color: Colors.white,
+                            ),
+                            backgroundColor: Colors.orange,
+                            label: 'Test Reminder',
+                            labelStyle: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                            onTap: () => _testNotification(service),
+                          ),
                       ],
                     ),
-                    // Add reminder button on the right
-                    SpeedDial(
-                icon: Icons.add,
-                activeIcon: Icons.close,
-                backgroundColor: const Color(0xFF6366F1),
-                foregroundColor: Colors.white,
-                activeForegroundColor: Colors.white,
-                activeBackgroundColor: Colors.grey[600],
-                buttonSize: const Size(56, 56),
-                iconTheme: const IconThemeData(size: 24),
-                label:
-                    service.reminders.isEmpty
-                        ? Text(
-                          AppLocalizations.of(context)?.addReminder ??
-                              'Add Reminder',
-                        )
-                        : null,
-                tooltip: 'Add health reminder',
-                overlayColor: Colors.black,
-                overlayOpacity: 0.4,
-                children: [
-                  SpeedDialChild(
-                    child: const Icon(Icons.water_drop, color: Colors.white),
-                    backgroundColor: const Color(0xFF06B6D4),
-                    label:
-                        AppLocalizations.of(context)?.waterReminder ??
-                        'Water Reminder',
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                    onTap:
-                        () => QuickAddDialogs.showWaterReminderDialog(
-                          context,
-                          service,
-                        ),
-                  ),
-                  SpeedDialChild(
-                    child: const Icon(
-                      Icons.fitness_center,
-                      color: Colors.white,
-                    ),
-                    backgroundColor: const Color(0xFFEF4444),
-                    label:
-                        AppLocalizations.of(context)?.exerciseReminder ??
-                        'Exercise Reminder',
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                    onTap:
-                        () => QuickAddDialogs.showExerciseReminderDialog(
-                          context,
-                          service,
-                        ),
-                  ),
-                  SpeedDialChild(
-                    child: const Icon(
-                      Icons.remove_red_eye,
-                      color: Colors.white,
-                    ),
-                    backgroundColor: const Color(0xFF3B82F6),
-                    label:
-                        AppLocalizations.of(context)?.eyeRestReminder ??
-                        'Eye Rest Reminder',
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                    onTap:
-                        () => QuickAddDialogs.showEyeRestReminderDialog(
-                          context,
-                          service,
-                        ),
-                  ),
-                  SpeedDialChild(
-                    child: const Icon(
-                      Icons.add_circle_outline,
-                      color: Colors.white,
-                    ),
-                    backgroundColor: const Color(0xFF8B5CF6),
-                    label:
-                        AppLocalizations.of(context)?.customReminder ??
-                        'Custom Reminder',
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                    onTap:
-                        () => QuickAddDialogs.showCustomReminderDialog(
-                          context,
-                          service,
-                        ),
-                  ),
-                  if (service.isRunning && service.reminders.isNotEmpty)
-                    SpeedDialChild(
-                      child: const Icon(Icons.science, color: Colors.white),
-                      backgroundColor: Colors.orange,
-                      label: 'Test Reminder',
-                      labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                      onTap: () => _testNotification(service),
-                    ),
-                ],
-              ),
                   ],
                 ),
               ),
@@ -560,84 +575,214 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  void _showStatsDetail(BuildContext context, ReminderService service, ThemeService themeService, String statType) {
-    String title = '';
-    String value = '';
-    Color color = Colors.blue;
-    IconData icon = Icons.info;
-    
-    switch (statType) {
-      case 'today':
-        title = 'Heute';
-        int total = 0;
-        for (var entry in service.statistics.dailyCompletions.values) {
-          total += entry;
-        }
-        value = '$total erledigt';
-        color = const Color(0xFF10B981);
-        icon = Icons.today;
-        break;
-      case 'next':
-        title = 'Nächste Erinnerung';
-        if (service.isRunning) {
-          final enabledReminders = service.reminders.where((r) => r.isEnabled && r.nextReminder != null).toList();
-          if (enabledReminders.isNotEmpty) {
-            final nextReminder = enabledReminders.reduce((a, b) {
-              final aDiff = a.nextReminder!.difference(DateTime.now());
-              final bDiff = b.nextReminder!.difference(DateTime.now());
-              return aDiff.inSeconds < bDiff.inSeconds ? a : b;
-            });
-            final timeRemaining = nextReminder.nextReminder!.difference(DateTime.now());
-            value = 'In ${timeRemaining.inMinutes} Min';
-            title = nextReminder.title;
-          } else {
-            value = 'Keine aktiv';
-          }
-        } else {
-          value = 'System pausiert';
-        }
-        color = const Color(0xFF8B5CF6);
-        icon = Icons.timer;
-        break;
-      case 'active':
-        title = 'Aktive Erinnerungen';
-        final count = service.reminders.where((r) => r.isEnabled).length;
-        value = '$count aktiv';
-        color = const Color(0xFF3B82F6);
-        icon = Icons.notifications_active;
-        break;
-      case 'streak':
-        title = 'Serie';
-        final today = 0;
-        for (var entry in service.statistics.dailyCompletions.values) {
-          today;
-        }
-        value = today > 0 ? '1 Tag' : 'Keine Serie';
-        color = const Color(0xFFF97316);
-        icon = Icons.local_fire_department;
-        break;
+  void _showStatsOverlay(
+    BuildContext context,
+    ReminderService service,
+    ThemeService themeService,
+  ) {
+    final activeReminders = service.reminders.where((r) => r.isEnabled).length;
+    final todayCompletions = service.statistics.dailyCompletions.values.fold(
+      0,
+      (sum, count) => sum + count,
+    );
+    final totalCompletions = service.statistics.totalCompletions.values.fold(
+      0,
+      (sum, count) => sum + count,
+    );
+
+    // Get next reminder info
+    String nextReminderText = 'Keine aktiv';
+    if (service.isRunning) {
+      final enabledReminders = service.reminders
+          .where((r) => r.isEnabled && r.nextReminder != null)
+          .toList();
+      if (enabledReminders.isNotEmpty) {
+        final nextReminder = enabledReminders.reduce((a, b) {
+          final aDiff = a.nextReminder!.difference(DateTime.now());
+          final bDiff = b.nextReminder!.difference(DateTime.now());
+          return aDiff.inSeconds < bDiff.inSeconds ? a : b;
+        });
+        final timeRemaining = nextReminder.nextReminder!.difference(
+          DateTime.now(),
+        );
+        nextReminderText = 'In ${timeRemaining.inMinutes} Min';
+      }
+    } else {
+      nextReminderText = 'System pausiert';
     }
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(icon, color: Colors.white),
-            const SizedBox(width: 12),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(value, style: const TextStyle(fontSize: 12)),
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black54,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: themeService.backgroundColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
               ],
             ),
-          ],
-        ),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Row(
+                  children: [
+                    Icon(
+                      Icons.bar_chart_rounded,
+                      color: const Color(0xFF8B5CF6),
+                      size: 28,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Statistiken',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close, color: Colors.white70),
+                      iconSize: 20,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                // Stats Grid
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatsCard(
+                        'Aktiv',
+                        '$activeReminders',
+                        Icons.notifications_active,
+                        const Color(0xFF3B82F6),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatsCard(
+                        'Heute',
+                        '$todayCompletions',
+                        Icons.today,
+                        const Color(0xFF10B981),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatsCard(
+                        'Gesamt',
+                        '$totalCompletions',
+                        Icons.emoji_events,
+                        const Color(0xFFF97316),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatsCard(
+                        'Nächste',
+                        nextReminderText,
+                        Icons.timer,
+                        const Color(0xFF8B5CF6),
+                        isLargeText: nextReminderText.length > 8,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                // Action button to view detailed stats
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              StatisticsScreen(reminderService: service),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.analytics, size: 18),
+                    label: const Text('Detaillierte Statistiken'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF8B5CF6),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildStatsCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color, {
+    bool isLargeText = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: isLargeText ? 12 : 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.white70,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -658,87 +803,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildSimpleStartStopButton(ReminderService service) {
-    return Material(
-      elevation: 4,
-      borderRadius: BorderRadius.circular(20),
-      shadowColor:
-          service.isRunning
-              ? const Color(0xFFEF4444).withValues(alpha: 0.2)
-              : const Color(0xFF10B981).withValues(alpha: 0.2),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors:
-                service.isRunning
-                    ? [
-                      const Color(0xFFEF4444), // Red gradient for stop
-                      const Color(0xFFDC2626),
-                    ]
-                    : [
-                      const Color(0xFF10B981), // Green gradient for start
-                      const Color(0xFF059669),
-                    ],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color:
-                  service.isRunning
-                      ? const Color(0xFFEF4444).withValues(alpha: 0.15)
-                      : const Color(0xFF10B981).withValues(alpha: 0.15),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: AnimatedScale(
-          duration: const Duration(milliseconds: 150),
-          scale: 1.0,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTapDown: (_) {}, // Handled by AnimatedScale
-            onTapCancel: () {}, // Handled by AnimatedScale
-            onTap: () {
-              // Haptic feedback for better user experience
-              HapticFeedback.mediumImpact();
-              if (service.isRunning) {
-                service.stopReminders();
-              } else {
-                service.startReminders();
-              }
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    service.isRunning
-                        ? Icons.pause_rounded
-                        : Icons.play_arrow_rounded,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    service.isRunning
-                        ? AppLocalizations.of(context)?.pauseSystem ?? 'PAUSE'
-                        : AppLocalizations.of(context)?.startSystem ?? 'START',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+    return EnergyStartStopButton(
+      isRunning: service.isRunning,
+      onToggle: () {
+        if (service.isRunning) {
+          service.stopReminders();
+        } else {
+          service.startReminders();
+        }
+      },
+      size: 100,
     );
   }
 }
