@@ -3,6 +3,7 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Flutter SDK (latest stable)
 - Platform-specific toolchains:
   - **Android**: Android Studio, SDK 21-34
@@ -79,6 +80,7 @@ flutter run -d linux
 ## 🧪 Testing Strategy
 
 ### Unit Tests
+
 ```bash
 # Run all unit tests
 flutter test test/unit/
@@ -92,6 +94,7 @@ flutter test test/unit/core/domain/entities/reminder_entity_test.dart
 ```
 
 ### Integration Tests
+
 ```bash
 # Run integration tests
 flutter test integration_test/
@@ -101,6 +104,7 @@ flutter test integration_test/ -d "device_id"
 ```
 
 ### Widget Tests
+
 ```bash
 # Run widget tests
 flutter test test/widget/
@@ -112,6 +116,7 @@ flutter test test/widget/ --verbose
 ## 🏗️ Architecture Validation
 
 ### Clean Architecture Compliance
+
 ```bash
 # Check dependency direction
 flutter pub deps --style=compact
@@ -122,6 +127,7 @@ dependency_validator
 ```
 
 ### Platform Abstraction Verification
+
 ```bash
 # Ensure no direct platform imports in core domain
 grep -r "dart:io" lib/core/domain/ || echo "✅ Domain layer is platform-agnostic"
@@ -133,6 +139,7 @@ grep -r "Platform\." lib/core/ || echo "✅ No direct platform checks in core"
 ## 📊 Performance Testing
 
 ### App Performance
+
 ```bash
 # Profile build
 flutter run --profile --target lib/main.dart
@@ -145,6 +152,7 @@ flutter run --target lib/main.dart --enable-software-rendering
 ```
 
 ### Build Size Analysis
+
 ```bash
 # Analyze APK size
 flutter build apk --analyze-size
@@ -156,6 +164,7 @@ flutter build appbundle --analyze-size
 ## 🔍 Quality Assurance
 
 ### Code Analysis
+
 ```bash
 # Static analysis
 flutter analyze
@@ -168,6 +177,7 @@ dart format . --dry-run --set-exit-if-changed
 ```
 
 ### Security Audit
+
 ```bash
 # Dependency audit
 flutter pub deps --json | jq '.packages[].version'
@@ -179,6 +189,7 @@ git secrets --scan
 ## 🚀 CI/CD Pipeline
 
 ### GitHub Actions Workflow
+
 ```yaml
 # .github/workflows/ci.yml
 name: CI/CD Pipeline
@@ -205,6 +216,7 @@ jobs:
 ```
 
 ### Local CI Simulation
+
 ```bash
 # Run the same checks as CI
 ./scripts/ci_local.sh
@@ -213,6 +225,7 @@ jobs:
 ## 🐛 Debugging
 
 ### Debug Builds
+
 ```bash
 # Debug mode with hot reload
 flutter run --debug
@@ -225,6 +238,7 @@ flutter run -d chrome --debug
 ```
 
 ### Logging
+
 ```bash
 # View logs during development
 flutter logs
@@ -236,6 +250,7 @@ flutter logs | grep "ZENU"
 ## 📦 Release Process
 
 ### Version Management
+
 ```bash
 # Update version in pubspec.yaml
 # Then create build
@@ -245,6 +260,7 @@ flutter build apk --release --build-name=1.0.5 --build-number=7
 ### Platform-Specific Releases
 
 #### Android Release
+
 ```bash
 # 1. Create release APK
 flutter build apk --release
@@ -258,6 +274,7 @@ zipalign -v 4 app-release-unsigned.apk app-release.apk
 ```
 
 #### iOS Release
+
 ```bash
 # 1. Build for App Store
 flutter build ios --release
@@ -270,6 +287,7 @@ xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportPath build/
 ```
 
 #### Desktop Release
+
 ```bash
 # Windows
 flutter build windows --release
@@ -289,6 +307,7 @@ flutter build linux --release
 ### Common Issues
 
 #### Build Failures
+
 ```bash
 # Clean build cache
 flutter clean
@@ -299,6 +318,7 @@ cd ios && pod repo update && pod install
 ```
 
 #### Platform-Specific Issues
+
 ```bash
 # Android - Clear gradle cache
 cd android && ./gradlew clean
@@ -311,6 +331,7 @@ rm -rf build/
 ```
 
 ### Performance Issues
+
 ```bash
 # Profile the app
 flutter run --profile
@@ -322,11 +343,13 @@ flutter run --profile --trace-skia
 ## 📚 Documentation
 
 ### Architecture Documentation
+
 - [ARCHITECTURE.md](ARCHITECTURE.md) - Current architecture overview
 - [ARCHITECTURE_PLAN.md](ARCHITECTURE_PLAN.md) - New clean architecture plan
 - [API Documentation](docs/api/) - Generated API docs
 
 ### Generate Documentation
+
 ```bash
 # Generate API documentation
 dart doc .
@@ -335,6 +358,7 @@ dart doc .
 ## 🤝 Contributing
 
 ### Development Workflow
+
 1. Create feature branch from `develop`
 2. Implement changes following clean architecture
 3. Write tests for new functionality
@@ -342,6 +366,7 @@ dart doc .
 5. Create pull request with tests passing
 
 ### Code Standards
+
 - Follow clean architecture principles
 - Use platform adapters for platform-specific code
 - Maintain 80%+ test coverage

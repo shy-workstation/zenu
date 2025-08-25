@@ -4,7 +4,7 @@ This directory contains the comprehensive testing infrastructure for the Zenu we
 
 ## 📁 Directory Structure
 
-```
+``` bash
 test/
 ├── unit/                           # Unit tests
 │   ├── core/                       # Core business logic tests
@@ -92,11 +92,13 @@ test\scripts\run_tests.bat
 ### 1. Unit Tests (`test/unit/`)
 
 **Core Domain Tests:**
+
 - `reminder_test.dart`: Tests the Reminder domain model
 - `statistics_test.dart`: Tests the Statistics domain model
 - `reminder_use_cases_test.dart`: Tests business logic and use cases
 
 **Platform Tests:**
+
 - Android notification system testing
 - iOS notification system testing  
 - Windows/macOS/Linux desktop integration testing
@@ -104,6 +106,7 @@ test\scripts\run_tests.bat
 ### 2. Widget Tests (`test/widget/`)
 
 Tests UI components in isolation:
+
 - CompactStatsBar widget behavior
 - Empty state widget rendering
 - User interaction handling
@@ -111,6 +114,7 @@ Tests UI components in isolation:
 ### 3. Integration Tests (`integration_test/`)
 
 End-to-end testing:
+
 - Complete user workflows
 - Cross-platform functionality
 - Performance testing
@@ -121,6 +125,7 @@ End-to-end testing:
 ### Test Configuration (`test_config.dart`)
 
 Central configuration for test environment:
+
 - Test timeouts and categories
 - Platform-specific setup
 - Custom matchers for accessibility and duration testing
@@ -128,6 +133,7 @@ Central configuration for test environment:
 ### Mock Adapters (`test/mocks/mock_adapters.dart`)
 
 Platform-specific mock implementations:
+
 - `MockNotificationAdapter`: Cross-platform notification testing
 - `MockSystemTrayAdapter`: Desktop system tray testing
 - `MockSharedPreferencesAdapter`: Data persistence testing
@@ -136,6 +142,7 @@ Platform-specific mock implementations:
 ### Test Data Fixtures (`test/fixtures/test_data.dart`)
 
 Predefined test data for consistent testing:
+
 - `TestReminders`: Sample reminder configurations
 - `TestStatistics`: Sample statistics data
 - `TestPlatformData`: Platform-specific test configurations
@@ -144,6 +151,7 @@ Predefined test data for consistent testing:
 ### Test Helpers (`test/helpers/test_helpers.dart`)
 
 Utility functions for common test operations:
+
 - Widget testing helpers (tap, drag, scroll)
 - Accessibility testing utilities
 - Performance measurement tools
@@ -154,13 +162,15 @@ Utility functions for common test operations:
 ### Android (API 21-34)
 
 **Notification Testing:**
+
 - Notification channels and permissions
 - Scheduled notifications with exact alarms
 - Battery optimization handling
 - WorkManager integration for API 12+
 - Action buttons and user interaction
 
-**Command:** 
+**Command:**
+
 ```bash
 flutter test test/unit/platform/android/ --platform chrome
 ```
@@ -168,6 +178,7 @@ flutter test test/unit/platform/android/ --platform chrome
 ### iOS (iOS 12+)
 
 **Notification Testing:**
+
 - UNUserNotificationCenter integration
 - Notification categories and actions
 - Critical alerts and time-sensitive notifications
@@ -175,6 +186,7 @@ flutter test test/unit/platform/android/ --platform chrome
 - Live Activities (iOS 16+)
 
 **Command:**
+
 ```bash
 flutter test test/unit/platform/ios/ --platform chrome
 ```
@@ -182,16 +194,19 @@ flutter test test/unit/platform/ios/ --platform chrome
 ### Desktop Platforms
 
 **Windows:**
+
 - WinRT notifications
 - System tray integration
 - MSIX packaging
 
 **macOS:**
+
 - UserNotifications framework
 - Menu bar integration
 - App sandboxing
 
 **Linux:**
+
 - FreeDesktop notifications
 - System integration
 
@@ -202,11 +217,13 @@ flutter test test/unit/platform/ios/ --platform chrome
 Comprehensive CI/CD pipeline:
 
 **Static Analysis Job:**
+
 - Code formatting verification
 - Dart analyzer with strict rules
 - Unit test execution with coverage
 
 **Platform Build Jobs:**
+
 - Android: API levels 21, 28, 34
 - iOS: Multiple iOS versions and device types
 - Web: HTML and CanvasKit renderers
@@ -215,6 +232,7 @@ Comprehensive CI/CD pipeline:
 - Linux: AppImage bundling
 
 **Performance & Security:**
+
 - Bundle size analysis
 - Dependency security audit
 - Memory leak detection
@@ -286,18 +304,21 @@ flutter packages pub run build_runner build
 ### Common Issues
 
 **Timeout Errors:**
+
 ```bash
 # Increase timeout for slow tests
 dart test/scripts/test_runner.dart --timeout 60s
 ```
 
 **Platform Channel Errors:**
+
 ```bash
 # Use TestWidgetsFlutterBinding.ensureInitialized()
 # Mock platform channels properly
 ```
 
 **Memory Issues:**
+
 ```bash
 # Run tests with verbose memory tracking
 flutter test --verbose test/
@@ -372,24 +393,28 @@ when(mockStorage.save(any)).thenThrow(StorageException());
 ## 📚 Best Practices
 
 ### Test Organization
+
 - Group related tests using `group()`
 - Use descriptive test names
 - Follow AAA pattern (Arrange, Act, Assert)
 - Keep tests independent and isolated
 
 ### Mock Usage
+
 - Mock external dependencies
 - Verify interaction with mocks
 - Use realistic test data
 - Clean up mocks in `tearDown()`
 
 ### Performance
+
 - Run tests in parallel when possible
 - Use `setUp()` and `tearDown()` for common operations
 - Cache expensive operations
 - Profile slow tests
 
 ### Maintenance
+
 - Update tests when functionality changes  
 - Remove obsolete tests
 - Refactor duplicated test code
@@ -422,6 +447,7 @@ when(mockStorage.save(any)).thenThrow(StorageException());
 ## 🏆 Test Metrics Dashboard
 
 Current test statistics:
+
 - **Total Tests:** 150+ (unit, widget, integration)
 - **Coverage:** 87% overall
 - **Platforms:** 6 (Android, iOS, Web, Windows, macOS, Linux)
