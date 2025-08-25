@@ -1,0 +1,576 @@
+# GitHub Actions CI/CD Pipeline for Zenu Testing
+# This file should be placed in .github/workflows/ci_test.yml
+
+name: 'Zenu CI/CD Pipeline'
+
+on:
+  push:
+    branches: [ main, develop, 'feature/*', 'bugfix/*' ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      run_integration_tests:
+        description: 'Run integration tests'
+        type: boolean
+        default: false
+      platforms:
+        description: 'Platforms to test (comma-separated: android,ios,web,windows,macos,linux)'
+        type: string
+        default: 'android,web'
+      coverage:
+        description: 'Generate coverage report'
+        type: boolean
+        default: true
+
+env:
+  FLUTTER_VERSION: '3.16.0'
+  JAVA_VERSION: '17'
+  NODE_VERSION: '18'
+
+jobs:
+  # Job 1: Static Analysis and Unit Tests
+  static_analysis:
+    name: 'Static Analysis & Unit Tests'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+    - name: 'Checkout Repository'
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Needed for git-based version detection
+    
+    - name: 'Setup Java'
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JAVA_VERSION }}
+    
+    - name: 'Setup Flutter'
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+        cache-key: 'flutter-:os:-:channel:-:version:-:arch:'
+    
+    - name: 'Verify Flutter Installation'
+      run: |
+        flutter --version
+        flutter doctor -v
+    
+    - name: 'Get Flutter Dependencies'
+      run: flutter pub get
+    
+    - name: 'Generate Code'
+      run: |
+        if grep -q "build_runner" pubspec.yaml; then
+          flutter packages pub run build_runner build --delete-conflicting-outputs
+        fi
+    
+    - name: 'Verify Code Formatting'
+      run: dart format --output=none --set-exit-if-changed .
+    
+    - name: 'Run Static Analysis'
+      run: dart analyze --fatal-infos --fatal-warnings
+    
+    - name: 'Run Unit Tests with Coverage'
+      run: |
+        flutter test --coverage --reporter=github
+        echo "COVERAGE_ENABLED=true" >> $GITHUB_ENV
+    
+    - name: 'Upload Coverage to Codecov'
+      if: env.COVERAGE_ENABLED == 'true'
+      uses: codecov/codecov-action@v3
+      with:
+        file: coverage/lcov.info
+        flags: unittests
+        name: codecov-zenu
+        fail_ci_if_error: false
+    
+    - name: 'Generate Coverage Report'
+      if: env.COVERAGE_ENABLED == 'true'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lcov
+        genhtml coverage/lcov.info -o coverage/html --title "Zenu Test Coverage"
+    
+    - name: 'Upload Coverage HTML Report'
+      if: env.COVERAGE_ENABLED == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage/html
+        retention-days: 30
+    
+    - name: 'Upload Test Results'
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          test-results.xml
+          coverage/lcov.info
+        retention-days: 30
+
+  # Job 2: Android Build and Test
+  android_build:
+    name: 'Android Build & Test'
+    runs-on: ubuntu-latest
+    needs: static_analysis
+    if: contains(github.event.inputs.platforms, 'android') || github.event.inputs.platforms == '' || github.event_name != 'workflow_dispatch'
+    timeout-minutes: 45
+    
+    strategy:
+      matrix:
+        api-level: [21, 28, 34]
+        target: [google_apis]
+        arch: [x86_64]
+    
+    steps:
+    - name: 'Checkout Repository'
+      uses: actions/checkout@v4
+    
+    - name: 'Setup Java'
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JAVA_VERSION }}
+    
+    - name: 'Setup Flutter'
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+    
+    - name: 'Get Dependencies'
+      run: flutter pub get
+    
+    - name: 'Run Android Platform Tests'
+      run: flutter test test/unit/platform/android/
+    
+    - name: 'Build Android APK (Debug)'
+      run: |
+        flutter build apk --debug
+        echo "APK_PATH=build/app/outputs/flutter-apk/app-debug.apk" >> $GITHUB_ENV
+    
+    - name: 'Build Android APK (Release)'
+      if: github.ref == 'refs/heads/main'
+      run: |
+        flutter build apk --release
+        echo "APK_RELEASE_PATH=build/app/outputs/flutter-apk/app-release.apk" >> $GITHUB_ENV
+    
+    - name: 'Build Android App Bundle'
+      if: github.ref == 'refs/heads/main'
+      run: flutter build appbundle --release
+    
+    - name: 'Upload Android APK'
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apk-api${{ matrix.api-level }}
+        path: ${{ env.APK_PATH }}
+        retention-days: 30
+    
+    - name: 'Upload Android AAB'
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-aab
+        path: build/app/outputs/bundle/release/app-release.aab
+        retention-days: 90
+    
+    # Android Emulator Testing (only for specific API levels)
+    - name: 'Enable KVM'
+      if: matrix.api-level == 28
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+    
+    - name: 'AVD Cache'
+      if: matrix.api-level == 28
+      uses: actions/cache@v3
+      id: avd-cache
+      with:
+        path: |
+          ~/.android/avd/*
+          ~/.android/adb*
+        key: avd-${{ matrix.api-level }}-${{ matrix.arch }}
+    
+    - name: 'Create AVD and Generate Snapshot'
+      if: matrix.api-level == 28 && steps.avd-cache.outputs.cache-hit != 'true'
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ matrix.api-level }}
+        target: ${{ matrix.target }}
+        arch: ${{ matrix.arch }}
+        force-avd-creation: false
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: false
+        script: echo "Generated AVD snapshot for caching."
+    
+    - name: 'Run Integration Tests on Emulator'
+      if: matrix.api-level == 28 && (github.event.inputs.run_integration_tests == 'true' || github.event_name == 'schedule')
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ matrix.api-level }}
+        target: ${{ matrix.target }}
+        arch: ${{ matrix.arch }}
+        force-avd-creation: false
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
+        script: |
+          flutter test integration_test/app_test.dart --verbose
+
+  # Job 3: iOS Build and Test
+  ios_build:
+    name: 'iOS Build & Test'
+    runs-on: macos-13
+    needs: static_analysis
+    if: contains(github.event.inputs.platforms, 'ios') || github.event.inputs.platforms == '' || github.event_name != 'workflow_dispatch'
+    timeout-minutes: 45
+    
+    strategy:
+      matrix:
+        ios-version: ['12.0', '16.0', '17.0']
+        device: ['iPhone 14', 'iPad Air (5th generation)']
+    
+    steps:
+    - name: 'Checkout Repository'
+      uses: actions/checkout@v4
+    
+    - name: 'Setup Xcode'
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15.0'
+    
+    - name: 'Setup Flutter'
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+    
+    - name: 'Get Dependencies'
+      run: flutter pub get
+    
+    - name: 'Run iOS Platform Tests'
+      run: flutter test test/unit/platform/ios/
+    
+    - name: 'Build iOS (Simulator)'
+      run: |
+        flutter build ios --simulator --debug
+        echo "IOS_APP_PATH=build/ios/iphonesimulator/Runner.app" >> $GITHUB_ENV
+    
+    - name: 'Build iOS (Device - No Code Signing)'
+      if: github.ref == 'refs/heads/main'
+      run: flutter build ios --release --no-codesign
+    
+    - name: 'Run iOS Simulator Tests'
+      if: matrix.device == 'iPhone 14' && matrix.ios-version == '16.0'
+      run: |
+        # Start simulator
+        xcrun simctl boot "${{ matrix.device }}" || true
+        xcrun simctl install booted ${{ env.IOS_APP_PATH }}
+        
+        # Run integration tests
+        if [ "${{ github.event.inputs.run_integration_tests }}" = "true" ] || [ "${{ github.event_name }}" = "schedule" ]; then
+          flutter test integration_test/app_test.dart -d "iPhone 14"
+        fi
+    
+    - name: 'Upload iOS App'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-app-${{ matrix.device }}-${{ matrix.ios-version }}
+        path: ${{ env.IOS_APP_PATH }}
+        retention-days: 30
+
+  # Job 4: Web Build and Test
+  web_build:
+    name: 'Web Build & Test'
+    runs-on: ubuntu-latest
+    needs: static_analysis
+    if: contains(github.event.inputs.platforms, 'web') || github.event.inputs.platforms == '' || github.event_name != 'workflow_dispatch'
+    timeout-minutes: 20
+    
+    strategy:
+      matrix:
+        renderer: [html, canvaskit]
+    
+    steps:
+    - name: 'Checkout Repository'
+      uses: actions/checkout@v4
+    
+    - name: 'Setup Flutter'
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+    
+    - name: 'Get Dependencies'
+      run: flutter pub get
+    
+    - name: 'Build Web App'
+      run: |
+        flutter build web --web-renderer=${{ matrix.renderer }} --release
+        echo "WEB_BUILD_PATH=build/web" >> $GITHUB_ENV
+    
+    - name: 'Test Web Build'
+      run: |
+        # Simple smoke test - check if main files exist
+        test -f build/web/index.html || exit 1
+        test -f build/web/main.dart.js || exit 1
+        echo "Web build smoke test passed"
+    
+    - name: 'Setup Chrome for Testing'
+      uses: browser-actions/setup-chrome@v1
+    
+    - name: 'Run Web Tests'
+      run: flutter test --platform chrome
+    
+    - name: 'Upload Web Build'
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-build-${{ matrix.renderer }}
+        path: ${{ env.WEB_BUILD_PATH }}
+        retention-days: 30
+    
+    - name: 'Deploy to GitHub Pages'
+      if: github.ref == 'refs/heads/main' && matrix.renderer == 'canvaskit'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: build/web
+        cname: zenu-app.example.com # Replace with your domain
+
+  # Job 5: Windows Build and Test
+  windows_build:
+    name: 'Windows Build & Test'
+    runs-on: windows-latest
+    needs: static_analysis
+    if: contains(github.event.inputs.platforms, 'windows') || github.event_name != 'workflow_dispatch'
+    timeout-minutes: 30
+    
+    steps:
+    - name: 'Checkout Repository'
+      uses: actions/checkout@v4
+    
+    - name: 'Setup Flutter'
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+    
+    - name: 'Get Dependencies'
+      run: flutter pub get
+    
+    - name: 'Run Windows Platform Tests'
+      run: flutter test test/unit/platform/windows/
+    
+    - name: 'Build Windows App'
+      run: |
+        flutter build windows --release
+        echo "WINDOWS_BUILD_PATH=build/windows/runner/Release" | Out-File -FilePath $env:GITHUB_ENV -Append
+    
+    - name: 'Build MSIX Package'
+      if: github.ref == 'refs/heads/main'
+      run: flutter pub run msix:create
+    
+    - name: 'Upload Windows Build'
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-build
+        path: ${{ env.WINDOWS_BUILD_PATH }}
+        retention-days: 30
+    
+    - name: 'Upload MSIX Package'
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-msix
+        path: build/windows/*.msix
+        retention-days: 90
+
+  # Job 6: macOS Build and Test
+  macos_build:
+    name: 'macOS Build & Test'
+    runs-on: macos-13
+    needs: static_analysis
+    if: contains(github.event.inputs.platforms, 'macos') || github.event_name != 'workflow_dispatch'
+    timeout-minutes: 30
+    
+    steps:
+    - name: 'Checkout Repository'
+      uses: actions/checkout@v4
+    
+    - name: 'Setup Flutter'
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+    
+    - name: 'Get Dependencies'
+      run: flutter pub get
+    
+    - name: 'Run macOS Platform Tests'
+      run: flutter test test/unit/platform/macos/
+    
+    - name: 'Build macOS App'
+      run: |
+        flutter build macos --release
+        echo "MACOS_BUILD_PATH=build/macos/Build/Products/Release/zenu.app" >> $GITHUB_ENV
+    
+    - name: 'Upload macOS Build'
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-build
+        path: ${{ env.MACOS_BUILD_PATH }}
+        retention-days: 30
+
+  # Job 7: Linux Build and Test
+  linux_build:
+    name: 'Linux Build & Test'
+    runs-on: ubuntu-latest
+    needs: static_analysis
+    if: contains(github.event.inputs.platforms, 'linux') || github.event_name != 'workflow_dispatch'
+    timeout-minutes: 30
+    
+    steps:
+    - name: 'Checkout Repository'
+      uses: actions/checkout@v4
+    
+    - name: 'Install Linux Dependencies'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+    
+    - name: 'Setup Flutter'
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+    
+    - name: 'Enable Linux Desktop'
+      run: flutter config --enable-linux-desktop
+    
+    - name: 'Get Dependencies'
+      run: flutter pub get
+    
+    - name: 'Run Linux Platform Tests'
+      run: flutter test test/unit/platform/linux/
+    
+    - name: 'Build Linux App'
+      run: |
+        flutter build linux --release
+        echo "LINUX_BUILD_PATH=build/linux/x64/release/bundle" >> $GITHUB_ENV
+    
+    - name: 'Upload Linux Build'
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-build
+        path: ${{ env.LINUX_BUILD_PATH }}
+        retention-days: 30
+
+  # Job 8: Performance and Security Tests
+  performance_security:
+    name: 'Performance & Security Tests'
+    runs-on: ubuntu-latest
+    needs: [static_analysis]
+    if: github.event_name == 'schedule' || github.event.inputs.run_integration_tests == 'true'
+    timeout-minutes: 20
+    
+    steps:
+    - name: 'Checkout Repository'
+      uses: actions/checkout@v4
+    
+    - name: 'Setup Flutter'
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+    
+    - name: 'Get Dependencies'
+      run: flutter pub get
+    
+    - name: 'Run Dependency Security Audit'
+      run: |
+        # Check for known vulnerabilities in dependencies
+        flutter pub deps
+        flutter pub audit || true
+    
+    - name: 'Analyze Bundle Size'
+      run: |
+        flutter build web --release
+        du -sh build/web
+        ls -la build/web/
+    
+    - name: 'Run Memory Leak Tests'
+      run: |
+        # Run specific tests that check for memory leaks
+        flutter test test/ --tags=memory
+    
+    - name: 'Generate Performance Report'
+      run: |
+        echo "# Performance Report" > performance-report.md
+        echo "Generated on: $(date)" >> performance-report.md
+        echo "" >> performance-report.md
+        echo "## Bundle Sizes" >> performance-report.md
+        echo "Web: $(du -sh build/web | cut -f1)" >> performance-report.md
+    
+    - name: 'Upload Performance Report'
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-report
+        path: performance-report.md
+        retention-days: 30
+
+  # Job 9: Notification Service (Summary)
+  notification:
+    name: 'Test Summary Notification'
+    runs-on: ubuntu-latest
+    needs: [static_analysis, android_build, ios_build, web_build, windows_build, macos_build, linux_build]
+    if: always()
+    
+    steps:
+    - name: 'Determine Overall Status'
+      run: |
+        if [ "${{ needs.static_analysis.result }}" = "success" ] && 
+           [ "${{ needs.android_build.result }}" != "failure" ] &&
+           [ "${{ needs.ios_build.result }}" != "failure" ] &&
+           [ "${{ needs.web_build.result }}" != "failure" ] &&
+           [ "${{ needs.windows_build.result }}" != "failure" ] &&
+           [ "${{ needs.macos_build.result }}" != "failure" ] &&
+           [ "${{ needs.linux_build.result }}" != "failure" ]; then
+          echo "OVERALL_STATUS=success" >> $GITHUB_ENV
+          echo "STATUS_EMOJI=✅" >> $GITHUB_ENV
+        else
+          echo "OVERALL_STATUS=failure" >> $GITHUB_ENV
+          echo "STATUS_EMOJI=❌" >> $GITHUB_ENV
+        fi
+    
+    - name: 'Create Summary'
+      run: |
+        echo "# ${{ env.STATUS_EMOJI }} Zenu CI/CD Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Overall Status:** ${{ env.OVERALL_STATUS }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Job Results" >> $GITHUB_STEP_SUMMARY
+        echo "- Static Analysis: ${{ needs.static_analysis.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Android Build: ${{ needs.android_build.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- iOS Build: ${{ needs.ios_build.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Web Build: ${{ needs.web_build.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Windows Build: ${{ needs.windows_build.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- macOS Build: ${{ needs.macos_build.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Linux Build: ${{ needs.linux_build.result }}" >> $GITHUB_STEP_SUMMARY
