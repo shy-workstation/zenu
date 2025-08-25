@@ -11,6 +11,8 @@ enum ReminderType {
   jumpingJacks,
   planks,
   burpees,
+  exercise, // Added missing exercise type
+  stretching, // Added missing stretching type
   custom, // New custom type
 }
 
@@ -137,5 +139,15 @@ class Reminder {
     if (nextReminder == null) return null;
     final diff = nextReminder!.difference(DateTime.now());
     return diff.isNegative ? Duration.zero : diff;
+  }
+
+  // Add missing methods
+  void scheduleNext() {
+    nextReminder = DateTime.now().add(interval);
+  }
+
+  bool isDue() {
+    if (!isEnabled || nextReminder == null) return false;
+    return DateTime.now().isAfter(nextReminder!);
   }
 }

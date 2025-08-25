@@ -12,28 +12,31 @@ import 'utils/state_management.dart';
 import 'utils/error_handler.dart';
 import 'utils/memory_cache.dart';
 import 'utils/app_lifecycle_manager.dart';
+import 'utils/platform_helper.dart';
 import 'config/app_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize window manager for proper desktop app behavior
-  await windowManager.ensureInitialized();
-  
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(1280, 960),
-    minimumSize: Size(900, 760),
-    center: true,
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.normal,
-    windowButtonVisibility: true,
-  );
-  
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
+  // Initialize window manager only on desktop platforms
+  if (PlatformHelper.supportsWindowManagement) {
+    await windowManager.ensureInitialized();
+    
+    WindowOptions windowOptions = const WindowOptions(
+      size: Size(1280, 960),
+      minimumSize: Size(900, 760),
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.normal,
+      windowButtonVisibility: true,
+    );
+    
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
 
   // Initialize error handling first
   ErrorHandler.logInfo('🚀 Starting Zenu v${AppConfig.version}');

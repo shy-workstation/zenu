@@ -281,6 +281,10 @@ class _ReminderDialogState extends State<ReminderDialog>
         return 3; // minutes
       case ReminderType.stretch:
         return 5; // minutes
+      case ReminderType.exercise:
+        return 10; // default exercise count
+      case ReminderType.stretching:
+        return 5; // minutes
       case ReminderType.custom:
         return ((widget.reminder.minQuantity + widget.reminder.maxQuantity) / 2)
             .round();
@@ -297,7 +301,9 @@ class _ReminderDialogState extends State<ReminderDialog>
         type == ReminderType.water ||
         type == ReminderType.eyeRest ||
         type == ReminderType.standUp ||
-        type == ReminderType.stretch;
+        type == ReminderType.stretch ||
+        type == ReminderType.exercise ||
+        type == ReminderType.stretching;
   }
 
   String _getQuantityUnit(ReminderType type) {
@@ -316,7 +322,10 @@ class _ReminderDialogState extends State<ReminderDialog>
         return 'seconds';
       case ReminderType.standUp:
       case ReminderType.stretch:
+      case ReminderType.stretching:
         return 'minutes';
+      case ReminderType.exercise:
+        return 'reps';
       case ReminderType.custom:
         return widget.reminder.unit; // Use dynamic unit
     }
@@ -487,6 +496,10 @@ class _ReminderDialogState extends State<ReminderDialog>
         return '💧 Stay hydrated, stay healthy!\nYour body will thank you.';
       case ReminderType.stretch:
         return '🤸‍♂️ Keep your muscles flexible!\nPrevent stiffness and tension.';
+      case ReminderType.exercise:
+        return '💪 Time to exercise!\nKeep your body moving and healthy!';
+      case ReminderType.stretching:
+        return '🤸‍♂️ Stretching time!\nImprove flexibility and reduce tension.';
       case ReminderType.custom:
         return '⚡ Time for your ${widget.reminder.title.toLowerCase()}!\n${widget.reminder.description}';
     }

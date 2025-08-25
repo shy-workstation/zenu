@@ -138,9 +138,14 @@ class NotificationService {
     }
   }
 
-  /// Professional window activation using window_manager
+  /// Professional window activation using window_manager (desktop only)
   /// This is the industry standard approach used by Discord, VS Code, etc.
   static Future<void> _professionalWindowActivation() async {
+    // Skip window management on mobile platforms
+    if (!Platform.isWindows && !Platform.isMacOS && !Platform.isLinux) {
+      return;
+    }
+
     try {
       // Stop any ongoing flashing when user opens the app
       await _stopTaskbarFlashing();
@@ -200,8 +205,10 @@ class NotificationService {
   }
 
   Future<void> showReminderNotification(Reminder reminder) async {
-    // Start flashing taskbar to get user attention (like Discord, Teams, etc.)
-    await _startTaskbarFlashing();
+    // Start flashing taskbar to get user attention (desktop only)
+    if (Platform.isWindows) {
+      await _startTaskbarFlashing();
+    }
 
     final notificationDetails = NotificationDetails(
       android: AndroidNotificationDetails(
@@ -276,6 +283,10 @@ class NotificationService {
           return 'Don\'t forget to drink water!';
         case ReminderType.stretch:
           return 'Take a moment to stretch your body.';
+        case ReminderType.exercise:
+          return 'Time to exercise! Keep your body active!';
+        case ReminderType.stretching:
+          return 'Time for stretching! Improve flexibility and reduce tension.';
         case ReminderType.custom:
           return reminder.description;
       }
@@ -314,6 +325,10 @@ class NotificationService {
         return _localizations!.notificationTimeToDrinkWater;
       case ReminderType.stretch:
         return _localizations!.notificationTimeToStretch;
+      case ReminderType.exercise:
+        return 'Time to exercise! Keep your body active!'; // fallback until localized
+      case ReminderType.stretching:
+        return 'Time for stretching! Improve flexibility and reduce tension.'; // fallback until localized
       case ReminderType.custom:
         return reminder.description;
     }
