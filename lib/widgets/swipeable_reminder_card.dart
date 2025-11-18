@@ -480,9 +480,8 @@ class SwipeableReminderCard extends StatelessWidget {
   }
 
   void _snoozeReminder(int minutes) {
-    // Reset reminder time to snooze duration
-    reminder.nextReminder = DateTime.now().add(Duration(minutes: minutes));
-    reminderService.saveData();
+    // Use proper state management instead of direct mutation
+    reminderService.snoozeReminder(reminder, Duration(minutes: minutes));
   }
 
   void _showActionFeedback(BuildContext context, String message, Color color) {

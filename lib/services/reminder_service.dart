@@ -331,7 +331,10 @@ class ReminderService extends ChangeNotifier {
   }
 
   void duplicateReminder(String reminderId) {
-    final original = _reminders.firstWhere((r) => r.id == reminderId);
+    final original = _reminders.firstWhere(
+      (r) => r.id == reminderId,
+      orElse: () => throw Exception('Reminder with id $reminderId not found'),
+    );
     final duplicate = Reminder(
       id: '${original.id}_copy_${DateTime.now().millisecondsSinceEpoch}',
       type: original.type,

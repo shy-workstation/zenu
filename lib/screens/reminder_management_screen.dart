@@ -571,42 +571,60 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
           Icons.visibility_outlined,
           Colors.cyan,
           ReminderType.eyeRest,
-          templates.firstWhere((t) => t.name == 'Eye Rest'),
+          templates.firstWhere(
+            (t) => t.name == 'Eye Rest',
+            orElse: () => throw Exception('Eye Rest template not found'),
+          ),
         ),
         _buildTemplateChip(
           'Stand Up',
           Icons.accessibility_new,
           Colors.orange,
           ReminderType.standUp,
-          templates.firstWhere((t) => t.name == 'Stand Up'),
+          templates.firstWhere(
+            (t) => t.name == 'Stand Up',
+            orElse: () => throw Exception('Stand Up template not found'),
+          ),
         ),
         _buildTemplateChip(
           'Pull Ups',
           Icons.fitness_center,
           Colors.red,
           ReminderType.pullUps,
-          templates.firstWhere((t) => t.name == 'Pull Ups'),
+          templates.firstWhere(
+            (t) => t.name == 'Pull Ups',
+            orElse: () => throw Exception('Pull Ups template not found'),
+          ),
         ),
         _buildTemplateChip(
           'Push Ups',
           Icons.sports_gymnastics,
           Colors.green,
           ReminderType.pushUps,
-          templates.firstWhere((t) => t.name == 'Push Ups'),
+          templates.firstWhere(
+            (t) => t.name == 'Push Ups',
+            orElse: () => throw Exception('Push Ups template not found'),
+          ),
         ),
         _buildTemplateChip(
           'Drink Water',
           Icons.local_drink,
           Colors.blue,
           ReminderType.water,
-          templates.firstWhere((t) => t.name == 'Drink Water'),
+          templates.firstWhere(
+            (t) => t.name == 'Drink Water',
+            orElse: () => throw Exception('Drink Water template not found'),
+          ),
         ),
         _buildTemplateChip(
           'Stretch',
           Icons.self_improvement,
           Colors.purple,
           ReminderType.stretch,
-          templates.firstWhere((t) => t.name == 'Stretch'),
+          templates.firstWhere(
+            (t) => t.name == 'Stretch',
+            orElse: () => throw Exception('Stretch template not found'),
+          ),
         ),
       ],
     );

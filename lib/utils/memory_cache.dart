@@ -29,13 +29,18 @@ class MemoryCache {
   /// Get cached value
   T? get<T>(String key) {
     final entry = _cache[key];
-    if (entry == null) return null;
-
-    if (entry.isExpired) {
-      _cache.remove(key);
+    if (entry == null) {
+      _missCount++;
       return null;
     }
 
+    if (entry.isExpired) {
+      _cache.remove(key);
+      _missCount++;
+      return null;
+    }
+
+    _hitCount++;
     entry.lastAccessed = DateTime.now();
     return entry.value as T?;
   }
@@ -68,12 +73,14 @@ class MemoryCache {
   CacheStats get stats {
     final expired = _cache.values.where((e) => e.isExpired).length;
     final active = _cache.length - expired;
+    final totalRequests = _hitCount + _missCount;
+    final hitRate = totalRequests > 0 ? _hitCount / totalRequests : 0.0;
 
     return CacheStats(
       totalEntries: _cache.length,
       activeEntries: active,
       expiredEntries: expired,
-      hitRate: _hitCount / (_hitCount + _missCount),
+      hitRate: hitRate,
       memoryUsage: _estimateMemoryUsage(),
     );
   }
@@ -122,8 +129,8 @@ class MemoryCache {
     return 32; // default estimate for other types
   }
 
-  final int _hitCount = 0;
-  final int _missCount = 0;
+  int _hitCount = 0;
+  int _missCount = 0;
 
   void dispose() {
     if (_cleanupTimerSubscriptionId != null) {

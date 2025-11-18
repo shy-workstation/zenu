@@ -140,12 +140,14 @@ class Statistics {
   void removeReminderStats(String reminderId) {
     dailyCompletions.remove(reminderId);
     weeklyCompletions.remove(reminderId);
+    monthlyCompletions.remove(reminderId);
     totalCompletions.remove(reminderId);
   }
 
   void reset() {
     dailyCompletions.clear();
     weeklyCompletions.clear();
+    monthlyCompletions.clear();
     totalCompletions.clear();
     lastReset = DateTime.now();
   }

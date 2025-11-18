@@ -60,7 +60,10 @@ class PerformanceUtils {
     required String key,
   }) {
     _debounceTimers[key]?.cancel();
-    _debounceTimers[key] = Timer(delay, action);
+    _debounceTimers[key] = Timer(delay, () {
+      action();
+      _debounceTimers.remove(key);
+    });
   }
 
   static final Map<String, Timer> _debounceTimers = {};
