@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../models/reminder.dart';
 import '../models/statistics.dart';
 import 'notification_service.dart';
-import 'in_app_notification_service.dart';
 import 'data_service.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/global_timer_service.dart';
@@ -12,20 +11,21 @@ import '../utils/global_timer_service.dart';
 class ReminderService extends ChangeNotifier {
   final NotificationService _notificationService;
   final DataService _dataService;
-  InAppNotificationService? _inAppNotificationService;
 
   String? _timerSubscriptionId;
-  bool _isTimerPaused = false; // Track if timer is paused for popup
   List<Reminder> _reminders = [];
   Statistics _statistics = Statistics();
   bool _isRunning = false;
 
+  // Optimized notification system - no modals, card-based notifications
+  final ValueNotifier<String?> _activeNotificationId = ValueNotifier(null);
+  final List<String> _notificationQueue = [];
+
+  ValueNotifier<String?> get activeNotificationId => _activeNotificationId;
+  String? get activeNotification => _activeNotificationId.value;
+
   ReminderService(this._notificationService, this._dataService) {
     _initializeReminders();
-  }
-
-  void setInAppNotificationService(InAppNotificationService service) {
-    _inAppNotificationService = service;
   }
 
   void setLocalizations(AppLocalizations localizations) {
@@ -134,7 +134,6 @@ class ReminderService extends ChangeNotifier {
 
   void stopReminders() {
     _isRunning = false;
-    _isTimerPaused = false; // Reset pause flag when stopping
 
     // Unsubscribe from global timer
     if (_timerSubscriptionId != null) {
@@ -151,11 +150,6 @@ class ReminderService extends ChangeNotifier {
   }
 
   void _checkReminders() {
-    // Don't process reminders if system is paused for popup
-    if (_isTimerPaused) {
-      return;
-    }
-
     final now = DateTime.now();
     bool hasChanges = false;
 
@@ -177,43 +171,62 @@ class ReminderService extends ChangeNotifier {
     // Always show system notification first (works even when app is minimized)
     _notificationService.showReminderNotification(reminder);
 
-    // Also show in-app notification if available (when app is open)
-    if (_inAppNotificationService != null) {
-      // Pause the timer while waiting for user interaction
-      _pauseTimer();
-
-      _inAppNotificationService!.showReminderDialog(reminder, (quantity) {
-        if (quantity > 0) {
-          // User confirmed completion with specific quantity
-          completeReminder(reminder, customCount: quantity);
-        } else {
-          // User skipped - set next reminder time
-          reminder.resetNextReminder();
-          notifyListeners();
-        }
-        // Resume the timer after user interaction
-        _resumeTimer();
-      });
+    // Optimized in-app notification: Queue-based system
+    if (_activeNotificationId.value == null) {
+      // No active notification, show this one immediately
+      _activeNotificationId.value = reminder.id;
     } else {
-      // No in-app notification service available, just reset reminder time
+      // Another notification is active, add to queue
+      if (!_notificationQueue.contains(reminder.id)) {
+        _notificationQueue.add(reminder.id);
+      }
+    }
+  }
+
+  /// Dismiss the current notification and show next in queue
+  void dismissNotification({bool completed = false}) {
+    final currentId = _activeNotificationId.value;
+    if (currentId == null) return;
+
+    final reminder = _reminders.firstWhere(
+      (r) => r.id == currentId,
+      orElse: () => throw Exception('Reminder not found'),
+    );
+
+    if (!completed) {
+      // Skipped - reset next reminder time
       reminder.resetNextReminder();
-      notifyListeners();
     }
+
+    // Clear active notification
+    _activeNotificationId.value = null;
+
+    // Process next in queue
+    if (_notificationQueue.isNotEmpty) {
+      final nextId = _notificationQueue.removeAt(0);
+      _activeNotificationId.value = nextId;
+    }
+
+    notifyListeners();
   }
 
-  void _pauseTimer() {
-    if (_timerSubscriptionId != null && !_isTimerPaused) {
-      // Timer is managed by GlobalTimerService, just set the pause flag
-      _isTimerPaused = true;
-      debugPrint('Timer paused for reminder popup'); // Debug log
-    }
+  /// Complete the active notification with quantity
+  void completeActiveNotification(int quantity) {
+    final currentId = _activeNotificationId.value;
+    if (currentId == null) return;
+
+    final reminder = _reminders.firstWhere(
+      (r) => r.id == currentId,
+      orElse: () => throw Exception('Reminder not found'),
+    );
+
+    completeReminder(reminder, customCount: quantity);
+    dismissNotification(completed: true);
   }
 
-  void _resumeTimer() {
-    if (_isRunning && _isTimerPaused) {
-      _isTimerPaused = false;
-      debugPrint('Timer resumed after reminder popup'); // Debug log
-    }
+  /// Skip the active notification
+  void skipActiveNotification() {
+    dismissNotification(completed: false);
   }
 
   void completeReminder(Reminder reminder, {int? customCount}) {
