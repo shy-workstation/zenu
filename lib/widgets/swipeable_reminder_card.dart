@@ -4,8 +4,16 @@ import '../models/reminder.dart';
 import '../services/reminder_service.dart';
 import '../services/theme_service.dart';
 import '../utils/accessibility_utils.dart';
+import '../utils/platform_helper.dart';
 import 'pulsing_dot.dart';
 
+/// Cross-platform optimized reminder card with inline notification mode
+///
+/// Optimizations:
+/// - Web: Hover states, keyboard shortcuts, click alternatives, reduced animations
+/// - Mobile: Touch-optimized, swipe gestures, haptic feedback
+/// - Desktop: Mouse interactions, larger hit targets, keyboard nav
+/// - Performance: ValueListenableBuilder, RepaintBoundary, conditional rendering
 class SwipeableReminderCard extends StatefulWidget {
   final Reminder reminder;
   final ReminderService reminderService;
@@ -32,18 +40,28 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
   late Animation<double> _pulseAnimation;
   late double _currentQuantity;
   bool _isInitialized = false;
+  bool _isHovered = false; // Web/Desktop hover state
+
+  // Platform detection for cross-platform optimizations
+  static final bool _isWeb = PlatformHelper.isWeb;
+  static final bool _isMobile = PlatformHelper.isMobile;
+  static final bool _isDesktop = PlatformHelper.isDesktop;
+  static final bool _usesMousePrimarily = _isWeb || _isDesktop;
 
   @override
   void initState() {
     super.initState();
 
-    // Animation controller for notification mode pulsing
+    // Animation controller - Web optimization: slower, less aggressive
     _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: Duration(milliseconds: _isWeb ? 2000 : 1500),
       vsync: this,
     );
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+    _pulseAnimation = Tween<double>(
+      begin: 1.0,
+      end: _isWeb ? 1.03 : 1.05, // Reduce motion on web for performance
+    ).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
@@ -168,8 +186,10 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
         // Start/stop pulse animation based on notification state
         if (isNotifying && !_pulseController.isAnimating) {
           _pulseController.repeat(reverse: true);
-          // Trigger haptic feedback when notification appears
-          HapticFeedback.mediumImpact();
+          // Haptic feedback only on mobile (not on web)
+          if (!_isWeb) {
+            HapticFeedback.mediumImpact();
+          }
         } else if (!isNotifying && _pulseController.isAnimating) {
           _pulseController.stop();
           _pulseController.reset();
