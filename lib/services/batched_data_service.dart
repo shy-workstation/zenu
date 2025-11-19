@@ -15,7 +15,9 @@ class BatchedDataService {
   SharedPreferences? _prefs;
   Timer? _batchTimer;
   final Map<String, dynamic> _pendingWrites = {};
+  final Map<String, int> _retryCount = {};
   final Duration _batchDelay = const Duration(milliseconds: 500);
+  static const int _maxRetries = 3;
 
   bool _isInitialized = false;
 
@@ -77,6 +79,11 @@ class BatchedDataService {
         }
       }
 
+      // Clear retry counts for successful writes
+      for (final key in batch.keys) {
+        _retryCount.remove(key);
+      }
+
       if (kDebugMode) {
         debugPrint('✅ Batch write completed: ${batch.length} operations');
       }
@@ -85,9 +92,25 @@ class BatchedDataService {
         debugPrint('❌ Batch write failed: $e');
       }
 
-      // Re-schedule failed operations
-      _pendingWrites.addAll(batch);
-      _batchTimer = Timer(_batchDelay, _executeBatch);
+      // Re-schedule failed operations with retry limit
+      bool shouldRetry = false;
+      for (final entry in batch.entries) {
+        final retries = _retryCount[entry.key] ?? 0;
+        if (retries < _maxRetries) {
+          _pendingWrites[entry.key] = entry.value;
+          _retryCount[entry.key] = retries + 1;
+          shouldRetry = true;
+        } else {
+          if (kDebugMode) {
+            debugPrint('⚠️ Max retries reached for key: ${entry.key}');
+          }
+          _retryCount.remove(entry.key);
+        }
+      }
+
+      if (shouldRetry) {
+        _batchTimer = Timer(_batchDelay, _executeBatch);
+      }
     }
   }
 
