@@ -130,11 +130,15 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
     }
   }
 
+  bool _isCompleting = false;
   void _exitNotificationState({bool completed = false}) {
     _pulseController.stop();
     _pulseController.reset();
 
     if (completed) {
+      if (_isCompleting) return;
+      _isCompleting = true;
+      _scaleController.reset();
       setState(() {
         _cardState = ReminderCardState.completing;
       });
@@ -142,6 +146,7 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
         _scaleController.reverse().then((_) {
           setState(() {
             _cardState = ReminderCardState.normal;
+            _isCompleting = false;
           });
         });
       });
@@ -155,10 +160,10 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
   void _handleSkip() {
     HapticFeedback.lightImpact();
     widget.reminder.resetNextReminder();
-    
+
     // Clear the triggered notification flag so it can be triggered again next time
     widget.reminderService.clearTriggeredNotification(widget.reminder.id);
-    
+
     widget.reminderService.saveData();
     widget.reminderService.refresh();
     _exitNotificationState(completed: false);
@@ -518,7 +523,7 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                   borderRadius: BorderRadius.circular(12),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(12),
-                    onTap: _handleSkip,
+                    onTap: _isCompleting ? null : _handleSkip,
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       child: Row(
@@ -553,7 +558,7 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                   borderRadius: BorderRadius.circular(12),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(12),
-                    onTap: _handleDone,
+                    onTap: _isCompleting ? null : _handleDone,
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       child: Row(

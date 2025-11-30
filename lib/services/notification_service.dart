@@ -59,7 +59,8 @@ class NotificationService {
 
   static void _onNotificationResponse(NotificationResponse response) {
     if (kDebugMode) {
-      debugPrint('🔔 Notification response: id=${response.id}, actionId=${response.actionId}, payload=${response.payload}, input=${response.input}');
+      debugPrint(
+          '🔔 Notification response: id=${response.id}, actionId=${response.actionId}, payload=${response.payload}, input=${response.input}');
     }
     _handleNotificationAction(response.actionId, response.payload);
   }
@@ -67,7 +68,8 @@ class NotificationService {
   @pragma('vm:entry-point')
   static void _onBackgroundNotificationResponse(NotificationResponse response) {
     if (kDebugMode) {
-      debugPrint('🔔 Background notification response: id=${response.id}, actionId=${response.actionId}, payload=${response.payload}');
+      debugPrint(
+          '🔔 Background notification response: id=${response.id}, actionId=${response.actionId}, payload=${response.payload}');
     }
     _handleNotificationAction(response.actionId, response.payload);
   }
@@ -93,7 +95,7 @@ class NotificationService {
     // But if actionId starts with "reminder_", it means the notification body was clicked
     // Android: actionId is the action ID (e.g., "skip_123")
     // iOS: payload contains the data
-    
+
     // Check if actionId looks like a payload (starts with "reminder_")
     if (actionId != null && actionId.startsWith('reminder_')) {
       // User clicked notification body, not an action button
@@ -125,7 +127,8 @@ class NotificationService {
 
     // Log for debugging
     if (kDebugMode) {
-      debugPrint('🔔 Notification action: actionId=$actionId, payload=$payload, parsed: action=$action, reminderId=$reminderId');
+      debugPrint(
+          '🔔 Notification action: actionId=$actionId, payload=$payload, parsed: action=$action, reminderId=$reminderId');
     }
 
     if (reminderId == null || action == null) return;
@@ -240,8 +243,7 @@ class NotificationService {
       android: AndroidNotificationDetails(
         'health_reminder_channel',
         _localizations?.healthReminders ?? 'Health Reminders',
-        channelDescription:
-            _localizations?.notificationsForHealthReminders ??
+        channelDescription: _localizations?.notificationsForHealthReminders ??
             'Notifications for health reminders',
         importance: Importance.high,
         priority: Priority.high,
@@ -279,14 +281,29 @@ class NotificationService {
     // Use a unique notification ID based on the reminder's ID hash
     // This ensures each reminder gets its own notification slot
     final notificationId = reminder.id.hashCode.abs();
-    
-    await _flutterLocalNotificationsPlugin.show(
-      notificationId,
-      reminder.title,
-      _getNotificationBody(reminder),
-      notificationDetails,
-      payload: 'reminder_${reminder.id}',
-    );
+
+    if (kDebugMode) {
+      debugPrint(
+          '📢 Attempting to show notification: id=$notificationId, title=${reminder.title}');
+    }
+
+    try {
+      await _flutterLocalNotificationsPlugin.show(
+        notificationId,
+        reminder.title,
+        _getNotificationBody(reminder),
+        notificationDetails,
+        payload: 'reminder_${reminder.id}',
+      );
+
+      if (kDebugMode) {
+        debugPrint('✅ Notification shown successfully');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ Error showing notification: $e');
+      }
+    }
   }
 
   String _getNotificationBody(Reminder reminder) {
