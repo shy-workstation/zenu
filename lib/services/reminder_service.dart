@@ -20,6 +20,9 @@ class ReminderService extends ChangeNotifier {
   Statistics _statistics = Statistics();
   bool _isRunning = false;
 
+  // Track which reminders have already triggered notifications to prevent duplicates
+  final Set<String> _triggeredNotifications = {};
+
   // Optimized notification system - no modals, card-based notifications
   final ValueNotifier<String?> _activeNotificationId = ValueNotifier(null);
   final List<String> _notificationQueue = [];
@@ -178,6 +181,14 @@ class ReminderService extends ChangeNotifier {
   }
 
   void _triggerReminder(Reminder reminder) {
+    // Prevent duplicate notifications for the same trigger event
+    if (_triggeredNotifications.contains(reminder.id)) {
+      return; // Already triggered this notification
+    }
+
+    // Mark as triggered
+    _triggeredNotifications.add(reminder.id);
+
     // Always show system notification first (works even when app is minimized)
     _notificationService.showReminderNotification(reminder);
 
@@ -199,6 +210,9 @@ class ReminderService extends ChangeNotifier {
     reminder.completeReminder();
     _statistics.incrementCount(reminder.id, 1); // Always increment by 1
 
+    // Clear triggered notification flag so it can trigger again next time
+    _triggeredNotifications.remove(reminder.id);
+
     // The customCount parameter represents the quantity/amount performed,
     // but for completion tracking, we only count it as 1 completed reminder
     saveData();
@@ -208,8 +222,18 @@ class ReminderService extends ChangeNotifier {
   void snoozeReminder(Reminder reminder, Duration snoozeDuration) {
     // Reset the next reminder time to the snooze duration from now
     reminder.nextReminder = DateTime.now().add(snoozeDuration);
+    
+    // Clear triggered notification flag so it can trigger again after snooze
+    _triggeredNotifications.remove(reminder.id);
+    
     saveData();
     notifyListeners();
+  }
+
+  /// Clear the triggered notification flag for a reminder
+  /// Call this when user manually dismisses or interacts with a reminder
+  void clearTriggeredNotification(String reminderId) {
+    _triggeredNotifications.remove(reminderId);
   }
 
   void toggleReminder(String reminderId) {

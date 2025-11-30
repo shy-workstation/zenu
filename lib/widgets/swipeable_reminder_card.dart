@@ -155,6 +155,10 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
   void _handleSkip() {
     HapticFeedback.lightImpact();
     widget.reminder.resetNextReminder();
+    
+    // Clear the triggered notification flag so it can be triggered again next time
+    widget.reminderService.clearTriggeredNotification(widget.reminder.id);
+    
     widget.reminderService.saveData();
     widget.reminderService.refresh();
     _exitNotificationState(completed: false);

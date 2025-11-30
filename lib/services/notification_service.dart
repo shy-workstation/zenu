@@ -1,5 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
 import 'package:window_manager/window_manager.dart';
 import '../models/reminder.dart';
 import '../l10n/app_localizations.dart';
@@ -82,7 +83,11 @@ class NotificationService {
     String? reminderId;
     String? action;
 
-    // Try to extract action and reminderId from actionId (Android format)
+    // Windows: actionId contains the arguments from WindowsAction
+    // Android: actionId is the action ID (e.g., "skip_123")
+    // iOS: payload contains the data
+    
+    // First, try actionId (works for both Windows arguments and Android actions)
     if (actionId != null && actionId.contains('_')) {
       final parts = actionId.split('_');
       if (parts.length >= 2) {
@@ -91,19 +96,23 @@ class NotificationService {
       }
     }
 
-    // If no actionId, check payload (notification tap without action)
+    // If no actionId, check payload (notification tap without action or iOS)
     if (action == null && payload != null) {
       if (payload.startsWith('reminder_')) {
         reminderId = payload.substring(9);
         action = 'open'; // Default to open when notification is tapped
       } else if (payload.contains('_')) {
-        // Windows might put the action in the payload
         final parts = payload.split('_');
         if (parts.length >= 2) {
           action = parts[0];
           reminderId = parts.sublist(1).join('_');
         }
       }
+    }
+
+    // Log for debugging
+    if (kDebugMode) {
+      debugPrint('🔔 Notification action: actionId=$actionId, payload=$payload, parsed: action=$action, reminderId=$reminderId');
     }
 
     if (reminderId == null || action == null) return;
@@ -250,8 +259,12 @@ class NotificationService {
       ),
     );
 
+    // Use a unique notification ID based on the reminder's ID hash
+    // This ensures each reminder gets its own notification slot
+    final notificationId = reminder.id.hashCode.abs();
+    
     await _flutterLocalNotificationsPlugin.show(
-      reminder.type.index,
+      notificationId,
       reminder.title,
       _getNotificationBody(reminder),
       notificationDetails,
