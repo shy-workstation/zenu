@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/reminder.dart';
 import '../services/reminder_service.dart';
@@ -25,7 +25,6 @@ class SwipeableReminderCard extends StatefulWidget {
   final ReminderService reminderService;
   final ThemeService themeService;
   final DateTime currentTime;
-  final GlobalKey? cardKey;
 
   const SwipeableReminderCard({
     super.key,
@@ -33,7 +32,6 @@ class SwipeableReminderCard extends StatefulWidget {
     required this.reminderService,
     required this.themeService,
     required this.currentTime,
-    this.cardKey,
   });
 
   @override
@@ -41,7 +39,6 @@ class SwipeableReminderCard extends StatefulWidget {
 }
 
 class _SwipeableReminderCardState extends State<SwipeableReminderCard>
-<<<<<<< HEAD
     with TickerProviderStateMixin {
   ReminderCardState _cardState = ReminderCardState.normal;
   late AnimationController _pulseController;
@@ -49,15 +46,15 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
   late Animation<double> _pulseAnimation;
   late Animation<double> _scaleAnimation;
   double _currentQuantity = 0;
-=======
-class _SwipeableReminderCardState extends State<SwipeableReminderCard>
-    with TickerProviderStateMixin {
-  ReminderCardState _cardState = ReminderCardState.normal;
-  late AnimationController _pulseController;
-  late AnimationController _scaleController;
-  late Animation<double> _pulseAnimation;
-  late Animation<double> _scaleAnimation;
-  double _currentQuantity = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeQuantity();
+    _setupAnimations();
+
+    // Check if this reminder is currently triggered
+    _checkIfTriggered();
   }
 
   void _initializeQuantity() {
@@ -175,45 +172,6 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
 
   int _getDefaultQuantity(ReminderType type) {
     switch (type) {
-=======
-
-    // Animation controller - Web optimization: slower, less aggressive
-    _pulseController = AnimationController(
-      duration: Duration(milliseconds: _isWeb ? 2000 : 1500),
-      vsync: this,
-    );
-
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: _isWeb ? 1.03 : 1.05, // Reduce motion on web for performance
-    ).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-
-    // Initialize quantity
-    _initializeQuantity();
-  }
-
-  void _initializeQuantity() {
-    _currentQuantity = (widget.reminder.exerciseCount > 0
-            ? widget.reminder.exerciseCount
-            : _getDefaultQuantity())
-        .clamp(
-      widget.reminder.minQuantity.toDouble(),
-      widget.reminder.maxQuantity.toDouble(),
-    );
-    _isInitialized = true;
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  int _getDefaultQuantity() {
-    switch (widget.reminder.type) {
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
       case ReminderType.pullUps:
         return 8;
       case ReminderType.pushUps:
@@ -223,11 +181,7 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
       case ReminderType.jumpingJacks:
         return 15;
       case ReminderType.planks:
-<<<<<<< HEAD
         return 1;
-=======
-        return 30;
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
       case ReminderType.burpees:
         return 5;
       case ReminderType.water:
@@ -237,25 +191,17 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
       case ReminderType.standUp:
         return 3;
       case ReminderType.stretch:
-<<<<<<< HEAD
         return 5;
       case ReminderType.exercise:
         return 10;
       case ReminderType.stretching:
         return 5;
-=======
-      case ReminderType.stretching:
-        return 5;
-      case ReminderType.exercise:
-        return 10;
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
       case ReminderType.custom:
         return ((widget.reminder.minQuantity + widget.reminder.maxQuantity) / 2)
             .round();
     }
   }
 
-<<<<<<< HEAD
   bool _hasQuantity(ReminderType type) {
     return type == ReminderType.pullUps ||
         type == ReminderType.pushUps ||
@@ -273,21 +219,11 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
 
   String _getQuantityUnit(ReminderType type) {
     switch (type) {
-=======
-  bool _hasQuantity() {
-    return widget.reminder.type != ReminderType.custom ||
-        widget.reminder.maxQuantity > widget.reminder.minQuantity;
-  }
-
-  String _getQuantityUnit() {
-    switch (widget.reminder.type) {
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
       case ReminderType.pullUps:
       case ReminderType.pushUps:
       case ReminderType.squats:
       case ReminderType.jumpingJacks:
       case ReminderType.burpees:
-<<<<<<< HEAD
         return 'reps';
       case ReminderType.planks:
         return 'seconds';
@@ -295,95 +231,27 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
         return 'ml';
       case ReminderType.eyeRest:
         return 'seconds';
-=======
-      case ReminderType.exercise:
-        return 'reps';
-      case ReminderType.planks:
-      case ReminderType.eyeRest:
-        return 'seconds';
-      case ReminderType.water:
-        return 'ml';
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
       case ReminderType.standUp:
       case ReminderType.stretch:
       case ReminderType.stretching:
         return 'minutes';
-<<<<<<< HEAD
       case ReminderType.exercise:
         return 'reps';
-=======
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
       case ReminderType.custom:
         return widget.reminder.unit;
     }
   }
 
-<<<<<<< HEAD
   @override
   void dispose() {
     _pulseController.dispose();
     _scaleController.dispose();
     super.dispose();
-=======
-  String _getMotivationalMessage() {
-    switch (widget.reminder.type) {
-      case ReminderType.eyeRest:
-        return '👀 Give your eyes a break!\nLook at something 20 feet away.';
-      case ReminderType.standUp:
-        return '🚶 Time to stand and stretch!\nGet your blood flowing.';
-      case ReminderType.pullUps:
-        return '💪 Build your upper body strength!\nYou\'ve got this!';
-      case ReminderType.pushUps:
-        return '💪 Push yourself to be stronger!\nEvery rep counts!';
-      case ReminderType.squats:
-        return '🏋️ Strengthen those legs!\nSquat your way to health!';
-      case ReminderType.jumpingJacks:
-        return '⭐ Get your heart pumping!\nJumping jacks boost energy!';
-      case ReminderType.planks:
-        return '💪 Core power time!\nHold strong, build strength!';
-      case ReminderType.burpees:
-        return '🔥 Full body burn!\nPush your limits!';
-      case ReminderType.water:
-        return '💧 Stay hydrated, stay healthy!\nYour body will thank you.';
-      case ReminderType.stretch:
-      case ReminderType.stretching:
-        return '🤸 Keep your muscles flexible!\nPrevent stiffness.';
-      case ReminderType.exercise:
-        return '💪 Time to exercise!\nKeep your body moving!';
-      case ReminderType.custom:
-        return '⚡ Time for ${widget.reminder.title}!\n${widget.reminder.description}';
-    }
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
   }
 
   @override
   Widget build(BuildContext context) {
-    // OPTIMIZATION: Only rebuild this card when its notification state changes
-    return ValueListenableBuilder<String?>(
-      valueListenable: widget.reminderService.activeNotificationId,
-      builder: (context, activeId, child) {
-        final isNotifying = activeId == widget.reminder.id;
-
-        // Start/stop pulse animation based on notification state
-        if (isNotifying && !_pulseController.isAnimating) {
-          _pulseController.repeat(reverse: true);
-          // Haptic feedback only on mobile (not on web)
-          if (!_isWeb) {
-            HapticFeedback.mediumImpact();
-          }
-        } else if (!isNotifying && _pulseController.isAnimating) {
-          _pulseController.stop();
-          _pulseController.reset();
-        }
-
-        return _buildCard(isNotifying);
-      },
-    );
-  }
-
-  Widget _buildCard(bool isNotifying) {
     final timeRemaining = _getTimeRemaining();
-<<<<<<< HEAD
     final isRunning =
         widget.reminder.isEnabled &&
         widget.reminderService.isRunning &&
@@ -417,306 +285,11 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
       focusLabel:
           '${widget.reminder.title} reminder card, ${widget.reminder.isEnabled ? "enabled" : "disabled"}',
       onActivate: () => widget.reminderService.toggleReminder(widget.reminder.id),
-=======
-    final isRunning = widget.reminder.isEnabled &&
-        widget.reminderService.isRunning &&
-        timeRemaining != null;
-
-    // OPTIMIZATION: Conditional rendering - different widget trees for each mode
-    if (isNotifying) {
-      return _buildNotificationMode();
-    } else {
-      return _buildNormalMode(isRunning, timeRemaining);
-    }
-  }
-
-  /// NOTIFICATION MODE: Expanded card with actions
-  Widget _buildNotificationMode() {
-    return RepaintBoundary(
-      key: widget.cardKey,
-      child: AnimatedBuilder(
-        animation: _pulseAnimation,
-        builder: (context, child) => Transform.scale(
-          scale: _pulseAnimation.value,
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 24),
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: widget.themeService.cardColor,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: widget.reminder.color.withValues(alpha: 0.6),
-                width: 3,
-              ),
-              gradient: LinearGradient(
-                colors: [
-                  widget.reminder.color.withValues(alpha: 0.15),
-                  widget.reminder.color.withValues(alpha: 0.05),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.reminder.color.withValues(alpha: 0.4),
-                  blurRadius: 30,
-                  spreadRadius: 5,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Animated icon
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: widget.reminder.color.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: widget.reminder.color.withValues(alpha: 0.4),
-                        blurRadius: 16,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    widget.reminder.icon,
-                    size: 56,
-                    color: widget.reminder.color,
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Title
-                Text(
-                  widget.reminder.title,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: widget.reminder.color,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                const SizedBox(height: 12),
-
-                // Motivational message
-                Text(
-                  _getMotivationalMessage(),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: widget.themeService.textPrimary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                // Quantity selector
-                if (_hasQuantity()) ...[
-                  const SizedBox(height: 24),
-                  _buildQuantitySelector(),
-                ],
-
-                const SizedBox(height: 32),
-
-                // Action buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildActionButton(
-                        label: 'Skip',
-                        icon: Icons.close_rounded,
-                        isPrimary: false,
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          widget.reminderService.skipActiveNotification();
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 2,
-                      child: _buildActionButton(
-                        label: 'Done!',
-                        icon: Icons.check_rounded,
-                        isPrimary: true,
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                          widget.reminderService.completeActiveNotification(
-                            _currentQuantity.round(),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuantitySelector() {
-    final unit = _getQuantityUnit();
-
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: widget.reminder.color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: widget.reminder.color.withValues(alpha: 0.3),
-          width: 2,
-        ),
-      ),
-      child: Column(
-        children: [
-          Text(
-            'How much?',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: widget.reminder.color,
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Current value display
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            decoration: BoxDecoration(
-              color: widget.reminder.color.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              '${_currentQuantity.round()} $unit',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                color: widget.reminder.color,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Slider
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: widget.reminder.color,
-              inactiveTrackColor: widget.reminder.color.withValues(alpha: 0.3),
-              thumbColor: widget.reminder.color,
-              overlayColor: widget.reminder.color.withValues(alpha: 0.2),
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 14),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
-              trackHeight: 8,
-            ),
-            child: Slider(
-              value: _currentQuantity.clamp(
-                widget.reminder.minQuantity.toDouble(),
-                widget.reminder.maxQuantity.toDouble(),
-              ),
-              min: widget.reminder.minQuantity.toDouble(),
-              max: widget.reminder.maxQuantity.toDouble(),
-              divisions: ((widget.reminder.maxQuantity -
-                          widget.reminder.minQuantity) /
-                      widget.reminder.stepSize)
-                  .round(),
-              onChanged: (value) {
-                setState(() {
-                  _currentQuantity = value;
-                });
-              },
-            ),
-          ),
-
-          // Min/Max labels
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${widget.reminder.minQuantity} $unit',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: widget.reminder.color.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                '${widget.reminder.maxQuantity} $unit',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: widget.reminder.color.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButton({
-    required String label,
-    required IconData icon,
-    required bool isPrimary,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: isPrimary
-          ? widget.reminder.color
-          : widget.reminder.color.withValues(alpha: 0.2),
-      borderRadius: BorderRadius.circular(16),
-      elevation: isPrimary ? 4 : 0,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 18),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                color: isPrimary ? Colors.white : widget.reminder.color,
-                size: 24,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                label,
-                style: TextStyle(
-                  color: isPrimary ? Colors.white : widget.reminder.color,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// NORMAL MODE: Compact card with swipe actions
-  Widget _buildNormalMode(bool isRunning, Duration? timeRemaining) {
-    return AccessibilityUtils.createKeyboardNavigable(
-      focusLabel:
-          '${widget.reminder.title} reminder card, ${widget.reminder.isEnabled ? "enabled" : "disabled"}',
-      onActivate: () =>
-          widget.reminderService.toggleReminder(widget.reminder.id),
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
       onSpace: () => widget.reminderService.toggleReminder(widget.reminder.id),
       onEnter: () => _showTimerChangeDialog(context),
       child: Semantics(
         label:
             '${widget.reminder.title} reminder, ${widget.reminder.isEnabled ? "enabled" : "disabled"}',
-<<<<<<< HEAD
         hint:
             _cardState == ReminderCardState.notification
                 ? 'Reminder triggered! Double tap to complete, or swipe to skip.'
@@ -1032,50 +605,6 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
       case ReminderType.custom:
         return widget.reminder.description;
     }
-=======
-        hint: isRunning
-            ? 'Next reminder in ${AccessibilityUtils.formatDurationForA11y(timeRemaining)}. Swipe right to complete, left to snooze 10 minutes.'
-            : 'Double tap to toggle reminder, press enter to change timer, swipe for actions',
-        button: true,
-        child: Dismissible(
-          key: Key('swipe_${widget.reminder.id}'),
-          background: _buildSwipeBackground(
-            alignment: Alignment.centerLeft,
-            color: Colors.green,
-            icon: Icons.check_circle,
-            label: 'Complete',
-          ),
-          secondaryBackground: _buildSwipeBackground(
-            alignment: Alignment.centerRight,
-            color: Colors.orange,
-            icon: Icons.snooze,
-            label: 'Snooze 10m',
-          ),
-          confirmDismiss: (direction) async {
-            HapticFeedback.mediumImpact();
-
-            if (direction == DismissDirection.startToEnd) {
-              widget.reminderService.completeReminder(widget.reminder);
-              _showActionFeedback(
-                context,
-                'Completed ${widget.reminder.title}!',
-                Colors.green,
-              );
-            } else if (direction == DismissDirection.endToStart) {
-              _snoozeReminder(10);
-              _showActionFeedback(
-                context,
-                'Snoozed for 10 minutes',
-                Colors.orange,
-              );
-            }
-            return false;
-          },
-          child: _buildReminderCard(context, isRunning, timeRemaining),
-        ),
-      ),
-    );
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
   }
 
   Widget _buildSwipeBackground({
@@ -1125,7 +654,6 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-<<<<<<< HEAD
           color:
               widget.reminder.isEnabled
                   ? widget.themeService.cardColor
@@ -1136,21 +664,10 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                 isRunning
                     ? widget.reminder.color.withValues(alpha: 0.6)
                     : widget.reminder.isEnabled
-=======
-          color: widget.reminder.isEnabled
-              ? widget.themeService.cardColor
-              : widget.themeService.cardColor.withValues(alpha: 0.7),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isRunning
-                ? widget.reminder.color.withValues(alpha: 0.6)
-                : widget.reminder.isEnabled
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                     ? widget.reminder.color.withValues(alpha: 0.2)
                     : widget.themeService.borderColor.withValues(alpha: 0.5),
             width: isRunning ? 2.5 : 2,
           ),
-<<<<<<< HEAD
           gradient:
               isRunning && widget.reminder.isEnabled
                   ? LinearGradient(
@@ -1168,23 +685,6 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                   isRunning
                       ? widget.reminder.color.withValues(alpha: 0.2)
                       : widget.themeService.shadowColor,
-=======
-          gradient: isRunning && widget.reminder.isEnabled
-              ? LinearGradient(
-                  colors: [
-                    widget.reminder.color.withValues(alpha: 0.08),
-                    widget.reminder.color.withValues(alpha: 0.02),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
-          boxShadow: [
-            BoxShadow(
-              color: isRunning
-                  ? widget.reminder.color.withValues(alpha: 0.2)
-                  : widget.themeService.shadowColor,
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
               blurRadius: isRunning ? 20 : 15,
               offset: const Offset(0, 5),
             ),
@@ -1192,26 +692,24 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
         ),
         child: Stack(
           children: [
-<<<<<<< HEAD
             // Pulsing indicator for active reminders
-=======
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
             if (isRunning && widget.reminder.isEnabled)
               Positioned(
                 top: 0,
                 right: 0,
                 child: PulsingDot(color: widget.reminder.color, size: 10),
               ),
+
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Header row with icon and toggle
                 Row(
                   children: [
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-<<<<<<< HEAD
                         color:
                             isRunning
                                 ? widget.reminder.color.withValues(alpha: 0.2)
@@ -1229,22 +727,6 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                                   ),
                                 ]
                                 : null,
-=======
-                        color: isRunning
-                            ? widget.reminder.color.withValues(alpha: 0.2)
-                            : widget.reminder.color.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: isRunning
-                            ? [
-                                BoxShadow(
-                                  color: widget.reminder.color
-                                      .withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                            : null,
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                       ),
                       child: Icon(
                         widget.reminder.icon,
@@ -1253,18 +735,15 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                       ),
                     ),
                     const Spacer(),
+
+                    // Enhanced toggle with text and clear states
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
                         onTap: () {
                           HapticFeedback.lightImpact();
-<<<<<<< HEAD
                           widget.reminderService.toggleReminder(widget.reminder.id);
-=======
-                          widget.reminderService
-                              .toggleReminder(widget.reminder.id);
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
@@ -1273,7 +752,6 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                           ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
-<<<<<<< HEAD
                             color:
                                 widget.reminder.isEnabled
                                     ? widget.reminder.color.withValues(alpha: 0.15)
@@ -1283,15 +761,6 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                                   widget.reminder.isEnabled
                                       ? widget.reminder.color.withValues(alpha: 0.3)
                                       : Colors.grey.withValues(alpha: 0.3),
-=======
-                            color: widget.reminder.isEnabled
-                                ? widget.reminder.color.withValues(alpha: 0.15)
-                                : Colors.grey.withValues(alpha: 0.1),
-                            border: Border.all(
-                              color: widget.reminder.isEnabled
-                                  ? widget.reminder.color.withValues(alpha: 0.3)
-                                  : Colors.grey.withValues(alpha: 0.3),
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                               width: 1.5,
                             ),
                           ),
@@ -1303,7 +772,6 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                                     ? Icons.check_circle
                                     : Icons.pause_circle_outline,
                                 size: 16,
-<<<<<<< HEAD
                                 color:
                                     widget.reminder.isEnabled
                                         ? widget.reminder.color
@@ -1321,21 +789,6 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                                       widget.reminder.isEnabled
                                           ? widget.reminder.color
                                           : Colors.grey,
-=======
-                                color: widget.reminder.isEnabled
-                                    ? widget.reminder.color
-                                    : Colors.grey,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                widget.reminder.isEnabled ? 'Ein' : 'Aus',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: widget.reminder.isEnabled
-                                      ? widget.reminder.color
-                                      : Colors.grey,
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                                 ),
                               ),
                             ],
@@ -1345,7 +798,10 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 16),
+
+                // Title and description
                 Text(
                   widget.reminder.title,
                   style: TextStyle(
@@ -1363,9 +819,13 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+
                 const SizedBox(height: 16),
+
+                // Time information with enhanced touch targets
                 Row(
                   children: [
+                    // Interval chip (enhanced touch target)
                     Semantics(
                       label:
                           'Reminder interval ${_formatDuration(widget.reminder.interval)}',
@@ -1381,19 +841,10 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-<<<<<<< HEAD
                               color: widget.reminder.color.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: widget.reminder.color.withValues(alpha: 0.2),
-=======
-                              color: widget.reminder.color
-                                  .withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: widget.reminder.color
-                                    .withValues(alpha: 0.2),
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                               ),
                             ),
                             child: Row(
@@ -1417,12 +868,7 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                                 Icon(
                                   Icons.edit_rounded,
                                   size: 12,
-<<<<<<< HEAD
                                   color: widget.reminder.color.withValues(alpha: 0.7),
-=======
-                                  color: widget.reminder.color
-                                      .withValues(alpha: 0.7),
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                                 ),
                               ],
                             ),
@@ -1430,6 +876,8 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                         ),
                       ),
                     ),
+
+                    // Time remaining (if running)
                     if (isRunning && timeRemaining != null) ...[
                       const SizedBox(width: 12),
                       Expanded(
@@ -1449,12 +897,7 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                             ),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-<<<<<<< HEAD
                               color: widget.reminder.color.withValues(alpha: 0.3),
-=======
-                              color:
-                                  widget.reminder.color.withValues(alpha: 0.3),
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                               width: 1.5,
                             ),
                           ),
@@ -1464,12 +907,7 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-<<<<<<< HEAD
                                   PulsingDot(color: widget.reminder.color, size: 6),
-=======
-                                  PulsingDot(
-                                      color: widget.reminder.color, size: 6),
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                                   const SizedBox(width: 8),
                                   Text(
                                     'Next in',
@@ -1497,19 +935,14 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                     ],
                   ],
                 ),
+
+                // Progress indicator for active reminders
                 if (isRunning && timeRemaining != null) ...[
                   const SizedBox(height: 12),
                   LinearProgressIndicator(
                     value: _getProgressValue(timeRemaining),
-<<<<<<< HEAD
                     backgroundColor: widget.reminder.color.withValues(alpha: 0.1),
                     valueColor: AlwaysStoppedAnimation<Color>(widget.reminder.color),
-=======
-                    backgroundColor:
-                        widget.reminder.color.withValues(alpha: 0.1),
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(widget.reminder.color),
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                     minHeight: 4,
                   ),
                 ],
@@ -1571,7 +1004,6 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
   }
 
   void _snoozeReminder(int minutes) {
-<<<<<<< HEAD
     // Reset reminder time to snooze duration
     widget.reminder.nextReminder = DateTime.now().add(Duration(minutes: minutes));
     widget.reminderService.saveData();
@@ -1581,10 +1013,6 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
   void _showEditDialog(BuildContext context) {
     // Open the timer change dialog for editing
     _showTimerChangeDialog(context);
-=======
-    widget.reminderService
-        .snoozeReminder(widget.reminder, Duration(minutes: minutes));
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
   }
 
   void _showActionFeedback(BuildContext context, String message, Color color) {
@@ -1630,12 +1058,7 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                   color: widget.reminder.color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-<<<<<<< HEAD
                 child: Icon(widget.reminder.icon, color: widget.reminder.color, size: 20),
-=======
-                child: Icon(widget.reminder.icon,
-                    color: widget.reminder.color, size: 20),
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1681,35 +1104,15 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: timerOptions.map((minutes) {
-                    final isSelected = minutes == currentMinutes;
-                    final duration = Duration(minutes: minutes);
+                  children:
+                      timerOptions.map((minutes) {
+                        final isSelected = minutes == currentMinutes;
+                        final duration = Duration(minutes: minutes);
 
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          widget.reminderService.updateReminderInterval(
-                            widget.reminder.id,
-                            duration,
-                          );
-                          Navigator.of(context).pop();
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? widget.reminder.color.withValues(alpha: 0.2)
-                                : widget.themeService.isDarkMode
-                                    ? Colors.grey[800]
-                                    : Colors.grey[100],
+                        return Material(
+                          color: Colors.transparent,
+                          child: InkWell(
                             borderRadius: BorderRadius.circular(12),
-<<<<<<< HEAD
                             onTap: () {
                               widget.reminderService.updateReminderInterval(
                                 widget.reminder.id,
@@ -1753,59 +1156,32 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                                           : widget.themeService.textPrimary,
                                 ),
                               ),
-=======
-                            border: Border.all(
-                              color: isSelected
-                                  ? widget.reminder.color
-                                  : widget.themeService.borderColor,
-                              width: isSelected ? 2 : 1,
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                             ),
                           ),
-                          child: Text(
-                            _formatDuration(duration),
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: isSelected
-                                  ? FontWeight.w700
-                                  : FontWeight.w600,
-                              color: isSelected
-                                  ? widget.reminder.color
-                                  : widget.themeService.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
                 ),
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-<<<<<<< HEAD
                     color:
                         widget.themeService.isDarkMode
                             ? Colors.blue.withValues(alpha: 0.1)
                             : Colors.blue.withValues(alpha: 0.05),
-=======
-                    color: widget.themeService.isDarkMode
-                        ? Colors.blue.withValues(alpha: 0.1)
-                        : Colors.blue.withValues(alpha: 0.05),
->>>>>>> cd70b5123505b204ba5fcc5a84d3db0cb3d46246
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: Colors.blue.withValues(alpha: 0.2),
                     ),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.info_outline_rounded,
                         size: 16,
                         color: Colors.blue,
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'Timer will reset and start with the new interval',
