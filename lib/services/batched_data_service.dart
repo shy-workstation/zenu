@@ -120,14 +120,16 @@ class BatchedDataService {
 
       if (kDebugMode) {
         final successCount = batch.length - failedWrites.length;
-        debugPrint('✅ Batch write completed: $successCount/${batch.length} operations');
+        debugPrint(
+            '✅ Batch write completed: $successCount/${batch.length} operations');
       }
 
       // Re-schedule only failed operations with exponential backoff
       if (failedWrites.isNotEmpty) {
         _pendingWrites.addAll(failedWrites);
         _currentRetryAttempt++;
-        final backoffDelay = _initialRetryDelay * (1 << _currentRetryAttempt.clamp(0, 5));
+        final backoffDelay =
+            _initialRetryDelay * (1 << _currentRetryAttempt.clamp(0, 5));
         _batchTimer = Timer(backoffDelay, _executeBatch);
 
         if (kDebugMode) {
@@ -146,11 +148,13 @@ class BatchedDataService {
       if (_currentRetryAttempt < _maxRetryAttempts) {
         _pendingWrites.addAll(batch);
         _currentRetryAttempt++;
-        final backoffDelay = _initialRetryDelay * (1 << _currentRetryAttempt.clamp(0, 5));
+        final backoffDelay =
+            _initialRetryDelay * (1 << _currentRetryAttempt.clamp(0, 5));
         _batchTimer = Timer(backoffDelay, _executeBatch);
       } else {
         if (kDebugMode) {
-          debugPrint('❌ Max retry attempts reached, dropping ${batch.length} writes');
+          debugPrint(
+              '❌ Max retry attempts reached, dropping ${batch.length} writes');
         }
         _currentRetryAttempt = 0;
       }

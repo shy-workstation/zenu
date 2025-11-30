@@ -21,7 +21,7 @@ void main() async {
   // Initialize window manager only on desktop platforms
   if (PlatformHelper.supportsWindowManagement) {
     await windowManager.ensureInitialized();
-    
+
     WindowOptions windowOptions = const WindowOptions(
       size: Size(1280, 960),
       minimumSize: Size(900, 760),
@@ -31,7 +31,7 @@ void main() async {
       titleBarStyle: TitleBarStyle.normal,
       windowButtonVisibility: true,
     );
-    
+
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
       await windowManager.focus();
@@ -91,30 +91,29 @@ void main() async {
         ],
         supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
         home: Builder(
-          builder:
-              (context) => Scaffold(
-                body: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error, size: 64, color: Colors.red),
-                      const SizedBox(height: 16),
-                      Text(
-                        AppLocalizations.of(context)?.failedToStartApp ??
-                            'Failed to start app',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${AppLocalizations.of(context)?.error ?? 'Error'}: ${e.toString()}',
-                      ),
-                    ],
+          builder: (context) => Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppLocalizations.of(context)?.failedToStartApp ??
+                        'Failed to start app',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${AppLocalizations.of(context)?.error ?? 'Error'}: ${e.toString()}',
+                  ),
+                ],
               ),
+            ),
+          ),
         ),
       ),
     );
