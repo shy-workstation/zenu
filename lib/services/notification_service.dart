@@ -128,8 +128,10 @@ class NotificationService {
       // Update debounce time
       _lastActivationTime = now;
 
-      // User chose to skip the reminder - just reset the next reminder time
+      // User chose to skip the reminder - reset the next reminder time
       reminder.resetNextReminder();
+      // Clear the triggered flag so it can notify again next time
+      _reminderService!.clearTriggeredNotification(reminderId);
       _reminderService!.saveData();
     } else if (action == 'open') {
       // Update debounce time
@@ -137,6 +139,8 @@ class NotificationService {
 
       // User chose to open app - reset reminder time
       reminder.resetNextReminder();
+      // Clear the triggered flag so it can notify again next time
+      _reminderService!.clearTriggeredNotification(reminderId);
       _reminderService!.saveData();
 
       // Use professional window manager to bring app to foreground
