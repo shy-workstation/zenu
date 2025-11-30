@@ -85,6 +85,11 @@ class ErrorHandler {
     }
   }
 
+  /// Dispose of resources (call when app is closing)
+  static void dispose() {
+    _errorStreamController.close();
+  }
+
   static void _logToConsole(AppError error) {
     final emoji = error.severity.emoji;
     debugPrint('$emoji ${error.severity.name.toUpperCase()}: ${error.error}');

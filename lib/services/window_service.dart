@@ -60,8 +60,11 @@ class WindowService {
   /// Save window size
   Future<void> saveWindowSize(double width, double height) async {
     try {
-      await _prefs?.setDouble(_windowWidthKey, width);
-      await _prefs?.setDouble(_windowHeightKey, height);
+      if (_prefs == null) {
+        throw StateError('WindowService not initialized');
+      }
+      await _prefs!.setDouble(_windowWidthKey, width);
+      await _prefs!.setDouble(_windowHeightKey, height);
 
       if (kDebugMode) {
         debugPrint('💾 Window size saved: ${width}x$height');
@@ -79,8 +82,11 @@ class WindowService {
   /// Save window position
   Future<void> saveWindowPosition(double x, double y) async {
     try {
-      await _prefs?.setDouble(_windowXKey, x);
-      await _prefs?.setDouble(_windowYKey, y);
+      if (_prefs == null) {
+        throw StateError('WindowService not initialized');
+      }
+      await _prefs!.setDouble(_windowXKey, x);
+      await _prefs!.setDouble(_windowYKey, y);
 
       if (kDebugMode) {
         debugPrint('💾 Window position saved: ($x, $y)');
@@ -98,11 +104,14 @@ class WindowService {
   /// Save window state
   Future<void> saveWindowState({bool? isMaximized, bool? isFullscreen}) async {
     try {
+      if (_prefs == null) {
+        throw StateError('WindowService not initialized');
+      }
       if (isMaximized != null) {
-        await _prefs?.setBool(_windowMaximizedKey, isMaximized);
+        await _prefs!.setBool(_windowMaximizedKey, isMaximized);
       }
       if (isFullscreen != null) {
-        await _prefs?.setBool(_windowFullscreenKey, isFullscreen);
+        await _prefs!.setBool(_windowFullscreenKey, isFullscreen);
       }
 
       if (kDebugMode) {

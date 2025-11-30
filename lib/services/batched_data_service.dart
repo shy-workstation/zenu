@@ -15,7 +15,9 @@ class BatchedDataService {
   SharedPreferences? _prefs;
   Timer? _batchTimer;
   final Map<String, dynamic> _pendingWrites = {};
+  final Map<String, int> _retryCount = {};
   final Duration _batchDelay = const Duration(milliseconds: 500);
+  static const int _maxRetries = 3;
 
   bool _isInitialized = false;
   bool _isExecutingBatch = false;
@@ -109,6 +111,11 @@ class BatchedDataService {
             _failedWriteAttempts.remove(entry.key);
           }
         }
+      }
+
+      // Clear retry counts for successful writes
+      for (final key in batch.keys) {
+        _retryCount.remove(key);
       }
 
       if (kDebugMode) {
