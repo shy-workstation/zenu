@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 
@@ -25,44 +24,25 @@ class EmptyState extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Animated icon with gentle pulse
-              TweenAnimationBuilder<double>(
-                duration: const Duration(seconds: 2),
-                tween: Tween(begin: 0.8, end: 1.0),
-                curve: Curves.easeInOut,
-                builder: (context, scale, child) {
-                  return Transform.scale(
-                    scale: scale,
-                    child: Container(
-                      padding: const EdgeInsets.all(32),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            primaryColor.withValues(alpha: 0.1),
-                            primaryColor.withValues(alpha: 0.05),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.notifications_none_outlined,
-                        size: 120,
-                        color: primaryColor.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  );
-                },
-                onEnd: () {
-                  // Restart animation for continuous pulse (only in non-test environment)
-                  if (!kIsWeb && !kDebugMode) {
-                    Future.delayed(const Duration(milliseconds: 500), () {
-                      if (context.mounted) {
-                        (context as Element).markNeedsBuild();
-                      }
-                    });
-                  }
-                },
+              // Static icon with subtle gradient - removed unsafe animation
+              Container(
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      primaryColor.withValues(alpha: 0.1),
+                      primaryColor.withValues(alpha: 0.05),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.notifications_none_outlined,
+                  size: 120,
+                  color: primaryColor.withValues(alpha: 0.6),
+                ),
               ),
 
               const SizedBox(height: 32),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import '../models/reminder.dart';
 import '../models/statistics.dart';
 import 'notification_service.dart';
@@ -8,6 +9,8 @@ import 'in_app_notification_service.dart';
 import 'data_service.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/global_timer_service.dart';
+
+const _uuid = Uuid();
 
 class ReminderService extends ChangeNotifier {
   final NotificationService _notificationService;
@@ -328,8 +331,9 @@ class ReminderService extends ChangeNotifier {
 
   void duplicateReminder(String reminderId) {
     final original = _reminders.firstWhere((r) => r.id == reminderId);
+    // Use UUID to guarantee unique ID and prevent collisions
     final duplicate = Reminder(
-      id: '${original.id}_copy_${DateTime.now().millisecondsSinceEpoch}',
+      id: _uuid.v4(),
       type: original.type,
       title: '${original.title} (Copy)',
       description: original.description,

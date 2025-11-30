@@ -318,18 +318,26 @@ class SharedPreferencesStorageAdapter implements StorageAdapter {
 
   @override
   Future<void> saveSecure(String key, String value) async {
-    // SharedPreferences doesn't provide encryption, so this is a basic implementation
-    // In a production app, you should use flutter_secure_storage for sensitive data
+    // SECURITY WARNING: SharedPreferences does NOT provide encryption!
+    // Data is stored in plaintext and can be accessed by other apps with root access.
+    // For sensitive data (API keys, tokens, passwords), use flutter_secure_storage instead.
+    ErrorHandler.logWarning(
+      '⚠️ SECURITY WARNING: saveSecure() called but SharedPreferences does NOT encrypt data! '
+      'Key "$key" is being stored in plaintext. Use flutter_secure_storage for sensitive data.'
+    );
     await save('secure_$key', value);
-    ErrorHandler.logWarning('Secure storage not implemented for SharedPreferences - use flutter_secure_storage for sensitive data');
   }
 
   @override
   Future<String?> getSecure(String key) async {
-    // SharedPreferences doesn't provide encryption
+    // SECURITY WARNING: This is NOT secure storage!
+    // The data was stored in plaintext and is being retrieved without decryption.
     final value = await get<String>('secure_$key');
     if (value != null) {
-      ErrorHandler.logWarning('Secure storage not implemented for SharedPreferences - use flutter_secure_storage for sensitive data');
+      ErrorHandler.logWarning(
+        '⚠️ SECURITY WARNING: getSecure() called but SharedPreferences does NOT encrypt data! '
+        'Key "$key" was stored in plaintext. Use flutter_secure_storage for sensitive data.'
+      );
     }
     return value;
   }

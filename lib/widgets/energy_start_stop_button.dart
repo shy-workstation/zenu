@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:math';
 import 'dart:async';
+import '../l10n/app_localizations.dart';
 
 class EnergyStartStopButton extends StatefulWidget {
   final bool isRunning;
@@ -142,93 +144,121 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([_breathingAnimation, _scaleAnimation]),
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: SizedBox(
-            width: widget.size * 2,
-            height: widget.size *
-                1.2, // Further reduced height to cut more bottom area
-            child: ClipRect(
-              // Clip to hide bottom effects
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Ambient dots
-                  ..._ambientDots.map((dot) => _buildAmbientDot(dot)),
+    final localizations = AppLocalizations.of(context);
+    // Use existing localization keys with English fallbacks
+    final semanticLabel = widget.isRunning
+        ? (localizations?.pauseSystem ?? 'Stop reminders')
+        : (localizations?.startSystem ?? 'Start reminders');
+    const semanticHint = 'Double tap to toggle';
+    final statusAnnouncement = widget.isRunning
+        ? (localizations?.systemActive ?? 'Reminders are running')
+        : (localizations?.systemPaused ?? 'Reminders are paused');
 
-                  // Energy particles
-                  ..._particles.map(
-                    (particle) => _buildEnergyParticle(particle),
-                  ),
+    return Semantics(
+      label: '$semanticLabel. $statusAnnouncement',
+      hint: semanticHint,
+      button: true,
+      enabled: true,
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        widget.onToggle();
+      },
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_breathingAnimation, _scaleAnimation]),
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: SizedBox(
+              width: widget.size * 2,
+              height: widget.size *
+                  1.2, // Further reduced height to cut more bottom area
+              child: ClipRect(
+                // Clip to hide bottom effects
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Ambient dots (excluded from semantics)
+                    ..._ambientDots.map((dot) => _buildAmbientDot(dot)),
 
-                  // Main button - positioned higher to account for reduced height
-                  Positioned(
-                    bottom: widget.size *
-                        0.1, // Position button 10px from bottom of reduced container
-                    child: GestureDetector(
-                      onTapDown: _onTapDown,
-                      onTapUp: _onTapUp,
-                      onTapCancel: _onTapCancel,
-                      child: Container(
-                        width: widget.size,
-                        height: widget.size,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.1),
-                            width: 1,
-                          ),
-                          gradient: RadialGradient(
-                            center: Alignment.center,
-                            colors: widget.isRunning
-                                ? [
-                                    const Color(0xFFF9CA24),
-                                    const Color(0xFFF0932B),
-                                  ]
-                                : [
-                                    const Color(0xFF1A4073),
-                                    const Color(0xFF1A4073),
-                                  ],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: widget.isRunning
-                                  ? const Color(
-                                      0xFFF9CA24,
-                                    ).withValues(
-                                      alpha: _breathingAnimation.value)
-                                  : Colors.black.withValues(alpha: 0.2),
-                              blurRadius: widget.isRunning ? 20 : 10,
-                              spreadRadius: widget.isRunning ? 2 : 0,
+                    // Energy particles (excluded from semantics)
+                    ..._particles.map(
+                      (particle) => _buildEnergyParticle(particle),
+                    ),
+
+                    // Main button - positioned higher to account for reduced height
+                    Positioned(
+                      bottom: widget.size *
+                          0.1, // Position button 10px from bottom of reduced container
+                      child: GestureDetector(
+                        onTapDown: _onTapDown,
+                        onTapUp: _onTapUp,
+                        onTapCancel: _onTapCancel,
+                        child: Container(
+                          width: widget.size,
+                          height: widget.size,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              width: 1,
                             ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            widget.isRunning ? 'STOP' : 'START',
-                            style: TextStyle(
-                              color: Colors.white.withValues(
-                                alpha: widget.isRunning ? 0.9 : 0.5,
+                            gradient: RadialGradient(
+                              center: Alignment.center,
+                              colors: widget.isRunning
+                                  ? [
+                                      const Color(0xFFF9CA24),
+                                      const Color(0xFFF0932B),
+                                    ]
+                                  : [
+                                      const Color(0xFF2D5A9E),
+                                      const Color(0xFF1A4073),
+                                    ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: widget.isRunning
+                                    ? const Color(
+                                        0xFFF9CA24,
+                                      ).withValues(
+                                        alpha: _breathingAnimation.value)
+                                    : Colors.black.withValues(alpha: 0.3),
+                                blurRadius: widget.isRunning ? 20 : 10,
+                                spreadRadius: widget.isRunning ? 2 : 0,
                               ),
-                              fontSize: 16, // Increased from 14 to 16
-                              fontWeight: FontWeight
-                                  .w500, // Increased from w400 to w500 for better visibility
-                              letterSpacing: 2,
+                            ],
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  widget.isRunning
+                                      ? (localizations?.pause ?? 'STOP')
+                                      : (localizations?.start ?? 'START'),
+                                  style: TextStyle(
+                                    // Improved contrast: minimum 0.7 opacity for better readability
+                                    color: Colors.white.withValues(
+                                      alpha: widget.isRunning ? 0.95 : 0.85,
+                                    ),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 2,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -275,7 +305,13 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
               });
             }
           });
-          return const SizedBox.shrink();
+          // Return an invisible Positioned instead of SizedBox.shrink()
+          // to maintain compatibility with Stack parent
+          return Positioned(
+            left: 0,
+            top: 0,
+            child: const SizedBox.shrink(),
+          );
         }
 
         final currentDistance = particle.startDistance * (1 - progress);

@@ -56,9 +56,21 @@ class GlobalTimerService {
     // Use 1-second interval as the base unit
     _globalTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final now = DateTime.now();
+      final subscriptionsToRemove = <String>[];
 
       // Execute callbacks based on their individual intervals
       for (final subscription in _subscribers.values) {
+        // Skip subscriptions that should be auto-removed
+        if (subscription.shouldAutoRemove) {
+          subscriptionsToRemove.add(subscription.id);
+          continue;
+        }
+
+        // Skip subscriptions in error cooldown
+        if (subscription.isInErrorCooldown) {
+          continue;
+        }
+
         final timeSinceLastExecution =
             now.difference(subscription.lastExecuted);
 
@@ -66,13 +78,38 @@ class GlobalTimerService {
           try {
             subscription.callback();
             subscription.lastExecuted = now;
+            subscription.recordSuccess();
           } catch (e) {
+            subscription.recordError();
             if (kDebugMode) {
               debugPrint(
-                  '⚠️ Error in timer subscription ${subscription.id}: $e');
+                  '⚠️ Error in timer subscription ${subscription.id} '
+                  '(${subscription.consecutiveErrors}/${TimerSubscription.maxConsecutiveErrors} errors): $e');
+            }
+
+            // Log warning if approaching auto-removal threshold
+            if (subscription.consecutiveErrors == TimerSubscription.maxConsecutiveErrors - 1) {
+              if (kDebugMode) {
+                debugPrint(
+                    '🚨 Timer subscription ${subscription.id} will be auto-removed after next error');
+              }
             }
           }
         }
+      }
+
+      // Remove failed subscriptions
+      for (final id in subscriptionsToRemove) {
+        _subscribers.remove(id);
+        if (kDebugMode) {
+          debugPrint(
+              '🗑️ Auto-removed timer subscription $id due to repeated errors');
+        }
+      }
+
+      // Stop timer if no subscribers left
+      if (_subscribers.isEmpty) {
+        _stopGlobalTimer();
       }
     });
 
@@ -97,7 +134,26 @@ class GlobalTimerService {
       'active_subscriptions': _subscribers.length,
       'is_running': _globalTimer != null,
       'subscription_ids': _subscribers.keys.toList(),
+      'subscriptions_with_errors': _subscribers.values
+          .where((s) => s.consecutiveErrors > 0)
+          .map((s) => {'id': s.id, 'errors': s.consecutiveErrors})
+          .toList(),
+      'subscriptions_in_cooldown': _subscribers.values
+          .where((s) => s.isInErrorCooldown)
+          .map((s) => s.id)
+          .toList(),
     };
+  }
+
+  /// Reset error count for a specific subscription
+  void resetErrors(String subscriptionId) {
+    final subscription = _subscribers[subscriptionId];
+    if (subscription != null) {
+      subscription.recordSuccess();
+      if (kDebugMode) {
+        debugPrint('🔄 Reset error count for subscription: $subscriptionId');
+      }
+    }
   }
 
   /// Dispose all resources
@@ -111,17 +167,48 @@ class GlobalTimerService {
   }
 }
 
-/// Represents a timer subscription
+/// Represents a timer subscription with error tracking
 class TimerSubscription {
   final String id;
   final Duration interval;
   final VoidCallback callback;
   DateTime lastExecuted;
+  int consecutiveErrors;
+  DateTime? lastErrorTime;
+
+  /// Maximum consecutive errors before auto-unsubscribe
+  static const int maxConsecutiveErrors = 5;
+
+  /// Cooldown period after errors before retrying
+  static const Duration errorCooldown = Duration(seconds: 30);
 
   TimerSubscription({
     required this.id,
     required this.interval,
     required this.callback,
     required this.lastExecuted,
+    this.consecutiveErrors = 0,
+    this.lastErrorTime,
   });
+
+  /// Check if subscription is in error cooldown period
+  bool get isInErrorCooldown {
+    if (lastErrorTime == null || consecutiveErrors == 0) return false;
+    return DateTime.now().difference(lastErrorTime!) < errorCooldown;
+  }
+
+  /// Check if subscription should be auto-removed due to too many errors
+  bool get shouldAutoRemove => consecutiveErrors >= maxConsecutiveErrors;
+
+  /// Record a successful execution
+  void recordSuccess() {
+    consecutiveErrors = 0;
+    lastErrorTime = null;
+  }
+
+  /// Record an error
+  void recordError() {
+    consecutiveErrors++;
+    lastErrorTime = DateTime.now();
+  }
 }

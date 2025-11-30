@@ -187,47 +187,52 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   Container(
                     margin: const EdgeInsets.only(right: 16),
-                    child: Material(
-                      color: const Color(0xFF6366F1),
-                      borderRadius: BorderRadius.circular(12),
-                      child: InkWell(
+                    child: Semantics(
+                      label: AppLocalizations.of(context)?.statistics ?? 'Analytics',
+                      hint: 'Double tap to view detailed statistics',
+                      button: true,
+                      child: Material(
+                        color: const Color(0xFF6366F1),
                         borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Provider<ReminderService>(
-                                value: service,
-                                child: StatisticsScreen(
-                                  reminderService: service,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Provider<ReminderService>(
+                                  value: service,
+                                  child: StatisticsScreen(
+                                    reminderService: service,
+                                  ),
                                 ),
                               ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
                             ),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.analytics_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Analytics',
-                                style: TextStyle(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.analytics_rounded,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14,
+                                  size: 20,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 8),
+                                Text(
+                                  AppLocalizations.of(context)?.statistics ?? 'Analytics',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -454,13 +459,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Stats button on the left - shows info directly
-                    FloatingActionButton(
-                      heroTag: "stats",
-                      onPressed: () =>
-                          _showStatsOverlay(context, service, themeService),
-                      backgroundColor: const Color(0xFF8B5CF6),
-                      foregroundColor: Colors.white,
-                      child: const Icon(Icons.bar_chart_rounded, size: 24),
+                    Semantics(
+                      label: AppLocalizations.of(context)?.statistics ?? 'View statistics',
+                      hint: 'Double tap to open',
+                      button: true,
+                      child: FloatingActionButton(
+                        heroTag: "stats",
+                        onPressed: () =>
+                            _showStatsOverlay(context, service, themeService),
+                        tooltip: AppLocalizations.of(context)?.statistics ?? 'View statistics',
+                        backgroundColor: const Color(0xFF8B5CF6),
+                        foregroundColor: Colors.white,
+                        child: const Icon(Icons.bar_chart_rounded, size: 24),
+                      ),
                     ),
                     // Add reminder button on the right
                     SpeedDial(
@@ -591,7 +602,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
 
     // Get next reminder info
-    String nextReminderText = 'Keine aktiv';
+    final localizations = AppLocalizations.of(context);
+    String nextReminderText = 'None active';
     if (service.isRunning) {
       final enabledReminders = service.reminders
           .where((r) => r.isEnabled && r.nextReminder != null)
@@ -605,10 +617,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         final timeRemaining = nextReminder.nextReminder!.difference(
           DateTime.now(),
         );
-        nextReminderText = 'In ${timeRemaining.inMinutes} Min';
+        nextReminderText = 'In ${timeRemaining.inMinutes} min';
       }
     } else {
-      nextReminderText = 'System pausiert';
+      nextReminderText = localizations?.systemPaused ?? 'System paused';
     }
 
     showDialog(
@@ -647,7 +659,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Statistiken',
+                      localizations?.statistics ?? 'Statistics',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -668,7 +680,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   children: [
                     Expanded(
                       child: _buildStatsCard(
-                        'Aktiv',
+                        localizations?.activeReminders ?? 'Active',
                         '$activeReminders',
                         Icons.notifications_active,
                         const Color(0xFF3B82F6),
@@ -677,7 +689,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildStatsCard(
-                        'Heute',
+                        localizations?.today ?? 'Today',
                         '$todayCompletions',
                         Icons.today,
                         const Color(0xFF10B981),
@@ -690,7 +702,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   children: [
                     Expanded(
                       child: _buildStatsCard(
-                        'Gesamt',
+                        localizations?.allTime ?? 'Total',
                         '$totalCompletions',
                         Icons.emoji_events,
                         const Color(0xFFF97316),
@@ -699,7 +711,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildStatsCard(
-                        'Nächste',
+                        localizations?.nextIn ?? 'Next',
                         nextReminderText,
                         Icons.timer,
                         const Color(0xFF8B5CF6),
@@ -724,7 +736,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       );
                     },
                     icon: const Icon(Icons.analytics, size: 18),
-                    label: const Text('Detaillierte Statistiken'),
+                    label: Text(localizations?.statistics ?? 'Detailed Statistics'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF8B5CF6),
                       foregroundColor: Colors.white,
@@ -750,39 +762,43 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     Color color, {
     bool isLargeText = false,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: isLargeText ? 12 : 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+    return Semantics(
+      label: '$value $title',
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: isLargeText ? 12 : 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.white70,
-              fontWeight: FontWeight.w500,
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.white70,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

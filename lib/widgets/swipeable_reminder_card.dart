@@ -293,7 +293,7 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
             _cardState == ReminderCardState.notification
                 ? 'Reminder triggered! Double tap to complete, or swipe to skip.'
                 : isRunning
-                ? 'Next reminder in ${AccessibilityUtils.formatDurationForA11y(timeRemaining)}. Swipe right to complete, left to snooze 10 minutes.'
+                ? 'Next reminder in ${AccessibilityUtils.formatDurationForA11y(timeRemaining)}. Swipe right to toggle enable, left to edit settings.'
                 : 'Double tap to toggle reminder, press enter to change timer, swipe for actions',
         button: true,
         child:
@@ -303,33 +303,32 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                   key: Key('swipe_${widget.reminder.id}'),
                   background: _buildSwipeBackground(
                     alignment: Alignment.centerLeft,
-                    color: Colors.green,
-                    icon: Icons.check_circle,
-                    label: 'Complete',
+                    color: widget.reminder.isEnabled ? Colors.grey : Colors.green,
+                    icon: widget.reminder.isEnabled ? Icons.pause_circle : Icons.play_circle,
+                    label: widget.reminder.isEnabled ? 'Disable' : 'Enable',
                   ),
                   secondaryBackground: _buildSwipeBackground(
                     alignment: Alignment.centerRight,
-                    color: Colors.orange,
-                    icon: Icons.snooze,
-                    label: 'Snooze 10m',
+                    color: const Color(0xFF6366F1),
+                    icon: Icons.edit,
+                    label: 'Edit',
                   ),
                   confirmDismiss: (direction) async {
                     HapticFeedback.mediumImpact();
 
                     if (direction == DismissDirection.startToEnd) {
-                      widget.reminderService.completeReminder(widget.reminder);
+                      // Toggle enable/disable
+                      widget.reminderService.toggleReminder(widget.reminder.id);
                       _showActionFeedback(
                         context,
-                        'Completed ${widget.reminder.title}!',
-                        Colors.green,
+                        widget.reminder.isEnabled
+                            ? '${widget.reminder.title} disabled'
+                            : '${widget.reminder.title} enabled',
+                        widget.reminder.isEnabled ? Colors.grey : Colors.green,
                       );
                     } else if (direction == DismissDirection.endToStart) {
-                      _snoozeReminder(10);
-                      _showActionFeedback(
-                        context,
-                        'Snoozed for 10 minutes',
-                        Colors.orange,
-                      );
+                      // Open edit dialog
+                      _showEditDialog(context);
                     }
                     return false;
                   },
@@ -779,7 +778,9 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                widget.reminder.isEnabled ? 'Ein' : 'Aus',
+                                widget.reminder.isEnabled
+                                    ? (AppLocalizations.of(context)?.active ?? 'On')
+                                    : 'Off',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -1008,6 +1009,11 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
     widget.reminderService.refresh();
   }
 
+  void _showEditDialog(BuildContext context) {
+    // Open the timer change dialog for editing
+    _showTimerChangeDialog(context);
+  }
+
   void _showActionFeedback(BuildContext context, String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1016,6 +1022,11 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         duration: const Duration(seconds: 2),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 150,
+          left: 16,
+          right: 16,
+        ),
       ),
     );
   }

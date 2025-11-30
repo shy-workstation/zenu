@@ -95,6 +95,13 @@ class _SimpleHomeScreenState extends State<SimpleHomeScreen> {
                           'Manual testing confirmed - App is working!',
                     ),
                     backgroundColor: Colors.green,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    margin: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).size.height - 150,
+                      left: 16,
+                      right: 16,
+                    ),
                   ),
                 );
               },

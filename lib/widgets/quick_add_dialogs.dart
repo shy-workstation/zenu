@@ -5,6 +5,23 @@ import '../models/reminder.dart';
 import '../services/reminder_service.dart';
 
 class QuickAddDialogs {
+  /// Shows a snackbar at the top of the screen to avoid overlapping with bottom UI elements
+  static void _showTopSnackBar(BuildContext context, String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 150,
+          left: 16,
+          right: 16,
+        ),
+      ),
+    );
+  }
+
   static Future<void> showWaterReminderDialog(
     BuildContext context,
     ReminderService reminderService,
@@ -31,18 +48,11 @@ class QuickAddDialogs {
     reminderService.addReminder(reminder);
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)?.waterReminderAdded ??
-                'Water reminder added! 💧',
-          ),
-          backgroundColor: reminder.color,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
+      _showTopSnackBar(
+        context,
+        AppLocalizations.of(context)?.waterReminderAdded ??
+            'Water reminder added! 💧',
+        reminder.color,
       );
     }
   }
@@ -75,20 +85,11 @@ class QuickAddDialogs {
 
       reminderService.addReminder(reminder);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(
-                  context,
-                )?.exerciseReminderAdded(result['title']) ??
-                '${result['title']} reminder added! 💪',
-          ),
-          backgroundColor: reminder.color,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
+      _showTopSnackBar(
+        context,
+        AppLocalizations.of(context)?.exerciseReminderAdded(result['title']) ??
+            '${result['title']} reminder added! 💪',
+        reminder.color,
       );
     }
   }
@@ -119,18 +120,11 @@ class QuickAddDialogs {
     reminderService.addReminder(reminder);
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)?.eyeRestReminderAdded ??
-                'Eye rest reminder added! 👁️',
-          ),
-          backgroundColor: reminder.color,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
+      _showTopSnackBar(
+        context,
+        AppLocalizations.of(context)?.eyeRestReminderAdded ??
+            'Eye rest reminder added! 👁️',
+        reminder.color,
       );
     }
   }
@@ -147,18 +141,11 @@ class QuickAddDialogs {
     if (result != null && context.mounted) {
       reminderService.addReminder(result);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)?.customReminderAdded(result.title) ??
-                'Custom reminder "${result.title}" added! ✨',
-          ),
-          backgroundColor: result.color,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
+      _showTopSnackBar(
+        context,
+        AppLocalizations.of(context)?.customReminderAdded(result.title) ??
+            'Custom reminder "${result.title}" added!',
+        result.color,
       );
     }
   }

@@ -2,8 +2,8 @@ import 'package:get_it/get_it.dart';
 import '../core/domain/repositories/reminder_repository.dart';
 import '../core/domain/use_cases/create_reminder_use_case.dart';
 import '../core/data/repositories/reminder_repository_impl.dart';
-import '../infrastructure/adapters/storage_adapter.dart';
-import '../infrastructure/platform/shared_preferences_storage_adapter.dart';
+import '../infrastructure/adapters/storage_adapter.dart' as infra;
+import '../infrastructure/platform/shared_preferences_storage_adapter.dart' as infra_prefs;
 import '../infrastructure/platform/platform_detector.dart';
 
 /// Dependency injection setup using GetIt service locator
@@ -21,7 +21,7 @@ class DependencyInjection {
 
     // Repositories
     _getIt.registerLazySingleton<ReminderRepository>(
-      () => ReminderRepositoryImpl(_getIt<StorageAdapter>()),
+      () => ReminderRepositoryImpl(_getIt<infra.StorageAdapter>()),
     );
 
     // Use cases
@@ -36,10 +36,10 @@ class DependencyInjection {
     // For now, use SharedPreferences for all platforms
     // In future iterations, we can add SQLite, secure storage, etc.
     // final platformDetector = _getIt<PlatformDetector>();
-    final storageAdapter = SharedPreferencesStorageAdapter();
+    final storageAdapter = infra_prefs.SharedPreferencesStorageAdapter();
     await storageAdapter.initialize();
-    
-    _getIt.registerSingleton<StorageAdapter>(storageAdapter);
+
+    _getIt.registerSingleton<infra.StorageAdapter>(storageAdapter);
   }
 
   /// Register test dependencies (for testing)

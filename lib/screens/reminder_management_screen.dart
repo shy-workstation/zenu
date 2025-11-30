@@ -1130,6 +1130,13 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
             AppLocalizations.of(context)?.pleaseEnterTitle ??
                 'Please enter a title',
           ),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height - 150,
+            left: 16,
+            right: 16,
+          ),
         ),
       );
       return;

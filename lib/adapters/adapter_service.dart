@@ -8,16 +8,36 @@ import '../utils/error_handler.dart';
 /// Service class that provides a unified interface to all platform adapters
 class AdapterService {
   static AdapterService? _instance;
+  static final Object _lock = Object();
+  static bool _initializing = false;
   late final PlatformAdapters _adapters;
   bool _initialized = false;
 
   AdapterService._();
 
   /// Get singleton instance of the adapter service
+  /// Thread-safe initialization with lock mechanism
   static Future<AdapterService> getInstance() async {
-    if (_instance == null) {
+    // Return existing instance if available
+    if (_instance != null && _instance!._initialized) {
+      return _instance!;
+    }
+
+    // Prevent concurrent initialization
+    if (_initializing) {
+      // Wait for initialization to complete
+      while (_initializing) {
+        await Future.delayed(const Duration(milliseconds: 10));
+      }
+      return _instance!;
+    }
+
+    _initializing = true;
+    try {
       _instance = AdapterService._();
       await _instance!._initialize();
+    } finally {
+      _initializing = false;
     }
     return _instance!;
   }

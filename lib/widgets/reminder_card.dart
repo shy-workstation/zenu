@@ -25,9 +25,13 @@ class ReminderCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  backgroundColor: reminder.color.withValues(alpha: 0.2),
-                  child: Icon(reminder.icon, color: reminder.color, size: 24),
+                Semantics(
+                  label: '${reminder.title} icon',
+                  excludeSemantics: true,
+                  child: CircleAvatar(
+                    backgroundColor: reminder.color.withValues(alpha: 0.2),
+                    child: Icon(reminder.icon, color: reminder.color, size: 24),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -49,12 +53,17 @@ class ReminderCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Switch(
-                  value: reminder.isEnabled,
-                  onChanged: (value) {
-                    reminderService.toggleReminder(reminder.id);
-                  },
-                  activeThumbColor: reminder.color,
+                Semantics(
+                  label: '${reminder.title} reminder',
+                  hint: reminder.isEnabled ? 'Double tap to disable' : 'Double tap to enable',
+                  toggled: reminder.isEnabled,
+                  child: Switch(
+                    value: reminder.isEnabled,
+                    onChanged: (value) {
+                      reminderService.toggleReminder(reminder.id);
+                    },
+                    activeThumbColor: reminder.color,
+                  ),
                 ),
               ],
             ),
@@ -92,10 +101,13 @@ class ReminderCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              LinearProgressIndicator(
-                value: _getProgressValue(reminder),
-                backgroundColor: reminder.color.withValues(alpha: 0.2),
-                valueColor: AlwaysStoppedAnimation<Color>(reminder.color),
+              Semantics(
+                label: 'Progress: ${(_getProgressValue(reminder) * 100).round()} percent until next ${reminder.title}',
+                child: LinearProgressIndicator(
+                  value: _getProgressValue(reminder),
+                  backgroundColor: reminder.color.withValues(alpha: 0.2),
+                  valueColor: AlwaysStoppedAnimation<Color>(reminder.color),
+                ),
               ),
             ],
             const SizedBox(height: 12),
@@ -121,15 +133,19 @@ class ReminderCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                IconButton(
-                  onPressed:
-                      () => _showSettingsDialog(
-                        context,
-                        reminder,
-                        reminderService,
-                      ),
-                  icon: const Icon(Icons.settings),
-                  tooltip: AppLocalizations.of(context)?.settings ?? 'Settings',
+                SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: IconButton(
+                    onPressed:
+                        () => _showSettingsDialog(
+                          context,
+                          reminder,
+                          reminderService,
+                        ),
+                    icon: const Icon(Icons.settings),
+                    tooltip: AppLocalizations.of(context)?.settings ?? 'Settings',
+                  ),
                 ),
               ],
             ),
@@ -186,7 +202,12 @@ class ReminderCard extends StatelessWidget {
     final remaining = reminder.timeUntilNext ?? Duration.zero;
     final elapsed = totalDuration - remaining;
 
-    return elapsed.inSeconds / totalDuration.inSeconds;
+    // Prevent division by zero
+    if (totalDuration.inSeconds <= 0) return 0;
+
+    final progress = elapsed.inSeconds / totalDuration.inSeconds;
+    // Clamp between 0 and 1 to prevent visual bugs
+    return progress.clamp(0.0, 1.0);
   }
 
   void _showCompleteDialog(
@@ -212,6 +233,13 @@ class ReminderCard extends StatelessWidget {
                 '${reminder.title} completed!',
           ),
           backgroundColor: reminder.color,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height - 150,
+            left: 16,
+            right: 16,
+          ),
         ),
       );
     }
@@ -275,12 +303,17 @@ class _ExerciseCompleteDialogState extends State<_ExerciseCompleteDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                onPressed:
-                    _completedCount > 0
-                        ? () => setState(() => _completedCount--)
-                        : null,
-                icon: const Icon(Icons.remove_circle_outline),
+              SizedBox(
+                width: 48,
+                height: 48,
+                child: IconButton(
+                  onPressed:
+                      _completedCount > 0
+                          ? () => setState(() => _completedCount--)
+                          : null,
+                  icon: const Icon(Icons.remove_circle_outline),
+                  tooltip: 'Decrease count',
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -299,9 +332,14 @@ class _ExerciseCompleteDialogState extends State<_ExerciseCompleteDialog> {
                   ),
                 ),
               ),
-              IconButton(
-                onPressed: () => setState(() => _completedCount++),
-                icon: const Icon(Icons.add_circle_outline),
+              SizedBox(
+                width: 48,
+                height: 48,
+                child: IconButton(
+                  onPressed: () => setState(() => _completedCount++),
+                  icon: const Icon(Icons.add_circle_outline),
+                  tooltip: 'Increase count',
+                ),
               ),
             ],
           ),
@@ -325,6 +363,13 @@ class _ExerciseCompleteDialogState extends State<_ExerciseCompleteDialog> {
                   'Completed $_completedCount ${widget.reminder.title.toLowerCase()}!',
                 ),
                 backgroundColor: widget.reminder.color,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                margin: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).size.height - 150,
+                  left: 16,
+                  right: 16,
+                ),
               ),
             );
           },

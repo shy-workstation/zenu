@@ -15,48 +15,61 @@ class CompactStatsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 90, // Increased from 80 to 90 for better spacing
-      margin: const EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: 20,
-      ), // Increased vertical margin
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          _CompactStatCard(
-            icon: Icons.timer,
-            value: _getNextReminderTime(),
-            label: 'Nächste in',
-            color: const Color(0xFF8B5CF6),
-            themeService: themeService,
-            isTime: true,
-          ),
-          const SizedBox(width: 12),
-          _CompactStatCard(
-            icon: Icons.today,
-            value: _getTodayCompletions().toString(),
-            label: 'Heute',
-            color: const Color(0xFF10B981),
-            themeService: themeService,
-          ),
-          const SizedBox(width: 12),
-          _CompactStatCard(
-            icon: Icons.notifications_active,
-            value: _getActiveCount().toString(),
-            label: 'Aktiv',
-            color: const Color(0xFF3B82F6),
-            themeService: themeService,
-          ),
-          const SizedBox(width: 12),
-          _CompactStatCard(
-            icon: Icons.local_fire_department,
-            value: _getStreak().toString(),
-            label: 'Serie',
-            color: const Color(0xFFF97316),
-            themeService: themeService,
-          ),
-        ],
+    final nextTime = _getNextReminderTime();
+    final todayCount = _getTodayCompletions();
+    final activeCount = _getActiveCount();
+    final streak = _getStreak();
+
+    return Semantics(
+      label: 'Statistics summary: Next reminder $nextTime, $todayCount completed today, $activeCount active reminders, $streak day streak',
+      container: true,
+      child: Container(
+        height: 90,
+        margin: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 20,
+        ),
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: [
+            _CompactStatCard(
+              icon: Icons.timer,
+              value: nextTime,
+              label: 'Next in',
+              semanticLabel: 'Next reminder in $nextTime',
+              color: const Color(0xFF8B5CF6),
+              themeService: themeService,
+              isTime: true,
+            ),
+            const SizedBox(width: 12),
+            _CompactStatCard(
+              icon: Icons.today,
+              value: todayCount.toString(),
+              label: 'Today',
+              semanticLabel: '$todayCount reminders completed today',
+              color: const Color(0xFF10B981),
+              themeService: themeService,
+            ),
+            const SizedBox(width: 12),
+            _CompactStatCard(
+              icon: Icons.notifications_active,
+              value: activeCount.toString(),
+              label: 'Active',
+              semanticLabel: '$activeCount active reminders',
+              color: const Color(0xFF3B82F6),
+              themeService: themeService,
+            ),
+            const SizedBox(width: 12),
+            _CompactStatCard(
+              icon: Icons.local_fire_department,
+              value: streak.toString(),
+              label: 'Streak',
+              semanticLabel: '$streak day streak',
+              color: const Color(0xFFF97316),
+              themeService: themeService,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -80,14 +93,14 @@ class CompactStatsBar extends StatelessWidget {
   }
 
   String _getNextReminderTime() {
-    if (!reminderService.isRunning) return 'Pausiert';
+    if (!reminderService.isRunning) return 'Paused';
 
     final enabledReminders =
         reminderService.reminders
             .where((r) => r.isEnabled && r.nextReminder != null)
             .toList();
 
-    if (enabledReminders.isEmpty) return 'Keine';
+    if (enabledReminders.isEmpty) return 'None';
 
     final nextReminder = enabledReminders.reduce((a, b) {
       final aDiff = a.nextReminder!.difference(DateTime.now());
@@ -105,6 +118,7 @@ class _CompactStatCard extends StatelessWidget {
   final IconData icon;
   final String value;
   final String label;
+  final String semanticLabel;
   final Color color;
   final ThemeService themeService;
   final bool isTime;
@@ -113,6 +127,7 @@ class _CompactStatCard extends StatelessWidget {
     required this.icon,
     required this.value,
     required this.label,
+    required this.semanticLabel,
     required this.color,
     required this.themeService,
     this.isTime = false,
@@ -120,59 +135,63 @@ class _CompactStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 110,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 10,
-      ), // More precise padding
-      decoration: BoxDecoration(
-        color: themeService.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: themeService.shadowColor,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(4), // Further reduced
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(6),
+    return Semantics(
+      label: semanticLabel,
+      excludeSemantics: true,
+      child: Container(
+        width: 110,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          color: themeService.cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: themeService.shadowColor,
+              blurRadius: 6,
+              offset: const Offset(0, 2),
             ),
-            child: Icon(icon, color: color, size: 16), // Smaller icon
-          ),
-          const SizedBox(height: 3), // Reduced spacing
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: isTime ? 13 : 16, // Reduced sizes to prevent overflow
-              fontWeight: FontWeight.w800,
-              color: themeService.textPrimary,
-              fontFamily: isTime ? 'monospace' : null,
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(icon, color: color, size: 16),
             ),
-          ),
-          const SizedBox(height: 1), // Reduced spacing
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11, // Reduced from 12 to 11
-              fontWeight: FontWeight.w500,
-              color: themeService.textSecondary,
+            const SizedBox(height: 3),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: isTime ? 13 : 16,
+                fontWeight: FontWeight.w800,
+                color: themeService.textPrimary,
+                fontFamily: isTime ? 'monospace' : null,
+              ),
             ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+            const SizedBox(height: 1),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: themeService.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
