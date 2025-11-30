@@ -49,8 +49,7 @@ void main() async {
     final inAppNotificationService = InAppNotificationService();
     final reminderService = ReminderService(notificationService, dataService);
 
-    // Set up in-app notification service for reminder service
-    reminderService.setInAppNotificationService(inAppNotificationService);
+    // In-app notifications are now handled by SwipeableReminderCard
 
     // Load saved data with error handling
     await reminderService.loadData();

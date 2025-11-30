@@ -194,25 +194,6 @@ class ReminderService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Complete the active notification with quantity
-  void completeActiveNotification(int quantity) {
-    final currentId = _activeNotificationId.value;
-    if (currentId == null) return;
-
-    final reminder = _reminders.firstWhere(
-      (r) => r.id == currentId,
-      orElse: () => throw Exception('Reminder not found'),
-    );
-
-    completeReminder(reminder, customCount: quantity);
-    dismissNotification(completed: true);
-  }
-
-  /// Skip the active notification
-  void skipActiveNotification() {
-    dismissNotification(completed: false);
-  }
-
   void completeReminder(Reminder reminder, {int? customCount}) {
     // Always count as 1 completion, regardless of the quantity/amount
     reminder.completeReminder();
