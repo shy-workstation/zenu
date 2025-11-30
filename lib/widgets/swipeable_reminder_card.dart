@@ -306,13 +306,15 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                     alignment: Alignment.centerLeft,
                     color: widget.reminder.isEnabled ? Colors.grey : Colors.green,
                     icon: widget.reminder.isEnabled ? Icons.pause_circle : Icons.play_circle,
-                    label: widget.reminder.isEnabled ? 'Disable' : 'Enable',
+                    label: widget.reminder.isEnabled
+                        ? (AppLocalizations.of(context)?.disable ?? 'Disable')
+                        : (AppLocalizations.of(context)?.enable ?? 'Enable'),
                   ),
                   secondaryBackground: _buildSwipeBackground(
                     alignment: Alignment.centerRight,
                     color: const Color(0xFF6366F1),
                     icon: Icons.edit,
-                    label: 'Edit',
+                    label: AppLocalizations.of(context)?.edit ?? 'Edit',
                   ),
                   confirmDismiss: (direction) async {
                     HapticFeedback.mediumImpact();
@@ -320,11 +322,12 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                     if (direction == DismissDirection.startToEnd) {
                       // Toggle enable/disable
                       widget.reminderService.toggleReminder(widget.reminder.id);
+                      final localizations = AppLocalizations.of(context);
                       _showActionFeedback(
                         context,
                         widget.reminder.isEnabled
-                            ? '${widget.reminder.title} disabled'
-                            : '${widget.reminder.title} enabled',
+                            ? (localizations?.reminderDisabled(widget.reminder.title) ?? '${widget.reminder.title} disabled')
+                            : (localizations?.reminderEnabled(widget.reminder.title) ?? '${widget.reminder.title} enabled'),
                         widget.reminder.isEnabled ? Colors.grey : Colors.green,
                       );
                     } else if (direction == DismissDirection.endToStart) {
@@ -781,7 +784,7 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                               Text(
                                 widget.reminder.isEnabled
                                     ? (AppLocalizations.of(context)?.active ?? 'On')
-                                    : 'Off',
+                                    : (AppLocalizations.of(context)?.off ?? 'Off'),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -910,7 +913,7 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
                                   PulsingDot(color: widget.reminder.color, size: 6),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Next in',
+                                    AppLocalizations.of(context)?.nextIn ?? 'Next in',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,

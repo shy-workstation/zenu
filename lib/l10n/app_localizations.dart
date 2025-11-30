@@ -913,6 +913,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PAUSE'**
   String get pause;
+
+  /// Enable action label
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get enable;
+
+  /// Disable action label
+  ///
+  /// In en, this message translates to:
+  /// **'Disable'**
+  String get disable;
+
+  /// Off status label
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get off;
+
+  /// On status label
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get on;
+
+  /// Enabled status text (lowercase)
+  ///
+  /// In en, this message translates to:
+  /// **'enabled'**
+  String get enabled;
+
+  /// Disabled status text (lowercase)
+  ///
+  /// In en, this message translates to:
+  /// **'disabled'**
+  String get disabled;
+
+  /// Message shown when reminder is enabled
+  ///
+  /// In en, this message translates to:
+  /// **'{reminderTitle} enabled'**
+  String reminderEnabled(String reminderTitle);
+
+  /// Message shown when reminder is disabled
+  ///
+  /// In en, this message translates to:
+  /// **'{reminderTitle} disabled'**
+  String reminderDisabled(String reminderTitle);
 }
 
 class _AppLocalizationsDelegate

@@ -651,5 +651,43 @@
   "pause": "PAUSE",
   "@pause": {
     "description": "Pause button text"
+  },
+  "enable": "Enable",
+  "@enable": {
+    "description": "Enable action label"
+  },
+  "disable": "Disable",
+  "@disable": {
+    "description": "Disable action label"
+  },
+  "off": "Off",
+  "@off": {
+    "description": "Off status label"
+  },
+  "on": "On",
+  "@on": {
+    "description": "On status label"
+  },
+  "enabled": "enabled",
+  "@enabled": {
+    "description": "Enabled status text (lowercase)"
+  },
+  "disabled": "disabled",
+  "@disabled": {
+    "description": "Disabled status text (lowercase)"
+  },
+  "reminderEnabled": "{reminderTitle} enabled",
+  "@reminderEnabled": {
+    "description": "Message shown when reminder is enabled",
+    "placeholders": {
+      "reminderTitle": {"type": "String"}
+    }
+  },
+  "reminderDisabled": "{reminderTitle} disabled",
+  "@reminderDisabled": {
+    "description": "Message shown when reminder is disabled",
+    "placeholders": {
+      "reminderTitle": {"type": "String"}
+    }
   }
 }

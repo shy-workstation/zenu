@@ -470,4 +470,32 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pause => 'PAUSIEREN';
+
+  @override
+  String get enable => 'Aktivieren';
+
+  @override
+  String get disable => 'Deaktivieren';
+
+  @override
+  String get off => 'Aus';
+
+  @override
+  String get on => 'An';
+
+  @override
+  String get enabled => 'aktiviert';
+
+  @override
+  String get disabled => 'deaktiviert';
+
+  @override
+  String reminderEnabled(String reminderTitle) {
+    return '$reminderTitle aktiviert';
+  }
+
+  @override
+  String reminderDisabled(String reminderTitle) {
+    return '$reminderTitle deaktiviert';
+  }
 }

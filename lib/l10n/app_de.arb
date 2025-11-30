@@ -149,5 +149,13 @@
   "settings": "Einstellungen",
   "addHealthReminder": "Gesundheitserinnerung hinzufügen",
   "start": "STARTEN",
-  "pause": "PAUSIEREN"
+  "pause": "PAUSIEREN",
+  "enable": "Aktivieren",
+  "disable": "Deaktivieren",
+  "off": "Aus",
+  "on": "An",
+  "enabled": "aktiviert",
+  "disabled": "deaktiviert",
+  "reminderEnabled": "{reminderTitle} aktiviert",
+  "reminderDisabled": "{reminderTitle} deaktiviert"
 }
