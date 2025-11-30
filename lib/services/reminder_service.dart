@@ -170,6 +170,9 @@ class ReminderService extends ChangeNotifier {
       if (reminder.isEnabled &&
           reminder.nextReminder != null &&
           now.isAfter(reminder.nextReminder!)) {
+        if (kDebugMode) {
+          debugPrint('⏰ Reminder ready to trigger: ${reminder.title}, nextReminder: ${reminder.nextReminder}, now: $now');
+        }
         _triggerReminder(reminder);
         hasChanges = true;
       }
@@ -183,7 +186,14 @@ class ReminderService extends ChangeNotifier {
   void _triggerReminder(Reminder reminder) {
     // Prevent duplicate notifications for the same trigger event
     if (_triggeredNotifications.contains(reminder.id)) {
+      if (kDebugMode) {
+        debugPrint('⚠️ Skipping duplicate notification for ${reminder.title} (already triggered)');
+      }
       return; // Already triggered this notification
+    }
+
+    if (kDebugMode) {
+      debugPrint('🔔 Triggering reminder: ${reminder.title} (id: ${reminder.id})');
     }
 
     // Mark as triggered

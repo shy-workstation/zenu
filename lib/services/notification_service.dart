@@ -58,11 +58,17 @@ class NotificationService {
   }
 
   static void _onNotificationResponse(NotificationResponse response) {
+    if (kDebugMode) {
+      debugPrint('🔔 Notification response: id=${response.id}, actionId=${response.actionId}, payload=${response.payload}, input=${response.input}');
+    }
     _handleNotificationAction(response.actionId, response.payload);
   }
 
   @pragma('vm:entry-point')
   static void _onBackgroundNotificationResponse(NotificationResponse response) {
+    if (kDebugMode) {
+      debugPrint('🔔 Background notification response: id=${response.id}, actionId=${response.actionId}, payload=${response.payload}');
+    }
     _handleNotificationAction(response.actionId, response.payload);
   }
 
@@ -83,12 +89,19 @@ class NotificationService {
     String? reminderId;
     String? action;
 
-    // Windows: actionId contains the arguments from WindowsAction
+    // Windows: When clicking action buttons, arguments should be in actionId
+    // But if actionId starts with "reminder_", it means the notification body was clicked
     // Android: actionId is the action ID (e.g., "skip_123")
     // iOS: payload contains the data
     
-    // First, try actionId (works for both Windows arguments and Android actions)
-    if (actionId != null && actionId.contains('_')) {
+    // Check if actionId looks like a payload (starts with "reminder_")
+    if (actionId != null && actionId.startsWith('reminder_')) {
+      // User clicked notification body, not an action button
+      reminderId = actionId.substring(9); // Remove "reminder_" prefix
+      action = 'open'; // Default to open when notification body is tapped
+    }
+    // Otherwise, try to parse actionId as action_reminderId
+    else if (actionId != null && actionId.contains('_')) {
       final parts = actionId.split('_');
       if (parts.length >= 2) {
         action = parts[0];
@@ -96,7 +109,7 @@ class NotificationService {
       }
     }
 
-    // If no actionId, check payload (notification tap without action or iOS)
+    // If still no action, check payload as fallback
     if (action == null && payload != null) {
       if (payload.startsWith('reminder_')) {
         reminderId = payload.substring(9);
@@ -252,7 +265,7 @@ class NotificationService {
           WindowsAction(
             content: _localizations?.skip ?? 'Skip',
             arguments: 'skip_${reminder.id}',
-            activationType: WindowsActivationType.protocol,
+            activationType: WindowsActivationType.foreground,
           ),
           WindowsAction(
             content: 'Open App',
