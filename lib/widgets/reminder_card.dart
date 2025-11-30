@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/reminder.dart';
 import '../services/reminder_service.dart';
 import '../l10n/app_localizations.dart';
+import 'floating_pill.dart';
 
 class ReminderCard extends StatelessWidget {
   final Reminder reminder;
@@ -48,7 +49,7 @@ class ReminderCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         reminder.description,
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -86,19 +87,24 @@ class ReminderCard extends StatelessWidget {
             if (reminder.isEnabled &&
                 reminder.nextReminder != null &&
                 reminderService.isRunning) ...[
-              Row(
-                children: [
-                  Icon(Icons.timer, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Next in: ${_formatTimeRemaining(reminder.timeUntilNext)}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+              Builder(
+                builder: (context) {
+                  final secondaryColor = Theme.of(context).colorScheme.onSurfaceVariant;
+                  return Row(
+                    children: [
+                      Icon(Icons.timer, size: 16, color: secondaryColor),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Next in: ${_formatTimeRemaining(reminder.timeUntilNext)}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: secondaryColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 8),
               Semantics(
@@ -226,22 +232,7 @@ class ReminderCard extends StatelessWidget {
       );
     } else {
       reminderService.completeReminder(reminder);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)?.reminderCompleted(reminder.title) ??
-                '${reminder.title} completed!',
-          ),
-          backgroundColor: reminder.color,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          margin: EdgeInsets.only(
-            bottom: MediaQuery.of(context).size.height - 150,
-            left: 16,
-            right: 16,
-          ),
-        ),
-      );
+      FloatingPill.success(context, 'Completed', color: reminder.color);
     }
   }
 
@@ -357,20 +348,10 @@ class _ExerciseCompleteDialogState extends State<_ExerciseCompleteDialog> {
               customCount: _completedCount,
             );
             Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Completed $_completedCount ${widget.reminder.title.toLowerCase()}!',
-                ),
-                backgroundColor: widget.reminder.color,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                margin: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).size.height - 150,
-                  left: 16,
-                  right: 16,
-                ),
-              ),
+            FloatingPill.success(
+              context,
+              '$_completedCount done',
+              color: widget.reminder.color,
             );
           },
           child: Text(AppLocalizations.of(context)?.complete ?? 'Complete'),

@@ -661,7 +661,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Text(
                       localizations?.statistics ?? 'Statistics',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: themeService.textPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -669,7 +669,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     const Spacer(),
                     IconButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close, color: Colors.white70),
+                      icon: Icon(Icons.close, color: themeService.textSecondary),
                       iconSize: 20,
                     ),
                   ],
@@ -684,6 +684,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         '$activeReminders',
                         Icons.notifications_active,
                         const Color(0xFF3B82F6),
+                        themeService,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -693,6 +694,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         '$todayCompletions',
                         Icons.today,
                         const Color(0xFF10B981),
+                        themeService,
                       ),
                     ),
                   ],
@@ -706,6 +708,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         '$totalCompletions',
                         Icons.emoji_events,
                         const Color(0xFFF97316),
+                        themeService,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -715,6 +718,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         nextReminderText,
                         Icons.timer,
                         const Color(0xFF8B5CF6),
+                        themeService,
                         isLargeText: nextReminderText.length > 8,
                       ),
                     ),
@@ -759,7 +763,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     String title,
     String value,
     IconData icon,
-    Color color, {
+    Color color,
+    ThemeService themeService, {
     bool isLargeText = false,
   }) {
     return Semantics(
@@ -781,7 +786,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               style: TextStyle(
                 fontSize: isLargeText ? 12 : 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: themeService.textPrimary,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -792,7 +797,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               title,
               style: TextStyle(
                 fontSize: 11,
-                color: Colors.white70,
+                color: themeService.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/reminder_service.dart';
 import '../services/theme_service.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/floating_pill.dart';
 
 class SimpleHomeScreen extends StatefulWidget {
   final ReminderService reminderService;
@@ -25,20 +26,21 @@ class _SimpleHomeScreenState extends State<SimpleHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
           AppLocalizations.of(context)?.zenuHealthReminder ??
               'Zenu - Health Reminder',
         ),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.health_and_safety, size: 80, color: Colors.blue),
+            Icon(Icons.health_and_safety, size: 80, color: theme.colorScheme.primary),
             const SizedBox(height: 20),
             const Text(
               'Zenu Health Reminder App',
@@ -48,7 +50,7 @@ class _SimpleHomeScreenState extends State<SimpleHomeScreen> {
             const SizedBox(height: 20),
             Text(
               'App is running successfully! 🎉',
-              style: TextStyle(fontSize: 18, color: Colors.green[700]),
+              style: TextStyle(fontSize: 18, color: theme.colorScheme.tertiary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
@@ -59,19 +61,19 @@ class _SimpleHomeScreenState extends State<SimpleHomeScreen> {
                 child: Column(
                   children: [
                     ListTile(
-                      leading: Icon(Icons.check_circle, color: Colors.green),
+                      leading: Icon(Icons.check_circle, color: theme.colorScheme.tertiary),
                       title: const Text('All compilation errors fixed'),
                       subtitle: const Text(
                         'The app now compiles and runs without errors',
                       ),
                     ),
                     ListTile(
-                      leading: Icon(Icons.construction, color: Colors.orange),
+                      leading: Icon(Icons.construction, color: theme.colorScheme.secondary),
                       title: const Text('Provider integration in progress'),
                       subtitle: const Text('Full UI functionality coming soon'),
                     ),
                     ListTile(
-                      leading: Icon(Icons.code, color: Colors.blue),
+                      leading: Icon(Icons.code, color: theme.colorScheme.primary),
                       title: Text(
                         'Reminder Service: ${widget.reminderService.isRunning ? "Running" : "Stopped"}',
                       ),
@@ -86,30 +88,13 @@ class _SimpleHomeScreenState extends State<SimpleHomeScreen> {
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      AppLocalizations.of(
-                            context,
-                          )?.manualTestingConfirmedAppWorking ??
-                          'Manual testing confirmed - App is working!',
-                    ),
-                    backgroundColor: Colors.green,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    margin: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).size.height - 150,
-                      left: 16,
-                      right: 16,
-                    ),
-                  ),
-                );
+                FloatingPill.success(context, 'App working!');
               },
               icon: const Icon(Icons.play_arrow),
               label: const Text('Test App Functionality'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,

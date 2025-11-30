@@ -3,24 +3,9 @@ import 'package:uuid/uuid.dart';
 import '../l10n/app_localizations.dart';
 import '../models/reminder.dart';
 import '../services/reminder_service.dart';
+import 'floating_pill.dart';
 
 class QuickAddDialogs {
-  /// Shows a snackbar at the top of the screen to avoid overlapping with bottom UI elements
-  static void _showTopSnackBar(BuildContext context, String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).size.height - 150,
-          left: 16,
-          right: 16,
-        ),
-      ),
-    );
-  }
 
   static Future<void> showWaterReminderDialog(
     BuildContext context,
@@ -48,12 +33,7 @@ class QuickAddDialogs {
     reminderService.addReminder(reminder);
 
     if (context.mounted) {
-      _showTopSnackBar(
-        context,
-        AppLocalizations.of(context)?.waterReminderAdded ??
-            'Water reminder added! 💧',
-        reminder.color,
-      );
+      FloatingPill.success(context, 'Water added', color: reminder.color);
     }
   }
 
@@ -85,12 +65,7 @@ class QuickAddDialogs {
 
       reminderService.addReminder(reminder);
 
-      _showTopSnackBar(
-        context,
-        AppLocalizations.of(context)?.exerciseReminderAdded(result['title']) ??
-            '${result['title']} reminder added! 💪',
-        reminder.color,
-      );
+      FloatingPill.success(context, '${result['title']} added', color: reminder.color);
     }
   }
 
@@ -120,12 +95,7 @@ class QuickAddDialogs {
     reminderService.addReminder(reminder);
 
     if (context.mounted) {
-      _showTopSnackBar(
-        context,
-        AppLocalizations.of(context)?.eyeRestReminderAdded ??
-            'Eye rest reminder added! 👁️',
-        reminder.color,
-      );
+      FloatingPill.success(context, 'Eye rest added', color: reminder.color);
     }
   }
 
@@ -141,12 +111,7 @@ class QuickAddDialogs {
     if (result != null && context.mounted) {
       reminderService.addReminder(result);
 
-      _showTopSnackBar(
-        context,
-        AppLocalizations.of(context)?.customReminderAdded(result.title) ??
-            'Custom reminder "${result.title}" added!',
-        result.color,
-      );
+      FloatingPill.success(context, '${result.title} added', color: result.color);
     }
   }
 }
@@ -371,35 +336,41 @@ class _CustomReminderDialogState extends State<_CustomReminderDialog> {
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children:
-                  _iconOptions.map((icon) {
-                    final isSelected = icon == _selectedIcon;
-                    return GestureDetector(
-                      onTap: () => setState(() => _selectedIcon = icon),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color:
-                              isSelected
-                                  ? _selectedColor.withValues(alpha: 0.2)
-                                  : Colors.grey[100],
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color:
-                                isSelected ? _selectedColor : Colors.grey[300]!,
-                            width: isSelected ? 2 : 1,
+            Builder(
+              builder: (context) {
+                final theme = Theme.of(context);
+                final isDark = theme.brightness == Brightness.dark;
+                return Wrap(
+                  spacing: 8,
+                  children:
+                      _iconOptions.map((icon) {
+                        final isSelected = icon == _selectedIcon;
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedIcon = icon),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color:
+                                  isSelected
+                                      ? _selectedColor.withValues(alpha: 0.2)
+                                      : (isDark ? Colors.grey[800] : Colors.grey[100]),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color:
+                                    isSelected ? _selectedColor : (isDark ? Colors.grey[600]! : Colors.grey[300]!),
+                                width: isSelected ? 2 : 1,
+                              ),
+                            ),
+                            child: Icon(
+                              icon,
+                              color: isSelected ? _selectedColor : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                              size: 24,
+                            ),
                           ),
-                        ),
-                        child: Icon(
-                          icon,
-                          color: isSelected ? _selectedColor : Colors.grey[600],
-                          size: 24,
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
+                );
+              },
             ),
 
             const SizedBox(height: 16),
@@ -410,36 +381,42 @@ class _CustomReminderDialogState extends State<_CustomReminderDialog> {
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children:
-                  _colorOptions.map((color) {
-                    final isSelected = color == _selectedColor;
-                    return GestureDetector(
-                      onTap: () => setState(() => _selectedColor = color),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color:
-                                isSelected ? Colors.black : Colors.grey[300]!,
-                            width: isSelected ? 3 : 1,
+            Builder(
+              builder: (context) {
+                final theme = Theme.of(context);
+                final isDark = theme.brightness == Brightness.dark;
+                return Wrap(
+                  spacing: 8,
+                  children:
+                      _colorOptions.map((color) {
+                        final isSelected = color == _selectedColor;
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedColor = color),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color:
+                                    isSelected ? (isDark ? Colors.white : Colors.black) : (isDark ? Colors.grey[600]! : Colors.grey[300]!),
+                                width: isSelected ? 3 : 1,
+                              ),
+                            ),
+                            child:
+                                isSelected
+                                    ? const Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 20,
+                                    )
+                                    : null,
                           ),
-                        ),
-                        child:
-                            isSelected
-                                ? const Icon(
-                                  Icons.check,
-                                  color: Colors.white,
-                                  size: 20,
-                                )
-                                : null,
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
+                );
+              },
             ),
           ],
         ),

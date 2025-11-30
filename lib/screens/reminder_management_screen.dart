@@ -4,6 +4,7 @@ import '../utils/state_management.dart';
 import '../services/reminder_service.dart';
 import '../services/reminder_template_service.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/floating_pill.dart';
 import 'package:uuid/uuid.dart';
 
 class ReminderManagementScreen extends StatelessWidget {
@@ -11,20 +12,23 @@ class ReminderManagementScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A1A),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
           AppLocalizations.of(context)!.manageReminders,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w700,
             fontSize: 24,
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
       ),
       body: Consumer<ReminderService>(
         builder: (context, reminderService, child) {
@@ -40,8 +44,8 @@ class ReminderManagementScreen extends StatelessWidget {
                         AppLocalizations.of(
                           context,
                         )!.yourReminders(reminderService.reminders.length),
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -89,16 +93,17 @@ class ReminderManagementScreen extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.notifications_off, size: 80, color: Colors.white24),
+          Icon(Icons.notifications_off, size: 80, color: theme.colorScheme.onSurface.withValues(alpha: 0.24)),
           const SizedBox(height: 16),
           Text(
             AppLocalizations.of(context)!.noRemindersTitle,
-            style: const TextStyle(
-              color: Colors.white54,
+            style: TextStyle(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.54),
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -106,7 +111,7 @@ class ReminderManagementScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             AppLocalizations.of(context)!.tapAddReminderToStart,
-            style: const TextStyle(color: Colors.white38, fontSize: 14),
+            style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 14),
           ),
         ],
       ),
@@ -118,10 +123,13 @@ class ReminderManagementScreen extends StatelessWidget {
     Reminder reminder,
     ReminderService service,
   ) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A2E),
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: reminder.color.withValues(alpha: 0.3),
@@ -140,8 +148,8 @@ class ReminderManagementScreen extends StatelessWidget {
         ),
         title: Text(
           reminder.title,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w700,
             fontSize: 16,
           ),
@@ -152,7 +160,7 @@ class ReminderManagementScreen extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               reminder.description,
-              style: const TextStyle(color: Colors.white60, fontSize: 13),
+              style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13),
             ),
             const SizedBox(height: 8),
             Row(
@@ -197,8 +205,8 @@ class ReminderManagementScreen extends StatelessWidget {
             const SizedBox(width: 8),
             // More options menu
             PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, color: Colors.white54),
-              color: const Color(0xFF2A2A3E),
+              icon: Icon(Icons.more_vert, color: theme.colorScheme.onSurface.withValues(alpha: 0.54)),
+              color: theme.cardColor,
               onSelected: (value) {
                 switch (value) {
                   case 'edit':
@@ -218,11 +226,11 @@ class ReminderManagementScreen extends StatelessWidget {
                       value: 'edit',
                       child: Row(
                         children: [
-                          Icon(Icons.edit, color: Colors.white70),
-                          SizedBox(width: 12),
+                          Icon(Icons.edit, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                          const SizedBox(width: 12),
                           Text(
                             AppLocalizations.of(context)?.edit ?? 'Edit',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: theme.colorScheme.onSurface),
                           ),
                         ],
                       ),
@@ -231,12 +239,12 @@ class ReminderManagementScreen extends StatelessWidget {
                       value: 'duplicate',
                       child: Row(
                         children: [
-                          const Icon(Icons.copy, color: Colors.white70),
+                          Icon(Icons.copy, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                           const SizedBox(width: 12),
                           Text(
                             AppLocalizations.of(context)?.duplicate ??
                                 'Duplicate',
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(color: theme.colorScheme.onSurface),
                           ),
                         ],
                       ),
@@ -246,7 +254,7 @@ class ReminderManagementScreen extends StatelessWidget {
                       child: Row(
                         children: [
                           Icon(Icons.delete, color: Colors.red),
-                          SizedBox(width: 12),
+                          const SizedBox(width: 12),
                           Text(
                             AppLocalizations.of(context)?.delete ?? 'Delete',
                             style: TextStyle(color: Colors.red),
@@ -346,18 +354,19 @@ class ReminderManagementScreen extends StatelessWidget {
     Reminder reminder,
     ReminderService service,
   ) {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            backgroundColor: const Color(0xFF2A2A3E),
-            title: const Text(
+            backgroundColor: theme.cardColor,
+            title: Text(
               'Delete Reminder',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: theme.colorScheme.onSurface),
             ),
             content: Text(
               'Are you sure you want to delete "${reminder.title}"?',
-              style: const TextStyle(color: Colors.white70),
+              style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
             ),
             actions: [
               TextButton(
@@ -432,8 +441,11 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Dialog(
-      backgroundColor: const Color(0xFF2A2A3E),
+      backgroundColor: theme.cardColor,
       child: Container(
         constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
         padding: const EdgeInsets.all(24),
@@ -446,8 +458,8 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
               widget.existingReminder != null
                   ? 'Edit Reminder'
                   : 'Add New Reminder',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
               ),
@@ -461,10 +473,10 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                   children: [
                     // Template selection (only for new reminders)
                     if (widget.existingReminder == null) ...[
-                      const Text(
+                      Text(
                         'Choose Template',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: theme.colorScheme.onSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -620,6 +632,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
     ReminderTemplate? template,
   ) {
     final isSelected = _selectedType == type;
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
@@ -661,7 +674,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
             Text(
               name,
               style: TextStyle(
-                color: isSelected ? Colors.white : color,
+                color: isSelected ? theme.colorScheme.onSurface : color,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                 fontSize: 12,
               ),
@@ -678,13 +691,14 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
     required String hint,
     int maxLines = 1,
   }) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -693,17 +707,17 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
         TextField(
           controller: controller,
           maxLines: maxLines,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Colors.white38),
+            hintStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.38)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white24),
+              borderSide: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.24)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white24),
+              borderSide: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.24)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -716,13 +730,14 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
   }
 
   Widget _buildIconSelector() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Icon',
           style: TextStyle(
-            color: Colors.white,
+            color: theme.colorScheme.onSurface,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -733,7 +748,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white24),
+              border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.24)),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -742,10 +757,10 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                 const SizedBox(width: 12),
                 Text(
                   AppLocalizations.of(context)?.icon ?? 'Choose Icon',
-                  style: const TextStyle(color: Colors.white70),
+                  style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                 ),
                 const Spacer(),
-                const Icon(Icons.arrow_drop_down, color: Colors.white54),
+                Icon(Icons.arrow_drop_down, color: theme.colorScheme.onSurface.withValues(alpha: 0.54)),
               ],
             ),
           ),
@@ -755,13 +770,14 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
   }
 
   Widget _buildColorSelector() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Color',
           style: TextStyle(
-            color: Colors.white,
+            color: theme.colorScheme.onSurface,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -772,7 +788,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white24),
+              border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.24)),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -788,10 +804,10 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                 const SizedBox(width: 12),
                 Text(
                   AppLocalizations.of(context)?.color ?? 'Choose Color',
-                  style: const TextStyle(color: Colors.white70),
+                  style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                 ),
                 const Spacer(),
-                const Icon(Icons.arrow_drop_down, color: Colors.white54),
+                Icon(Icons.arrow_drop_down, color: theme.colorScheme.onSurface.withValues(alpha: 0.54)),
               ],
             ),
           ),
@@ -801,13 +817,14 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
   }
 
   Widget _buildIntervalSelector() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Reminder Interval',
           style: TextStyle(
-            color: Colors.white,
+            color: theme.colorScheme.onSurface,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -816,7 +833,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.white24),
+            border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.24)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -852,13 +869,14 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
   }
 
   Widget _buildQuantitySettings() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Quantity Settings',
           style: TextStyle(
-            color: Colors.white,
+            color: theme.colorScheme.onSurface,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -867,7 +885,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.white24),
+            border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.24)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -875,14 +893,14 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
               // Unit
               Row(
                 children: [
-                  const Text('Unit:', style: TextStyle(color: Colors.white70)),
+                  Text('Unit:', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: theme.colorScheme.onSurface),
                       decoration: InputDecoration(
                         hintText: 'e.g., reps, ml, minutes',
-                        hintStyle: const TextStyle(color: Colors.white38),
+                        hintStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.38)),
                         border: InputBorder.none,
                       ),
                       onChanged: (value) => _unit = value,
@@ -891,12 +909,12 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                   ),
                 ],
               ),
-              const Divider(color: Colors.white24),
+              Divider(color: theme.colorScheme.onSurface.withValues(alpha: 0.24)),
 
               // Min Quantity
               Row(
                 children: [
-                  const Text('Min:', style: TextStyle(color: Colors.white70)),
+                  Text('Min:', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
                   Expanded(
                     child: Slider(
                       value: _minQuantity.clamp(0, _maxQuantity - 1).toDouble(),
@@ -928,7 +946,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
               // Max Quantity
               Row(
                 children: [
-                  const Text('Max:', style: TextStyle(color: Colors.white70)),
+                  Text('Max:', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
                   Expanded(
                     child: Slider(
                       value:
@@ -961,7 +979,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
               // Step Size
               Row(
                 children: [
-                  const Text('Step:', style: TextStyle(color: Colors.white70)),
+                  Text('Step:', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
                   Expanded(
                     child: Slider(
                       value: _stepSize.toDouble(),
@@ -1006,14 +1024,15 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
   }
 
   void _showIconPicker() {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            backgroundColor: const Color(0xFF2A2A3E),
+            backgroundColor: theme.cardColor,
             title: Text(
               AppLocalizations.of(context)?.icon ?? 'Choose Icon',
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: theme.colorScheme.onSurface),
             ),
             content: SizedBox(
               width: double.maxFinite,
@@ -1046,7 +1065,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                           color:
                               _selectedIcon == icon
                                   ? _selectedColor
-                                  : Colors.white24,
+                                  : theme.colorScheme.onSurface.withValues(alpha: 0.24),
                         ),
                       ),
                       child: Icon(icon, color: _selectedColor),
@@ -1066,14 +1085,15 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
   }
 
   void _showColorPicker() {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            backgroundColor: const Color(0xFF2A2A3E),
+            backgroundColor: theme.cardColor,
             title: Text(
               AppLocalizations.of(context)?.color ?? 'Choose Color',
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: theme.colorScheme.onSurface),
             ),
             content: SizedBox(
               width: double.maxFinite,
@@ -1102,7 +1122,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
                         border: Border.all(
                           color:
                               _selectedColor == color
-                                  ? Colors.white
+                                  ? theme.colorScheme.onSurface
                                   : Colors.transparent,
                           width: 3,
                         ),
@@ -1124,21 +1144,7 @@ class _ReminderEditDialogState extends State<ReminderEditDialog> {
 
   void _saveReminder() {
     if (_titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)?.pleaseEnterTitle ??
-                'Please enter a title',
-          ),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          margin: EdgeInsets.only(
-            bottom: MediaQuery.of(context).size.height - 150,
-            left: 16,
-            right: 16,
-          ),
-        ),
-      );
+      FloatingPill.warning(context, 'Enter a title');
       return;
     }
 

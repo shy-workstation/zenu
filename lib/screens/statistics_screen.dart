@@ -3,6 +3,7 @@ import '../models/reminder.dart';
 import '../services/reminder_service.dart';
 import '../utils/state_management.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/floating_pill.dart';
 
 class StatisticsScreen extends StatelessWidget {
   final ReminderService reminderService;
@@ -11,11 +12,12 @@ class StatisticsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.statistics),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
@@ -62,6 +64,7 @@ class StatisticsScreen extends StatelessWidget {
       children: [
         Expanded(
           child: _buildOverviewCard(
+            context,
             AppLocalizations.of(context)!.activeReminders,
             '$activeReminders',
             Icons.notifications_active,
@@ -71,6 +74,7 @@ class StatisticsScreen extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: _buildOverviewCard(
+            context,
             AppLocalizations.of(context)!.today,
             '$todayCompletions',
             Icons.today,
@@ -80,6 +84,7 @@ class StatisticsScreen extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: _buildOverviewCard(
+            context,
             AppLocalizations.of(context)!.allTime,
             '$totalCompletions',
             Icons.emoji_events,
@@ -91,6 +96,7 @@ class StatisticsScreen extends StatelessWidget {
   }
 
   Widget _buildOverviewCard(
+    BuildContext context,
     String title,
     String value,
     IconData icon,
@@ -113,7 +119,7 @@ class StatisticsScreen extends StatelessWidget {
               ),
               Text(
                 title,
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -125,6 +131,7 @@ class StatisticsScreen extends StatelessWidget {
 
   Widget _buildDailyStats(BuildContext context, ReminderService service) {
     return _buildStatsSection(
+      context,
       AppLocalizations.of(context)!.todaysProgress,
       service.reminders,
       service.statistics.dailyCompletions,
@@ -134,6 +141,7 @@ class StatisticsScreen extends StatelessWidget {
 
   Widget _buildWeeklyStats(BuildContext context, ReminderService service) {
     return _buildStatsSection(
+      context,
       AppLocalizations.of(context)!.thisWeek,
       service.reminders,
       service.statistics.weeklyCompletions,
@@ -143,6 +151,7 @@ class StatisticsScreen extends StatelessWidget {
 
   Widget _buildAllTimeStats(BuildContext context, ReminderService service) {
     return _buildStatsSection(
+      context,
       AppLocalizations.of(context)!.allTime,
       service.reminders,
       service.statistics.totalCompletions,
@@ -151,11 +160,13 @@ class StatisticsScreen extends StatelessWidget {
   }
 
   Widget _buildStatsSection(
+    BuildContext context,
     String title,
     List<Reminder> reminders,
     Map<String, int> completions,
     Color color,
   ) {
+    final theme = Theme.of(context);
     return Card(
       elevation: 2,
       child: Padding(
@@ -165,12 +176,16 @@ class StatisticsScreen extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
             const SizedBox(height: 16),
             ...reminders.map((reminder) {
               final count = completions[reminder.id] ?? 0;
-              return _buildStatItem(reminder, count, color);
+              return _buildStatItem(context, reminder, count, color);
             }),
           ],
         ),
@@ -178,7 +193,8 @@ class StatisticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(Reminder reminder, int count, Color color) {
+  Widget _buildStatItem(BuildContext context, Reminder reminder, int count, Color color) {
+    final theme = Theme.of(context);
     return Semantics(
       label: '${reminder.title}: $count completions',
       excludeSemantics: true,
@@ -195,7 +211,11 @@ class StatisticsScreen extends StatelessWidget {
             Expanded(
               child: Text(
                 reminder.title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
             ),
             Container(
@@ -223,44 +243,38 @@ class StatisticsScreen extends StatelessWidget {
     BuildContext context,
     ReminderService service,
   ) async {
+    final theme = Theme.of(context);
     return showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.resetStatistics),
-          content: Text(AppLocalizations.of(context)!.resetStatisticsDialog),
+          backgroundColor: theme.cardColor,
+          title: Text(
+            AppLocalizations.of(dialogContext)!.resetStatistics,
+            style: TextStyle(color: theme.colorScheme.onSurface),
+          ),
+          content: Text(
+            AppLocalizations.of(dialogContext)!.resetStatisticsDialog,
+            style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+          ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(AppLocalizations.of(dialogContext)!.cancel),
             ),
             ElevatedButton(
               onPressed: () {
                 // Reset statistics
                 service.statistics.reset();
                 service.saveData();
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context)!.statisticsResetSuccess,
-                    ),
-                    backgroundColor: Colors.green,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    margin: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).size.height - 150,
-                      left: 16,
-                      right: 16,
-                    ),
-                  ),
-                );
+                Navigator.of(dialogContext).pop();
+                FloatingPill.success(context, 'Stats reset');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
               ),
-              child: Text(AppLocalizations.of(context)!.reset),
+              child: Text(AppLocalizations.of(dialogContext)!.reset),
             ),
           ],
         );

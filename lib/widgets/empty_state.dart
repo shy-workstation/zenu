@@ -14,6 +14,8 @@ class EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Center(
       child: Padding(
@@ -66,7 +68,7 @@ class EmptyState extends StatelessWidget {
                     'Tap the + button to create your first healthy habit',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[600],
+                  color: theme.colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
@@ -110,23 +112,23 @@ class EmptyState extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withValues(alpha: 0.05),
+                  color: primaryColor.withValues(alpha: isDark ? 0.1 : 0.05),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Colors.blue.withValues(alpha: 0.2),
+                    color: primaryColor.withValues(alpha: 0.2),
                     width: 1,
                   ),
                 ),
                 child: Column(
                   children: [
-                    Icon(Icons.lightbulb_outline, color: Colors.blue, size: 24),
+                    Icon(Icons.lightbulb_outline, color: primaryColor, size: 24),
                     const SizedBox(height: 8),
                     Text(
                       AppLocalizations.of(context)?.quickTips ?? 'Quick Tips',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Colors.blue,
+                        color: primaryColor,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -134,7 +136,7 @@ class EmptyState extends StatelessWidget {
                       '• ${AppLocalizations.of(context)?.startWithSimpleReminders ?? 'Start with 2-3 simple reminders'}\n• ${AppLocalizations.of(context)?.useDefaultIntervals ?? 'Use default intervals initially'}\n• ${AppLocalizations.of(context)?.enableNotifications ?? 'Enable notifications for best results'}',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.blue.withValues(alpha: 0.8),
+                        color: primaryColor.withValues(alpha: 0.8),
                         height: 1.4,
                       ),
                       textAlign: TextAlign.center,

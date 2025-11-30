@@ -50,8 +50,10 @@ class ThemeService extends ChangeNotifier {
     colorScheme: const ColorScheme.light(
       primary: Color(0xFF6366F1),
       secondary: Color(0xFF8B5CF6),
+      tertiary: Color(0xFF059669), // Green for success states
       surface: Colors.white,
       onSurface: Color(0xFF1E293B),
+      onSurfaceVariant: Color(0xFF64748B), // WCAG AA compliant secondary text
       surfaceContainerHighest: Color(0xFFE2E8F0),
     ),
   );
@@ -76,8 +78,10 @@ class ThemeService extends ChangeNotifier {
     colorScheme: const ColorScheme.dark(
       primary: Color(0xFF6366F1),
       secondary: Color(0xFF8B5CF6),
+      tertiary: Color(0xFF34D399), // Green for success states
       surface: Color(0xFF1E293B),
       onSurface: Color(0xFFF1F5F9),
+      onSurfaceVariant: Color(0xFF94A3B8), // WCAG AA compliant secondary text
       surfaceContainerHighest: Color(0xFF334155),
     ),
   );

@@ -6,6 +6,7 @@ import '../services/theme_service.dart';
 import '../utils/accessibility_utils.dart';
 import '../l10n/app_localizations.dart';
 import 'pulsing_dot.dart';
+import 'floating_pill.dart';
 
 /// Enum defining the possible states of a reminder card
 enum ReminderCardState {
@@ -1015,19 +1016,11 @@ class _SwipeableReminderCardState extends State<SwipeableReminderCard>
   }
 
   void _showActionFeedback(BuildContext context, String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).size.height - 150,
-          left: 16,
-          right: 16,
-        ),
-      ),
+    FloatingPill.show(
+      context,
+      icon: Icons.check_rounded,
+      message: message,
+      color: color,
     );
   }
 
