@@ -110,6 +110,13 @@ class ReminderService extends ChangeNotifier {
     }
   }
 
+  /// Triggers a rebuild of widgets listening to this service.
+  /// This is a public method to allow external callers to refresh the UI
+  /// after modifying reminder state directly (e.g., resetting next reminder time).
+  void refresh() {
+    notifyListeners();
+  }
+
   void startReminders() {
     if (_isRunning) return;
 
@@ -177,28 +184,17 @@ class ReminderService extends ChangeNotifier {
     // Always show system notification first (works even when app is minimized)
     _notificationService.showReminderNotification(reminder);
 
-    // Also show in-app notification if available (when app is open)
-    if (_inAppNotificationService != null) {
-      // Pause the timer while waiting for user interaction
-      _pauseTimer();
+    // The in-app notification is now handled by the SwipeableReminderCard
+    // which detects when the reminder time has passed and enters notification state.
+    // We don't reset the timer here - the card will handle it when user interacts.
+    // The card checks if currentTime is after nextReminder to enter notification state.
 
-      _inAppNotificationService!.showReminderDialog(reminder, (quantity) {
-        if (quantity > 0) {
-          // User confirmed completion with specific quantity
-          completeReminder(reminder, customCount: quantity);
-        } else {
-          // User skipped - set next reminder time
-          reminder.resetNextReminder();
-          notifyListeners();
-        }
-        // Resume the timer after user interaction
-        _resumeTimer();
-      });
-    } else {
-      // No in-app notification service available, just reset reminder time
-      reminder.resetNextReminder();
-      notifyListeners();
-    }
+    // Note: We intentionally don't call reminder.resetNextReminder() here
+    // because the card needs to see that the reminder has triggered
+    // (nextReminder is in the past) to show the notification UI.
+    // The card will reset the timer when the user clicks Skip or Done.
+
+    notifyListeners();
   }
 
   void _pauseTimer() {
