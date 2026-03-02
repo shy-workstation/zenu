@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zenu - Orbital + Drawer</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#111;color:#fff;overflow:hidden;height:100vh}
+#nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);padding:10px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #333}
+#nav .title{font-size:14px;font-weight:700;color:#6366f1;white-space:nowrap}
+#nav .st-btn{padding:5px 10px;border-radius:8px;font-size:11px;cursor:pointer;border:1px solid #333;background:#1a1a2e;transition:.2s;margin-left:4px}
+#nav .st-btn.active{background:#6366f1;border-color:#6366f1}
+#nav .spacer{flex:1}
+#phone{width:390px;height:844px;margin:56px auto 20px;border-radius:40px;overflow:hidden;position:relative;border:3px solid #333;background:#0f172a}
+#phone .notch{width:160px;height:34px;background:#000;border-radius:0 0 20px 20px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10}
+#screen{width:100%;height:100%;overflow:hidden;position:relative}
+.hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);backdrop-filter:blur(10px);padding:8px 16px;border-radius:20px;font-size:12px;color:#94a3b8;z-index:100;white-space:nowrap}
+@media(max-height:920px){#phone{transform:scale(.82);margin-top:48px;transform-origin:top center}}
+</style>
+</head>
+<body>
+<div id="nav">
+<span class="title">ORBITAL + DRAWER</span>
+<div class="spacer"></div>
+<div class="st-btn active" onclick="setState('normal')">Normal</div>
+<div class="st-btn" onclick="setState('drawer')">Drawer Open</div>
+<div class="st-btn" onclick="setState('editing')">Editing</div>
+<div class="st-btn" onclick="setState('running')">Running</div>
+<div class="st-btn" onclick="setState('running-drawer')">Running+Drawer</div>
+<div class="st-btn" onclick="setState('triggered')">Triggered</div>
+</div>
+<div id="phone"><div class="notch"></div><div id="screen"></div></div>
+<div class="hint">Toggle states above to see each view</div>
+
+<script>
+const C={water:'#06b6d4',exercise:'#ef4444',eye:'#3b82f6',custom:'#8b5cf6',primary:'#6366f1',amber:'#f59e0b',green:'#10b981',surface:'#1e293b',bg:'#0f172a',text:'#f1f5f9',muted:'#94a3b8',border:'#334155'};
+const R=[
+{title:'Water',icon:'\u{1F4A7}',color:C.water,interval:30,next:'12:45',qty:'250ml',enabled:true},
+{title:'Eye Rest',icon:'\u{1F440}',color:C.eye,interval:20,next:'5:12',qty:'20 sec',enabled:true},
+{title:'Stretch',icon:'\u{1F9D8}',color:C.green,interval:45,next:'32:10',qty:'',enabled:true},
+{title:'Push Ups',icon:'\u{1F4AA}',color:C.exercise,interval:60,next:'48:30',qty:'15 reps',enabled:false}
+];
+
+let currentState='normal';
+
+function setState(s){
+  currentState=s;
+  document.querySelectorAll('.st-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().replace('+','_').replace(' ','_')===s.replace('-','_')));
+  render();
+}
+
+function orbitHTML(running,selectedIdx){
+  const sel=selectedIdx??-1;
+  return R.map((r,i)=>{
+    const a=i*90-90;
+    const x=120*Math.cos(a*Math.PI/180);
+    const y=120*Math.sin(a*Math.PI/180);
+    const isSel=i===sel;
+    const pct=[58,75,29,0][i];
+    return`
+    <div style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + ${x}px),calc(-50% + ${y}px))${isSel?' scale(1.15)':''};text-align:center;cursor:pointer;transition:.2s;${!r.enabled&&!isSel?'opacity:.3':''}">
+      ${running&&r.enabled?`
+      <div style="position:relative;width:60px;height:60px">
+        <svg viewBox="0 0 60 60" style="position:absolute;top:0;left:0;transform:rotate(-90deg)">
+          <circle cx="30" cy="30" r="27" fill="${r.color}10" stroke="${C.border}" stroke-width="2"/>
+          <circle cx="30" cy="30" r="27" fill="none" stroke="${r.color}" stroke-width="2.5" stroke-dasharray="${2*Math.PI*27}" stroke-dashoffset="${2*Math.PI*27*(1-pct/100)}" stroke-linecap="round"/>
+        </svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px">${r.icon}</div>
+      </div>`:`
+      <div style="width:56px;height:56px;border-radius:50%;background:${isSel?r.color+'25':r.color+'12'};border:2px solid ${isSel?r.color:r.enabled?r.color+'60':C.border};display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto;${isSel?'box-shadow:0 0 20px '+r.color+'30':''}">${r.icon}</div>`}
+      <div style="font-size:11px;font-weight:600;margin-top:4px;color:${r.enabled?C.text:C.muted}">${r.title}</div>
+      <div style="font-size:10px;font-family:monospace;font-weight:600;color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'Off'}</div>
+    </div>`;
+  }).join('');
+}
+
+function drawerHandle(label){
+  return`
+  <div style="padding:10px 20px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center">
+    <div style="width:36px;height:4px;border-radius:2px;background:${C.border};margin-bottom:6px"></div>
+    <span style="font-size:11px;color:${C.muted};font-weight:600;letter-spacing:1px">${label}</span>
+  </div>`;
+}
+
+function reminderRow(r, showEdit){
+  return`
+  <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:${C.bg};border-radius:14px;margin-bottom:6px;border-left:3px solid ${r.enabled?r.color:C.border};${!r.enabled?'opacity:.45':''}">
+    <span style="font-size:16px">${r.icon}</span>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:600">${r.title}</div>
+      <div style="font-size:11px;color:${C.muted}">${r.interval}m${r.qty?' \u00b7 '+r.qty:''}</div>
+    </div>
+    <span style="font-size:13px;font-family:monospace;font-weight:600;color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'--:--'}</span>
+    ${showEdit?`<div style="width:28px;height:28px;border-radius:8px;background:${C.border};display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer">\u270E</div>`:''}
+  </div>`;
+}
+
+const states={};
+
+// ===== NORMAL: Orbit + collapsed drawer hint =====
+states.normal=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-size:20px;font-weight:700">Zenu</div>
+  <div style="padding:6px 10px;border-radius:8px;background:${C.surface};font-size:12px;color:${C.muted}">&#9790;</div>
+</div>
+
+<!-- Orbital area -->
+<div style="position:relative;width:300px;height:300px;margin:10px auto 0">
+  <div style="position:absolute;top:50%;left:50%;width:240px;height:240px;border-radius:50%;border:1px dashed ${C.border};transform:translate(-50%,-50%)"></div>
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,${C.amber},#f97316);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 30px ${C.amber}25">
+    <span style="font-size:13px;font-weight:700;letter-spacing:2px">START</span>
+    <span style="font-size:10px;opacity:.7;margin-top:2px">${R.filter(r=>r.enabled).length} active</span>
+  </div>
+  ${orbitHTML(false)}
+</div>
+
+<!-- Collapsed drawer -->
+<div style="position:absolute;bottom:0;left:0;right:0;background:${C.surface};border-radius:24px 24px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.3)">
+  ${drawerHandle('SWIPE UP FOR DETAILS')}
+  <!-- Peek: mini row of reminders -->
+  <div style="display:flex;gap:8px;padding:8px 20px 34px;overflow-x:auto">
+    ${R.map(r=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:${C.bg};border-radius:12px;flex-shrink:0;${!r.enabled?'opacity:.4':''}">
+      <span style="font-size:14px">${r.icon}</span>
+      <span style="font-size:12px;font-weight:600">${r.title}</span>
+      <span style="font-size:11px;font-family:monospace;color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'Off'}</span>
+    </div>`).join('')}
+  </div>
+</div>`;
+
+// ===== DRAWER OPEN: Orbit shrunk + full list =====
+states.drawer=()=>`
+<div style="padding:54px 20px 8px;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-size:20px;font-weight:700">Zenu</div>
+  <div style="padding:6px 10px;border-radius:8px;background:${C.surface};font-size:12px;color:${C.muted}">&#9790;</div>
+</div>
+
+<!-- Shrunk orbital area -->
+<div style="position:relative;width:220px;height:220px;margin:0 auto">
+  <div style="position:absolute;top:50%;left:50%;width:176px;height:176px;border-radius:50%;border:1px dashed ${C.border};transform:translate(-50%,-50%)"></div>
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,${C.amber},#f97316);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 20px ${C.amber}20">
+    <span style="font-size:11px;font-weight:700;letter-spacing:2px">START</span>
+  </div>
+  ${R.map((r,i)=>{
+    const a=i*90-90;const x=88*Math.cos(a*Math.PI/180);const y=88*Math.sin(a*Math.PI/180);
+    return`<div style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + ${x}px),calc(-50% + ${y}px));text-align:center;${!r.enabled?'opacity:.3':''}">
+      <div style="width:42px;height:42px;border-radius:50%;background:${r.color}12;border:2px solid ${r.enabled?r.color+'60':C.border};display:flex;align-items:center;justify-content:center;font-size:17px">${r.icon}</div>
+    </div>`;
+  }).join('')}
+</div>
+
+<!-- Expanded drawer -->
+<div style="background:${C.surface};border-radius:24px 24px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.3);min-height:420px;position:relative">
+  ${drawerHandle('SWIPE DOWN TO COLLAPSE')}
+  <div style="padding:8px 20px 34px;overflow-y:auto;max-height:400px">
+    ${R.map(r=>reminderRow(r,true)).join('')}
+
+    <!-- Add reminder -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:1px dashed ${C.border};border-radius:14px;margin-top:4px;cursor:pointer;color:${C.primary}">
+      <span style="font-size:18px">+</span><span style="font-size:13px;font-weight:600">Add Reminder</span>
+    </div>
+  </div>
+</div>`;
+
+// ===== EDITING: Orbit + edit panel in drawer =====
+states.editing=()=>`
+<div style="padding:54px 20px 8px;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-size:20px;font-weight:700">Zenu</div>
+  <div style="padding:6px 12px;border-radius:8px;background:${C.surface};font-size:12px;color:${C.muted};cursor:pointer">Cancel</div>
+</div>
+
+<!-- Orbit with Water selected -->
+<div style="position:relative;width:220px;height:220px;margin:0 auto">
+  <div style="position:absolute;top:50%;left:50%;width:176px;height:176px;border-radius:50%;border:1px dashed ${C.border};transform:translate(-50%,-50%)"></div>
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:68px;border-radius:50%;background:${C.surface};display:flex;align-items:center;justify-content:center;opacity:.3">
+    <span style="font-size:11px;font-weight:700;letter-spacing:2px">START</span>
+  </div>
+  ${R.map((r,i)=>{
+    const a=i*90-90;const x=88*Math.cos(a*Math.PI/180);const y=88*Math.sin(a*Math.PI/180);
+    const sel=i===0;
+    return`<div style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + ${x}px),calc(-50% + ${y}px))${sel?' scale(1.15)':''};text-align:center;${!r.enabled&&!sel?'opacity:.25':''}">
+      <div style="width:42px;height:42px;border-radius:50%;background:${sel?r.color+'25':r.color+'12'};border:2px solid ${sel?r.color:r.enabled?r.color+'60':C.border};display:flex;align-items:center;justify-content:center;font-size:17px;${sel?'box-shadow:0 0 15px '+r.color+'30':''}">${r.icon}</div>
+      ${sel?`<div style="font-size:10px;font-weight:600;margin-top:3px;color:${r.color}">Editing</div>`:''}</div>`;
+  }).join('')}
+</div>
+
+<!-- Edit drawer -->
+<div style="background:${C.surface};border-radius:24px 24px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.3);overflow-y:auto">
+  ${drawerHandle('EDITING WATER')}
+  <div style="padding:4px 20px 34px">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0 14px;border-bottom:1px solid ${C.border};margin-bottom:14px">
+      <div style="width:40px;height:40px;border-radius:50%;background:${R[0].color}20;display:flex;align-items:center;justify-content:center;font-size:20px">${R[0].icon}</div>
+      <div style="flex:1"><span style="font-size:16px;font-weight:700">Drink Water</span></div>
+      <div style="width:44px;height:24px;border-radius:12px;background:${C.green};position:relative;cursor:pointer"><div style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;right:2px;top:2px"></div></div>
+    </div>
+
+    <!-- Title -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:6px">TITLE</div>
+      <div style="padding:10px 12px;background:${C.bg};border-radius:10px;border:1px solid ${C.border};font-size:14px">Drink Water</div>
+    </div>
+
+    <!-- Interval -->
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;color:${C.muted};font-weight:600">EVERY</span><span style="font-size:14px;font-weight:700;color:${R[0].color}">30 min</span></div>
+      <div style="display:flex;gap:5px">
+        ${[15,20,30,45,60,90].map(v=>`<div style="flex:1;padding:7px 0;border-radius:8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;${v===30?`background:${R[0].color}25;border:1px solid ${R[0].color};color:${R[0].color}`:`background:${C.bg};border:1px solid ${C.border};color:${C.muted}`}">${v}</div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Quantity -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:6px">QUANTITY</div>
+      <div style="display:flex;gap:5px">
+        ${['150ml','250ml','350ml','500ml'].map((q,i)=>`<div style="flex:1;padding:7px 0;border-radius:8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;${i===1?`background:${R[0].color}25;border:1px solid ${R[0].color};color:${R[0].color}`:`background:${C.bg};border:1px solid ${C.border};color:${C.muted}`}">${q}</div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Icon & Color -->
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <div style="flex:1">
+        <div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:6px">ICON</div>
+        <div style="display:flex;gap:4px">
+          ${['\u{1F4A7}','\u{1F6B0}','\u{1FAD7}','\u{2615}'].map((ic,i)=>`<div style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;${i===0?`background:${R[0].color}20;border:1px solid ${R[0].color}`:`background:${C.bg};border:1px solid ${C.border}`}">${ic}</div>`).join('')}
+        </div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:6px">COLOR</div>
+        <div style="display:flex;gap:4px">
+          ${[C.water,C.eye,C.green,C.primary].map((c,i)=>`<div style="width:36px;height:36px;border-radius:8px;background:${c};cursor:pointer;${i===0?'border:2px solid #fff':'border:2px solid transparent'};opacity:${i===0?1:.5}"></div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;gap:8px">
+      <div style="flex:1;padding:12px;border-radius:12px;background:${R[0].color};text-align:center;font-weight:700;font-size:14px;cursor:pointer">Save</div>
+      <div style="width:44px;padding:12px;border-radius:12px;background:${C.exercise}15;text-align:center;font-size:16px;cursor:pointer;color:${C.exercise}">\u{1F5D1}</div>
+    </div>
+  </div>
+</div>`;
+
+// ===== RUNNING: Orbit with progress + collapsed drawer =====
+states.running=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-size:20px;font-weight:700">Zenu</div>
+  <div style="padding:6px 10px;border-radius:8px;background:${C.green}15;font-size:12px;color:${C.green};border:1px solid ${C.green}30">\u25CF Running</div>
+</div>
+
+<div style="position:relative;width:300px;height:300px;margin:10px auto 0">
+  <div style="position:absolute;top:50%;left:50%;width:240px;height:240px;border-radius:50%;border:1px solid ${C.green}20;transform:translate(-50%,-50%)"></div>
+
+  <!-- STOP button -->
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,${C.exercise},#dc2626);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 30px ${C.exercise}20">
+    <span style="font-size:13px;font-weight:700;letter-spacing:2px">STOP</span>
+  </div>
+
+  ${R.map((r,i)=>{
+    const a=i*90-90;const x=120*Math.cos(a*Math.PI/180);const y=120*Math.sin(a*Math.PI/180);
+    const pct=[58,75,29,0][i];
+    return`
+    <div style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + ${x}px),calc(-50% + ${y}px));text-align:center;${!r.enabled?'opacity:.25':''}">
+      <div style="position:relative;width:60px;height:60px">
+        <svg viewBox="0 0 60 60" style="position:absolute;top:0;left:0;transform:rotate(-90deg)">
+          <circle cx="30" cy="30" r="27" fill="${r.color}10" stroke="${C.border}" stroke-width="2"/>
+          ${r.enabled?`<circle cx="30" cy="30" r="27" fill="none" stroke="${r.color}" stroke-width="2.5" stroke-dasharray="${2*Math.PI*27}" stroke-dashoffset="${2*Math.PI*27*(1-pct/100)}" stroke-linecap="round"/>`:''}</svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px">${r.icon}</div>
+      </div>
+      <div style="font-size:11px;font-weight:600;margin-top:3px">${r.title}</div>
+      <div style="font-size:11px;font-family:monospace;font-weight:600;color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'Off'}</div>
+    </div>`;
+  }).join('')}
+</div>
+
+<!-- Collapsed drawer showing timers -->
+<div style="position:absolute;bottom:0;left:0;right:0;background:${C.surface};border-radius:24px 24px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.3)">
+  ${drawerHandle('ACTIVE TIMERS')}
+  <div style="display:flex;gap:8px;padding:8px 20px 34px;overflow-x:auto">
+    ${R.filter(r=>r.enabled).map(r=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:${C.bg};border-radius:12px;flex-shrink:0;border-left:3px solid ${r.color}">
+      <span style="font-size:14px">${r.icon}</span>
+      <div>
+        <div style="font-size:12px;font-weight:600">${r.title}</div>
+        <div style="font-size:13px;font-family:monospace;font-weight:700;color:${r.color}">${r.next}</div>
+      </div>
+    </div>`).join('')}
+  </div>
+</div>`;
+
+// ===== RUNNING + DRAWER OPEN =====
+states['running-drawer']=()=>`
+<div style="padding:54px 20px 8px;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-size:20px;font-weight:700">Zenu</div>
+  <div style="padding:6px 10px;border-radius:8px;background:${C.green}15;font-size:12px;color:${C.green};border:1px solid ${C.green}30">\u25CF Running</div>
+</div>
+
+<!-- Shrunk orbit with progress -->
+<div style="position:relative;width:220px;height:220px;margin:0 auto">
+  <div style="position:absolute;top:50%;left:50%;width:176px;height:176px;border-radius:50%;border:1px solid ${C.green}20;transform:translate(-50%,-50%)"></div>
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,${C.exercise},#dc2626);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 20px ${C.exercise}15">
+    <span style="font-size:11px;font-weight:700;letter-spacing:2px">STOP</span>
+  </div>
+  ${R.map((r,i)=>{
+    const a=i*90-90;const x=88*Math.cos(a*Math.PI/180);const y=88*Math.sin(a*Math.PI/180);
+    const pct=[58,75,29,0][i];
+    return`<div style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + ${x}px),calc(-50% + ${y}px));text-align:center;${!r.enabled?'opacity:.25':''}">
+      <div style="position:relative;width:44px;height:44px">
+        <svg viewBox="0 0 44 44" style="position:absolute;top:0;left:0;transform:rotate(-90deg)">
+          <circle cx="22" cy="22" r="19" fill="${r.color}10" stroke="${C.border}" stroke-width="1.5"/>
+          ${r.enabled?`<circle cx="22" cy="22" r="19" fill="none" stroke="${r.color}" stroke-width="2" stroke-dasharray="${2*Math.PI*19}" stroke-dashoffset="${2*Math.PI*19*(1-pct/100)}" stroke-linecap="round"/>`:''}</svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:16px">${r.icon}</div>
+      </div></div>`;
+  }).join('')}
+</div>
+
+<!-- Expanded drawer with live timers -->
+<div style="background:${C.surface};border-radius:24px 24px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.3);min-height:400px">
+  ${drawerHandle('ACTIVE TIMERS')}
+  <div style="padding:8px 20px 34px">
+    ${R.filter(r=>r.enabled).map(r=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:${C.bg};border-radius:14px;margin-bottom:6px;border-left:3px solid ${r.color}">
+      <span style="font-size:18px">${r.icon}</span>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${r.title}</div>
+        <div style="font-size:11px;color:${C.muted}">${r.interval}m${r.qty?' \u00b7 '+r.qty:''}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:18px;font-family:monospace;font-weight:700;color:${r.color}">${r.next}</div>
+        <div style="width:80px;height:3px;border-radius:2px;background:${C.border};margin-top:4px"><div style="height:100%;border-radius:2px;background:${r.color};width:60%"></div></div>
+      </div>
+    </div>`).join('')}
+
+    <!-- Paused section -->
+    <div style="font-size:11px;color:${C.muted};font-weight:600;letter-spacing:1px;margin:12px 0 8px;padding-left:2px">PAUSED</div>
+    ${R.filter(r=>!r.enabled).map(r=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:${C.bg};border-radius:14px;margin-bottom:6px;opacity:.4">
+      <span style="font-size:16px">${r.icon}</span>
+      <div style="flex:1"><span style="font-size:13px;font-weight:600">${r.title}</span></div>
+      <span style="font-size:12px;color:${C.muted}">Off</span>
+    </div>`).join('')}
+  </div>
+</div>`;
+
+// ===== TRIGGERED =====
+states.triggered=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-size:20px;font-weight:700">Zenu</div>
+  <div style="padding:6px 10px;border-radius:8px;background:${C.green}15;font-size:12px;color:${C.green};border:1px solid ${C.green}30">\u25CF Running</div>
+</div>
+
+<!-- Triggered reminder takes over orbit area -->
+<div style="text-align:center;padding:20px 20px 10px">
+  <div style="width:100px;height:100px;border-radius:50%;background:${R[0].color}15;border:3px solid ${R[0].color};margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:48px;animation:triggerPulse 1.5s infinite">${R[0].icon}</div>
+  <div style="font-size:22px;font-weight:700;margin:12px 0 4px">Drink Water!</div>
+  <div style="font-size:14px;color:${C.muted}">Time for your 250ml</div>
+</div>
+
+<!-- Quantity picker -->
+<div style="padding:0 20px">
+  <div style="background:${C.surface};border-radius:16px;padding:16px;margin-bottom:12px">
+    <div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:10px;text-align:center">HOW MUCH?</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+      <div style="width:40px;height:40px;border-radius:50%;background:${C.bg};border:1px solid ${C.border};display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer">&minus;</div>
+      <span style="font-size:32px;font-weight:700;color:${R[0].color};font-family:monospace;min-width:80px;text-align:center">250ml</span>
+      <div style="width:40px;height:40px;border-radius:50%;background:${C.bg};border:1px solid ${C.border};display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer">+</div>
+    </div>
+  </div>
+
+  <!-- Skip / Done -->
+  <div style="display:flex;gap:10px;margin-bottom:16px">
+    <div style="flex:1;padding:16px;border-radius:14px;background:${C.surface};text-align:center;cursor:pointer">
+      <div style="font-size:18px;margin-bottom:4px">\u23ED</div>
+      <div style="font-size:12px;color:${C.muted}">Skip</div>
+    </div>
+    <div style="flex:2;padding:16px;border-radius:14px;background:${R[0].color};text-align:center;cursor:pointer">
+      <div style="font-size:18px;margin-bottom:4px">\u2705</div>
+      <div style="font-size:13px;font-weight:700">Done!</div>
+    </div>
+  </div>
+</div>
+
+<!-- Other running timers in collapsed drawer -->
+<div style="position:absolute;bottom:0;left:0;right:0;background:${C.surface};border-radius:24px 24px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.3)">
+  ${drawerHandle('STILL RUNNING')}
+  <div style="display:flex;gap:8px;padding:8px 20px 34px;overflow-x:auto">
+    ${R.filter(r=>r.enabled&&r.title!=='Water').map(r=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:${C.bg};border-radius:12px;flex-shrink:0;border-left:3px solid ${r.color}">
+      <span style="font-size:14px">${r.icon}</span>
+      <div>
+        <div style="font-size:12px;font-weight:600">${r.title}</div>
+        <div style="font-size:13px;font-family:monospace;font-weight:700;color:${r.color}">${r.next}</div>
+      </div>
+    </div>`).join('')}
+  </div>
+</div>`;
+
+function render(){
+  const fn=states[currentState];
+  if(fn)document.getElementById('screen').innerHTML=fn();
+}
+render();
+</script>
+<style>@keyframes triggerPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(6,182,212,.3)}50%{transform:scale(1.05);box-shadow:0 0 0 15px rgba(6,182,212,0)}}</style>
+</body>
+</html>

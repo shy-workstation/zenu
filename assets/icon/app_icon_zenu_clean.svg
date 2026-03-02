@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <clipPath id="meditation-figure">
+      <!-- Head -->
+      <circle cx="512" cy="185" r="100"/>
+      <!-- Body - meditation lotus pose -->
+      <path d="
+        M462,280
+        C432,292 388,318 352,355
+        C312,398 278,452 258,508
+        C238,565 234,610 248,642
+        C265,672 360,692 512,692
+        C664,692 759,672 776,642
+        C790,610 786,565 766,508
+        C746,452 712,398 672,355
+        C636,318 592,292 562,280
+        Z
+      "/>
+    </clipPath>
+  </defs>
+
+  <!-- Wave stripes clipped to meditation figure -->
+  <g clip-path="url(#meditation-figure)" fill="#2ACCD6">
+    <!-- Head bands -->
+    <path d="M300,100 Q406,88 512,100 Q618,112 724,100 L724,140 Q618,152 512,140 Q406,128 300,140 Z"/>
+    <path d="M300,156 Q406,144 512,156 Q618,168 724,156 L724,196 Q618,208 512,196 Q406,184 300,196 Z"/>
+    <path d="M300,212 Q406,200 512,212 Q618,224 724,212 L724,258 Q618,270 512,258 Q406,246 300,258 Z"/>
+
+    <!-- Neck/upper body -->
+    <path d="M150,286 Q331,274 512,286 Q693,298 874,286 L874,330 Q693,342 512,330 Q331,318 150,330 Z"/>
+
+    <!-- Body bands -->
+    <path d="M150,355 Q331,343 512,355 Q693,367 874,355 L874,398 Q693,410 512,398 Q331,386 150,398 Z"/>
+    <path d="M150,420 Q331,408 512,420 Q693,432 874,420 L874,464 Q693,476 512,464 Q331,452 150,464 Z"/>
+    <path d="M150,488 Q331,476 512,488 Q693,500 874,488 L874,532 Q693,544 512,532 Q331,520 150,532 Z"/>
+    <path d="M150,556 Q331,544 512,556 Q693,568 874,556 L874,600 Q693,612 512,600 Q331,588 150,600 Z"/>
+    <path d="M150,624 Q331,612 512,624 Q693,636 874,624 L874,668 Q693,680 512,668 Q331,656 150,668 Z"/>
+  </g>
+
+  <!-- "Zenu" text -->
+  <text x="512" y="895" text-anchor="middle"
+        font-family="'Nunito', 'Varela Round', 'Poppins', 'Arial Rounded MT Bold', sans-serif"
+        font-weight="700" font-size="145" letter-spacing="3" fill="#2ACCD6">
+    Zenu
+  </text>
+</svg>

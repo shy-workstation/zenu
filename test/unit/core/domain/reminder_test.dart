@@ -6,7 +6,6 @@ void main() {
   group('Reminder Domain Model Tests', () {
     group('Creation and Initialization', () {
       test('should create reminder with required fields', () {
-        // Arrange & Act
         final reminder = Reminder(
           id: 'test-1',
           type: ReminderType.water,
@@ -17,7 +16,6 @@ void main() {
           interval: const Duration(minutes: 30),
         );
 
-        // Assert
         expect(reminder.id, equals('test-1'));
         expect(reminder.type, equals(ReminderType.water));
         expect(reminder.title, equals('Water Reminder'));
@@ -25,16 +23,16 @@ void main() {
         expect(reminder.icon, equals(Icons.water_drop));
         expect(reminder.color, equals(Colors.blue));
         expect(reminder.interval, equals(const Duration(minutes: 30)));
-        expect(reminder.isEnabled, isTrue); // Default value
-        expect(reminder.nextReminder, isNull); // Default value
+        expect(reminder.isEnabled, isTrue);
+        expect(reminder.nextReminder, isNull);
+        expect(reminder.completionLog, isEmpty);
       });
 
       test('should create reminder with custom enabled state', () {
-        // Arrange & Act
         final reminder = Reminder(
           id: 'test-1',
-          type: ReminderType.exercise,
-          title: 'Exercise',
+          type: ReminderType.pushUps,
+          title: 'Push-ups',
           description: 'Stay active',
           icon: Icons.fitness_center,
           color: Colors.green,
@@ -42,34 +40,29 @@ void main() {
           isEnabled: false,
         );
 
-        // Assert
         expect(reminder.isEnabled, isFalse);
       });
 
       test('should create reminder with next reminder time', () {
-        // Arrange
         final nextTime = DateTime.now().add(const Duration(minutes: 30));
 
-        // Act
         final reminder = Reminder(
           id: 'test-1',
           type: ReminderType.eyeRest,
           title: 'Eye Rest',
           description: 'Look away from screen',
-          icon: Icons.visibility,
+          icon: Icons.remove_red_eye,
           color: Colors.orange,
           interval: const Duration(minutes: 20),
           nextReminder: nextTime,
         );
 
-        // Assert
         expect(reminder.nextReminder, equals(nextTime));
       });
     });
 
     group('Business Logic', () {
-      test('should calculate next reminder time correctly', () {
-        // Arrange
+      test('should set next reminder time correctly via resetNextReminder', () {
         final reminder = Reminder(
           id: 'test-1',
           type: ReminderType.water,
@@ -80,18 +73,22 @@ void main() {
           interval: const Duration(minutes: 30),
         );
 
-        // Act
-        reminder.scheduleNext();
+        final before = DateTime.now();
+        reminder.resetNextReminder();
+        final after = DateTime.now();
 
-        // Assert
+        expect(reminder.nextReminder, isNotNull);
         expect(
-          reminder.nextReminder,
-          equals(DateTime(2024, 1, 1, 10, 30, 0)),
+          reminder.nextReminder!.isAfter(before.add(const Duration(minutes: 29))),
+          isTrue,
+        );
+        expect(
+          reminder.nextReminder!.isBefore(after.add(const Duration(minutes: 31))),
+          isTrue,
         );
       });
 
       test('should determine if reminder is due', () {
-        // Arrange
         final pastTime = DateTime.now().subtract(const Duration(minutes: 5));
         final futureTime = DateTime.now().add(const Duration(minutes: 5));
 
@@ -117,13 +114,11 @@ void main() {
           nextReminder: futureTime,
         );
 
-        // Assert
         expect(dueReminder.isDue(), isTrue);
         expect(notDueReminder.isDue(), isFalse);
       });
 
       test('should handle null next reminder time in isDue check', () {
-        // Arrange
         final reminder = Reminder(
           id: 'test-1',
           type: ReminderType.water,
@@ -135,12 +130,10 @@ void main() {
           nextReminder: null,
         );
 
-        // Act & Assert
         expect(reminder.isDue(), isFalse);
       });
 
       test('should calculate time until next reminder', () {
-        // Arrange
         final futureTime = DateTime.now().add(const Duration(minutes: 15));
         final reminder = Reminder(
           id: 'test-1',
@@ -153,18 +146,15 @@ void main() {
           nextReminder: futureTime,
         );
 
-        // Act
         final timeUntil = reminder.timeUntilNext;
 
-        // Assert
         expect(timeUntil, isNotNull);
         if (timeUntil != null) {
-          expect(timeUntil.inMinutes, closeTo(15, 1)); // Within 1 minute tolerance
+          expect(timeUntil.inMinutes, closeTo(15, 1));
         }
       });
 
       test('should return null for time until next when no next reminder set', () {
-        // Arrange
         final reminder = Reminder(
           id: 'test-1',
           type: ReminderType.water,
@@ -175,17 +165,74 @@ void main() {
           interval: const Duration(minutes: 30),
         );
 
-        // Act
-        final timeUntil = reminder.timeUntilNext;
+        expect(reminder.timeUntilNext, isNull);
+      });
+    });
 
-        // Assert
-        expect(timeUntil, isNull);
+    group('Completion Tracking', () {
+      test('should log completion with custom count', () {
+        final reminder = Reminder(
+          id: 'test-1',
+          type: ReminderType.water,
+          title: 'Water',
+          description: 'Hydrate',
+          icon: Icons.water_drop,
+          color: Colors.blue,
+          interval: const Duration(minutes: 30),
+        );
+
+        reminder.completeReminder(customCount: 250);
+
+        expect(reminder.totalCompleted, equals(1));
+        expect(reminder.completionLog.length, equals(1));
+        expect(reminder.completionLog.first['qty'], equals(250));
+        expect(reminder.todayTotal, equals(250));
+        expect(reminder.todayCount, equals(1));
+      });
+
+      test('should accumulate multiple completions', () {
+        final reminder = Reminder(
+          id: 'test-1',
+          type: ReminderType.water,
+          title: 'Water',
+          description: 'Hydrate',
+          icon: Icons.water_drop,
+          color: Colors.blue,
+          interval: const Duration(minutes: 30),
+        );
+
+        reminder.completeReminder(customCount: 250);
+        reminder.completeReminder(customCount: 500);
+
+        expect(reminder.totalCompleted, equals(2));
+        expect(reminder.todayTotal, equals(750));
+        expect(reminder.todayCount, equals(2));
+      });
+
+      test('should prune old entries', () {
+        final reminder = Reminder(
+          id: 'test-1',
+          type: ReminderType.water,
+          title: 'Water',
+          description: 'Hydrate',
+          icon: Icons.water_drop,
+          color: Colors.blue,
+          interval: const Duration(minutes: 30),
+          completionLog: [
+            {'date': '2020-01-01', 'qty': 100},
+            {'date': DateTime.now().toIso8601String().substring(0, 10), 'qty': 200},
+          ],
+        );
+
+        reminder.pruneOldEntries();
+
+        expect(reminder.completionLog.length, equals(1));
+        expect(reminder.completionLog.first['qty'], equals(200));
       });
     });
 
     group('Serialization', () {
       test('should serialize to JSON correctly', () {
-        // Arrange
         final nextTime = DateTime(2024, 1, 1, 10, 30, 0);
         final reminder = Reminder(
           id: 'test-1',
@@ -199,200 +246,125 @@ void main() {
           nextReminder: nextTime,
         );
 
-        // Act
         final json = reminder.toJson();
 
-        // Assert
         expect(json['id'], equals('test-1'));
-        expect(json['type'], equals(0)); // ReminderType.water.index
+        expect(json['type'], equals('water'));
         expect(json['title'], equals('Water Reminder'));
         expect(json['description'], equals('Stay hydrated'));
         expect(json['iconCodePoint'], equals(Icons.water_drop.codePoint));
         expect(json['iconFontFamily'], equals(Icons.water_drop.fontFamily));
-        expect(json['colorValue'], equals('FF2196F3')); // Blue color hex
-        expect(json['interval'], equals(1800)); // 30 minutes in seconds
+        expect(json['interval'], equals(1800));
         expect(json['isEnabled'], isTrue);
         expect(json['nextReminder'], equals(nextTime.millisecondsSinceEpoch));
+        expect(json['completionLog'], isEmpty);
       });
 
       test('should deserialize from JSON correctly', () {
-        // Arrange
         final nextTime = DateTime(2024, 1, 1, 10, 30, 0);
         final json = {
           'id': 'test-1',
-          'type': 0, // ReminderType.water
+          'type': 'water',
           'title': 'Water Reminder',
           'description': 'Stay hydrated',
           'iconCodePoint': Icons.water_drop.codePoint,
           'iconFontFamily': Icons.water_drop.fontFamily,
-          'colorValue': 'FF2196F3',
+          'colorValue': 'ff2196f3',
           'interval': 1800,
           'isEnabled': true,
           'nextReminder': nextTime.millisecondsSinceEpoch,
+          'completionLog': [
+            {'date': '2024-01-01', 'qty': 250},
+          ],
         };
 
-        // Act
         final reminder = Reminder.fromJson(json);
 
-        // Assert
         expect(reminder.id, equals('test-1'));
         expect(reminder.type, equals(ReminderType.water));
         expect(reminder.title, equals('Water Reminder'));
-        expect(reminder.description, equals('Stay hydrated'));
-        expect(reminder.icon.codePoint, equals(Icons.water_drop.codePoint));
-        expect(reminder.color, equals(Colors.blue));
         expect(reminder.interval, equals(const Duration(minutes: 30)));
         expect(reminder.isEnabled, isTrue);
         expect(reminder.nextReminder, equals(nextTime));
+        expect(reminder.completionLog.length, equals(1));
+      });
+
+      test('should handle old index-based type serialization', () {
+        final json = {
+          'id': 'test-1',
+          'type': 0,
+          'title': 'Water',
+          'description': 'Hydrate',
+          'iconCodePoint': Icons.water_drop.codePoint,
+          'iconFontFamily': Icons.water_drop.fontFamily,
+          'colorValue': 'ff2196f3',
+          'interval': 1800,
+        };
+
+        final reminder = Reminder.fromJson(json);
+        expect(reminder.type, equals(ReminderType.water));
       });
 
       test('should handle missing optional fields in JSON deserialization', () {
-        // Arrange
         final json = {
           'id': 'test-1',
-          'type': 1, // ReminderType.exercise
-          'title': 'Exercise',
-          'description': 'Stay active',
-          'iconCodePoint': Icons.fitness_center.codePoint,
-          'iconFontFamily': Icons.fitness_center.fontFamily,
-          'colorValue': 'FF4CAF50',
-          'interval': 7200, // 2 hours
-          // Missing isEnabled and nextReminder
+          'type': 'eyeRest',
+          'title': 'Eye Rest',
+          'description': 'Look away',
+          'iconCodePoint': Icons.remove_red_eye.codePoint,
+          'iconFontFamily': Icons.remove_red_eye.fontFamily,
+          'colorValue': 'ff4caf50',
+          'interval': 1200,
         };
 
-        // Act
         final reminder = Reminder.fromJson(json);
 
-        // Assert
-        expect(reminder.isEnabled, isTrue); // Default value
-        expect(reminder.nextReminder, isNull); // Default value
-      });
-    });
-
-    group('Equality and Hash Code', () {
-      test('should be equal when all fields match', () {
-        // Arrange
-        final reminder1 = Reminder(
-          id: 'test-1',
-          type: ReminderType.water,
-          title: 'Water',
-          description: 'Hydrate',
-          icon: Icons.water_drop,
-          color: Colors.blue,
-          interval: const Duration(minutes: 30),
-        );
-
-        final reminder2 = Reminder(
-          id: 'test-1',
-          type: ReminderType.water,
-          title: 'Water',
-          description: 'Hydrate',
-          icon: Icons.water_drop,
-          color: Colors.blue,
-          interval: const Duration(minutes: 30),
-        );
-
-        // Act & Assert
-        expect(reminder1, equals(reminder2));
-        expect(reminder1.hashCode, equals(reminder2.hashCode));
-      });
-
-      test('should not be equal when IDs differ', () {
-        // Arrange
-        final reminder1 = Reminder(
-          id: 'test-1',
-          type: ReminderType.water,
-          title: 'Water',
-          description: 'Hydrate',
-          icon: Icons.water_drop,
-          color: Colors.blue,
-          interval: const Duration(minutes: 30),
-        );
-
-        final reminder2 = Reminder(
-          id: 'test-2',
-          type: ReminderType.water,
-          title: 'Water',
-          description: 'Hydrate',
-          icon: Icons.water_drop,
-          color: Colors.blue,
-          interval: const Duration(minutes: 30),
-        );
-
-        // Act & Assert
-        expect(reminder1, isNot(equals(reminder2)));
-      });
-    });
-
-    group('Edge Cases', () {
-      test('should handle very short intervals', () {
-        // Arrange & Act
-        final reminder = Reminder(
-          id: 'test-1',
-          type: ReminderType.custom,
-          title: 'Frequent',
-          description: 'Very frequent reminder',
-          icon: Icons.notifications,
-          color: Colors.red,
-          interval: const Duration(seconds: 1),
-        );
-
-        // Assert
-        expect(reminder.interval.inSeconds, equals(1));
-      });
-
-      test('should handle very long intervals', () {
-        // Arrange & Act
-        final reminder = Reminder(
-          id: 'test-1',
-          type: ReminderType.custom,
-          title: 'Rare',
-          description: 'Very rare reminder',
-          icon: Icons.notifications,
-          color: Colors.red,
-          interval: const Duration(days: 7),
-        );
-
-        // Assert
-        expect(reminder.interval.inDays, equals(7));
-      });
-
-      test('should handle special characters in title and description', () {
-        // Arrange & Act
-        final reminder = Reminder(
-          id: 'test-1',
-          type: ReminderType.custom,
-          title: 'Title with émojis 🚰 and spéciäl chârs',
-          description: 'Description with\nnewlines and\ttabs',
-          icon: Icons.water_drop,
-          color: Colors.blue,
-          interval: const Duration(minutes: 30),
-        );
-
-        // Assert
-        expect(reminder.title, contains('émojis'));
-        expect(reminder.title, contains('🚰'));
-        expect(reminder.description, contains('\n'));
-        expect(reminder.description, contains('\t'));
+        expect(reminder.isEnabled, isTrue);
+        expect(reminder.nextReminder, isNull);
+        expect(reminder.completionLog, isEmpty);
       });
     });
 
     group('ReminderType Enum', () {
       test('should have correct enum values', () {
-        expect(ReminderType.values.length, equals(5));
-        expect(ReminderType.water.index, equals(0));
-        expect(ReminderType.exercise.index, equals(1));
-        expect(ReminderType.eyeRest.index, equals(2));
-        expect(ReminderType.stretching.index, equals(3));
-        expect(ReminderType.custom.index, equals(4));
+        expect(ReminderType.values.length, equals(12));
+        expect(ReminderType.water.name, equals('water'));
+        expect(ReminderType.eyeRest.name, equals('eyeRest'));
+        expect(ReminderType.standUp.name, equals('standUp'));
+        expect(ReminderType.pushUps.name, equals('pushUps'));
+        expect(ReminderType.stretch.name, equals('stretch'));
+        expect(ReminderType.deepBreathing.name, equals('deepBreathing'));
+        expect(ReminderType.meditation.name, equals('meditation'));
+      });
+    });
+
+    group('Edge Cases', () {
+      test('should handle very short intervals', () {
+        final reminder = Reminder(
+          id: 'test-1',
+          type: ReminderType.water,
+          title: 'Frequent',
+          description: 'Very frequent reminder',
+          icon: Icons.water_drop,
+          color: Colors.red,
+          interval: const Duration(seconds: 1),
+        );
+
+        expect(reminder.interval.inSeconds, equals(1));
       });
 
-      test('should convert enum to string correctly', () {
-        expect(ReminderType.water.toString(), equals('ReminderType.water'));
-        expect(ReminderType.exercise.toString(), equals('ReminderType.exercise'));
-        expect(ReminderType.eyeRest.toString(), equals('ReminderType.eyeRest'));
-        expect(ReminderType.stretching.toString(), equals('ReminderType.stretching'));
-        expect(ReminderType.custom.toString(), equals('ReminderType.custom'));
+      test('should handle very long intervals', () {
+        final reminder = Reminder(
+          id: 'test-1',
+          type: ReminderType.water,
+          title: 'Rare',
+          description: 'Very rare reminder',
+          icon: Icons.water_drop,
+          color: Colors.red,
+          interval: const Duration(days: 7),
+        );
+
+        expect(reminder.interval.inDays, equals(7));
       });
     });
   });

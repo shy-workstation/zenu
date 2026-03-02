@@ -1,13 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ThemeService extends ChangeNotifier {
+class ThemeService extends ChangeNotifier with WidgetsBindingObserver {
   static const String _themeKey = 'theme_mode';
+  static const String _themeLegacyKey = 'theme_mode_legacy';
   static ThemeService? _instance;
   SharedPreferences? _prefs;
 
-  bool _isDarkMode = false;
-  bool get isDarkMode => _isDarkMode;
+  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode get themeMode => _themeMode;
+
+  bool get isDarkMode {
+    switch (_themeMode) {
+      case ThemeMode.dark:
+        return true;
+      case ThemeMode.light:
+        return false;
+      case ThemeMode.system:
+        return WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+            Brightness.dark;
+    }
+  }
 
   ThemeService._();
 
@@ -21,12 +34,65 @@ class ThemeService extends ChangeNotifier {
 
   Future<void> _init() async {
     _prefs = await SharedPreferences.getInstance();
-    _isDarkMode = _prefs?.getBool(_themeKey) ?? false;
+    WidgetsBinding.instance.addObserver(this);
+
+    // Migrate from old bool storage to new string storage
+    // The old code stored a bool under the same 'theme_mode' key,
+    // so getString() will throw if it finds a bool. Use try-catch.
+    String? savedMode;
+    try {
+      savedMode = _prefs?.getString(_themeKey);
+    } catch (_) {
+      // Old bool value exists under this key — treat as legacy
+    }
+
+    if (savedMode != null) {
+      _themeMode = ThemeMode.values.firstWhere(
+        (m) => m.name == savedMode,
+        orElse: () => ThemeMode.system,
+      );
+    } else {
+      // Check legacy bool key for migration
+      bool? legacyDark;
+      try {
+        legacyDark = _prefs?.getBool(_themeKey);
+      } catch (_) {}
+      legacyDark ??= _prefs?.getBool(_themeLegacyKey);
+
+      if (legacyDark != null) {
+        _themeMode = legacyDark ? ThemeMode.dark : ThemeMode.light;
+      }
+      // Save in new string format and clean up old keys
+      await _prefs?.setString(_themeKey, _themeMode.name);
+      await _prefs?.remove(_themeLegacyKey);
+    }
   }
 
-  Future<void> toggleTheme() async {
-    _isDarkMode = !_isDarkMode;
-    await _prefs?.setBool(_themeKey, _isDarkMode);
+  @override
+  void didChangePlatformBrightness() {
+    // When OS dark/light mode changes, update widgets using custom colors
+    if (_themeMode == ThemeMode.system) {
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Cycles through: system -> light -> dark -> system
+  Future<void> cycleTheme() async {
+    switch (_themeMode) {
+      case ThemeMode.system:
+        _themeMode = ThemeMode.light;
+      case ThemeMode.light:
+        _themeMode = ThemeMode.dark;
+      case ThemeMode.dark:
+        _themeMode = ThemeMode.system;
+    }
+    await _prefs?.setString(_themeKey, _themeMode.name);
     notifyListeners();
   }
 
@@ -88,14 +154,14 @@ class ThemeService extends ChangeNotifier {
 
   // Custom colors for light/dark mode
   Color get backgroundColor =>
-      _isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
-  Color get cardColor => _isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+      isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+  Color get cardColor => isDarkMode ? const Color(0xFF1E293B) : Colors.white;
   Color get textPrimary =>
-      _isDarkMode ? const Color(0xFFF1F5F9) : const Color(0xFF1E293B);
+      isDarkMode ? const Color(0xFFF1F5F9) : const Color(0xFF1E293B);
   Color get textSecondary =>
-      _isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+      isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
   Color get borderColor =>
-      _isDarkMode ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+      isDarkMode ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
   Color get shadowColor =>
-      _isDarkMode ? Colors.black54 : Colors.black.withValues(alpha: 0.03);
+      isDarkMode ? Colors.black54 : Colors.black.withValues(alpha: 0.03);
 }

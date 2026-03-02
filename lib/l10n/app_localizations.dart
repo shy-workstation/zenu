@@ -961,6 +961,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{reminderTitle} disabled'**
   String reminderDisabled(String reminderTitle);
+
+  /// Health category header in template picker
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get categoryHealth;
+
+  /// Exercise category header in template picker
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise'**
+  String get categoryExercise;
+
+  /// Mind & Body category header in template picker
+  ///
+  /// In en, this message translates to:
+  /// **'Mind & Body'**
+  String get categoryMindBody;
+
+  /// Push-ups exercise name
+  ///
+  /// In en, this message translates to:
+  /// **'Push-ups'**
+  String get pushUps;
+
+  /// Pull-ups exercise name
+  ///
+  /// In en, this message translates to:
+  /// **'Pull-ups'**
+  String get pullUps;
+
+  /// Squats exercise name
+  ///
+  /// In en, this message translates to:
+  /// **'Squats'**
+  String get squats;
+
+  /// Stretching exercise name
+  ///
+  /// In en, this message translates to:
+  /// **'Stretching'**
+  String get stretching;
+
+  /// Jumping jacks exercise name
+  ///
+  /// In en, this message translates to:
+  /// **'Jumping Jacks'**
+  String get jumpingJacks;
+
+  /// Planks exercise name
+  ///
+  /// In en, this message translates to:
+  /// **'Planks'**
+  String get planks;
+
+  /// Burpees exercise name
+  ///
+  /// In en, this message translates to:
+  /// **'Burpees'**
+  String get burpees;
+
+  /// Deep breathing activity name
+  ///
+  /// In en, this message translates to:
+  /// **'Deep Breathing'**
+  String get deepBreathing;
+
+  /// Meditation activity name
+  ///
+  /// In en, this message translates to:
+  /// **'Meditation'**
+  String get meditationTitle;
+
+  /// Deep breathing description
+  ///
+  /// In en, this message translates to:
+  /// **'Calm your mind with breathing exercises'**
+  String get deepBreathingDescription;
+
+  /// Meditation description
+  ///
+  /// In en, this message translates to:
+  /// **'Clear your mind and find focus'**
+  String get meditationDescription;
+
+  /// Notification message for deep breathing reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Take a deep breath and relax.'**
+  String get notificationTimeForDeepBreathing;
+
+  /// Notification message for meditation reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Take a moment to clear your mind.'**
+  String get notificationTimeForMeditation;
+
+  /// Label for reminders still running in triggered overlay
+  ///
+  /// In en, this message translates to:
+  /// **'Still running'**
+  String get stillRunning;
+
+  /// Interval label in edit drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Interval'**
+  String get interval;
+
+  /// Enabled switch label in edit drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get enabledLabel;
+
+  /// Inactive section label
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get inactive;
+
+  /// Tooltip for inactive reminder
+  ///
+  /// In en, this message translates to:
+  /// **'{title} — tap to enable'**
+  String tapToEnable(String title);
+
+  /// Done button label without exclamation
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get doneButton;
+
+  /// Accessibility hint for toggle button
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap to toggle'**
+  String get doubleTapToToggle;
+
+  /// Accessibility hint for theme cycle button
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap to cycle theme'**
+  String get doubleTapToCycleTheme;
+
+  /// Accessibility hint for add reminder button
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap to add your first health reminder'**
+  String get doubleTapToAddReminder;
+
+  /// System theme accessibility label
+  ///
+  /// In en, this message translates to:
+  /// **'Theme: System'**
+  String get themeSystem;
+
+  /// Light theme accessibility label
+  ///
+  /// In en, this message translates to:
+  /// **'Theme: Light'**
+  String get themeLight;
+
+  /// Dark theme accessibility label
+  ///
+  /// In en, this message translates to:
+  /// **'Theme: Dark'**
+  String get themeDark;
+
+  /// Due label for overdue reminders
+  ///
+  /// In en, this message translates to:
+  /// **'due'**
+  String get due;
+
+  /// Last 30 days section title
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 Days'**
+  String get last30Days;
+
+  /// Number of times completed
+  ///
+  /// In en, this message translates to:
+  /// **'{count} times'**
+  String times(int count);
+
+  /// Daily average label
+  ///
+  /// In en, this message translates to:
+  /// **'Daily avg'**
+  String get dailyAverage;
+
+  /// Empty state for statistics
+  ///
+  /// In en, this message translates to:
+  /// **'No completions yet'**
+  String get noCompletionsYet;
+
+  /// Total label
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// Feedback message after clearing all timers
+  ///
+  /// In en, this message translates to:
+  /// **'Timers reset'**
+  String get timersReset;
 }
 
 class _AppLocalizationsDelegate

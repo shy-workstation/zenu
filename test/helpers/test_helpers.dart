@@ -7,7 +7,6 @@ import 'package:mockito/mockito.dart';
 import 'package:zenu/services/reminder_service.dart';
 import 'package:zenu/services/theme_service.dart';
 import 'package:zenu/models/reminder.dart';
-import 'package:zenu/models/statistics.dart';
 
 /// Helper class for common test operations
 class TestHelpers {
@@ -161,45 +160,32 @@ class TestHelpers {
     );
   }
 
-  /// Create test statistics with sample data
-  static Statistics createTestStatistics({
-    int totalCompletions = 10,
-    int dailyCompletions = 3,
-  }) {
-    return Statistics(
-      totalCompletions: {'test': totalCompletions},
-      dailyCompletions: {'test': dailyCompletions},
-    );
-  }
-
   static IconData _getIconForType(ReminderType type) {
     switch (type) {
       case ReminderType.water:
         return Icons.water_drop;
-      case ReminderType.exercise:
-        return Icons.fitness_center;
       case ReminderType.eyeRest:
         return Icons.visibility;
-      case ReminderType.stretching:
-        return Icons.accessibility_new;
-      case ReminderType.custom:
-        return Icons.notifications;
       case ReminderType.standUp:
         return Icons.airline_seat_recline_normal;
-      case ReminderType.pullUps:
-        return Icons.fitness_center;
       case ReminderType.pushUps:
         return Icons.fitness_center;
-      case ReminderType.stretch:
-        return Icons.accessibility_new;
+      case ReminderType.pullUps:
+        return Icons.fitness_center;
       case ReminderType.squats:
         return Icons.fitness_center;
       case ReminderType.jumpingJacks:
         return Icons.fitness_center;
-      case ReminderType.planks:
-        return Icons.fitness_center;
       case ReminderType.burpees:
         return Icons.fitness_center;
+      case ReminderType.stretch:
+        return Icons.accessibility_new;
+      case ReminderType.planks:
+        return Icons.fitness_center;
+      case ReminderType.deepBreathing:
+        return Icons.air;
+      case ReminderType.meditation:
+        return Icons.self_improvement;
     }
   }
 
@@ -207,30 +193,28 @@ class TestHelpers {
     switch (type) {
       case ReminderType.water:
         return Colors.blue;
-      case ReminderType.exercise:
-        return Colors.green;
       case ReminderType.eyeRest:
         return Colors.orange;
-      case ReminderType.stretching:
-        return Colors.purple;
-      case ReminderType.custom:
-        return Colors.red;
       case ReminderType.standUp:
         return Colors.teal;
-      case ReminderType.pullUps:
-        return Colors.indigo;
       case ReminderType.pushUps:
         return Colors.cyan;
-      case ReminderType.stretch:
-        return Colors.purple;
+      case ReminderType.pullUps:
+        return Colors.indigo;
       case ReminderType.squats:
         return Colors.deepOrange;
       case ReminderType.jumpingJacks:
         return Colors.lime;
-      case ReminderType.planks:
-        return Colors.brown;
       case ReminderType.burpees:
         return Colors.pink;
+      case ReminderType.stretch:
+        return Colors.purple;
+      case ReminderType.planks:
+        return Colors.brown;
+      case ReminderType.deepBreathing:
+        return Colors.lightBlue;
+      case ReminderType.meditation:
+        return Colors.deepPurple;
     }
   }
 }
@@ -241,17 +225,12 @@ class MockSetupHelpers {
   static void setupMockReminderService(
     MockReminderService mock, {
     List<Reminder>? reminders,
-    Statistics? statistics,
     bool isRunning = false,
   }) {
     when(mock.reminders).thenReturn(reminders ?? []);
-    when(mock.statistics).thenReturn(statistics ?? Statistics());
     when(mock.isRunning).thenReturn(isRunning);
     when(mock.loadData()).thenAnswer((_) async {});
     when(mock.saveData()).thenAnswer((_) async {});
-    // addReminder and removeReminder are void methods - no need to mock return values
-    when(mock.startReminders()).thenAnswer((_) async {});
-    when(mock.stopReminders()).thenAnswer((_) async {});
   }
 
   /// Setup mock theme service with default behavior

@@ -95,10 +95,12 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
   void _startEffects() {
     _breathingController.repeat(reverse: true);
 
-    // Create energy particles every 2 seconds
+    // Create energy particles and clean up expired ones every 2 seconds
     _particleTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       if (mounted) {
         setState(() {
+          _particles.removeWhere((p) =>
+              DateTime.now().difference(p.createdTime).inMilliseconds > 5000);
           _particles.add(_createEnergyParticle());
         });
       }
@@ -149,7 +151,7 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
     final semanticLabel = widget.isRunning
         ? (localizations?.pauseSystem ?? 'Stop reminders')
         : (localizations?.startSystem ?? 'Start reminders');
-    const semanticHint = 'Double tap to toggle';
+    final semanticHint = localizations?.doubleTapToToggle ?? 'Double tap to toggle';
     final statusAnnouncement = widget.isRunning
         ? (localizations?.systemActive ?? 'Reminders are running')
         : (localizations?.systemPaused ?? 'Reminders are paused');
@@ -297,16 +299,7 @@ class _EnergyStartStopButtonState extends State<EnergyStartStopButton>
         final elapsed =
             DateTime.now().difference(particle.createdTime).inMilliseconds;
         if (elapsed > 5000) {
-          // Remove old particles
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              setState(() {
-                _particles.remove(particle);
-              });
-            }
-          });
-          // Return an invisible Positioned instead of SizedBox.shrink()
-          // to maintain compatibility with Stack parent
+          // Expired particle - render invisible (cleanup happens in timer)
           return Positioned(
             left: 0,
             top: 0,

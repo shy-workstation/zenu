@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:window_manager/window_manager.dart';
 import 'l10n/app_localizations.dart';
@@ -6,14 +7,9 @@ import 'services/notification_service.dart';
 import 'services/reminder_service.dart';
 import 'services/data_service.dart';
 import 'services/theme_service.dart';
-import 'services/in_app_notification_service.dart';
-import 'screens/home_screen.dart';
+import 'screens/orbital_home_screen.dart';
 import 'utils/state_management.dart';
-import 'utils/error_handler.dart';
-import 'utils/memory_cache.dart';
-import 'utils/app_lifecycle_manager.dart';
 import 'utils/platform_helper.dart';
-import 'config/app_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,80 +34,45 @@ void main() async {
     });
   }
 
-  // Initialize error handling first
-  ErrorHandler.logInfo('🚀 Starting Zenu v${AppConfig.version}');
-
   try {
-    // Initialize services with error handling
     final notificationService = await NotificationService.getInstance();
     final dataService = await DataService.getInstance();
     final themeService = await ThemeService.getInstance();
-    final inAppNotificationService = InAppNotificationService();
     final reminderService = ReminderService(notificationService, dataService);
 
-    // In-app notifications are now handled by SwipeableReminderCard
-
-    // Load saved data with error handling
     await reminderService.loadData();
 
-    // Initialize cache system
-    MemoryCache().initialize();
-
-    // Initialize app lifecycle management
-    await AppLifecycleManager.instance.initialize();
-
-    ErrorHandler.logInfo('✅ All services initialized successfully');
-
-    ErrorHandler.logInfo('🏠 About to launch HealthReminderApp');
     runApp(
       HealthReminderApp(
         reminderService: reminderService,
         themeService: themeService,
-        inAppNotificationService: inAppNotificationService,
       ),
     );
-  } catch (e, stackTrace) {
-    // Handle critical startup errors
-    await ErrorHandler.handleError(
-      e,
-      stackTrace,
-      context: 'main() startup',
-      severity: ErrorSeverity.critical,
-    );
+  } catch (e) {
+    if (kDebugMode) {
+      debugPrint('Failed to start app: $e');
+    }
 
-    // Still try to run the app with minimal functionality
     runApp(
       MaterialApp(
-        title: AppConfig.appName,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
-        home: Builder(
-          builder: (context) => Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text(
-                    AppLocalizations.of(context)?.failedToStartApp ??
-                        'Failed to start app',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${AppLocalizations.of(context)?.error ?? 'Error'}: ${e.toString()}',
-                  ),
-                ],
-              ),
+        title: 'Zenu',
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                const SizedBox(height: 16),
+                const Text(
+                  'Unable to start Zenu',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Please restart the application.',
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ],
             ),
           ),
         ),
@@ -123,18 +84,12 @@ void main() async {
 class HealthReminderApp extends StatelessWidget {
   final ReminderService reminderService;
   final ThemeService themeService;
-  final InAppNotificationService inAppNotificationService;
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  HealthReminderApp({
+  const HealthReminderApp({
     super.key,
     required this.reminderService,
     required this.themeService,
-    required this.inAppNotificationService,
-  }) {
-    // Set the navigator key for in-app notifications
-    inAppNotificationService.setNavigatorKey(navigatorKey);
-  }
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -146,11 +101,9 @@ class HealthReminderApp extends StatelessWidget {
             value: reminderService,
             child: MaterialApp(
               title: 'Zenu',
-              navigatorKey: navigatorKey,
               theme: themeService.lightTheme,
               darkTheme: themeService.darkTheme,
-              themeMode:
-                  themeService.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+              themeMode: themeService.themeMode,
               supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
               localizationsDelegates: const [
                 AppLocalizations.delegate,
@@ -159,14 +112,13 @@ class HealthReminderApp extends StatelessWidget {
                 GlobalCupertinoLocalizations.delegate,
               ],
               builder: (context, widget) {
-                // Set localizations in notification service when app is built
                 final localizations = AppLocalizations.of(context);
                 if (localizations != null) {
                   reminderService.setLocalizations(localizations);
                 }
                 return widget!;
               },
-              home: HomeScreen(
+              home: OrbitalHomeScreen(
                 reminderService: reminderService,
                 themeService: themeService,
               ),

@@ -5,461 +5,337 @@ import '../models/reminder.dart';
 import '../services/reminder_service.dart';
 import 'floating_pill.dart';
 
+class _HoverScale extends StatefulWidget {
+  final Widget child;
+  const _HoverScale({required this.child});
+  @override
+  State<_HoverScale> createState() => _HoverScaleState();
+}
+
+class _HoverScaleState extends State<_HoverScale> {
+  bool _hovering = false;
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: AnimatedScale(
+        scale: _hovering ? 1.06 : 1.0,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOut,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
 class QuickAddDialogs {
 
-  static Future<void> showWaterReminderDialog(
-    BuildContext context,
-    ReminderService reminderService,
-  ) async {
-    final localizations = AppLocalizations.of(context);
-
-    final reminder = Reminder(
-      id: const Uuid().v4(),
-      type: ReminderType.water,
-      title: '💧 ${localizations?.stayHydrated ?? 'Stay Hydrated'}',
-      description:
-          localizations?.drinkWaterRegularly ??
-          'Stay hydrated throughout the day',
-      interval: const Duration(minutes: 30),
-      icon: Icons.water_drop,
-      color: const Color(0xFF06B6D4),
-      isEnabled: true,
-      minQuantity: 0,
-      maxQuantity: 1000,
-      stepSize: 25,
-      unit: 'ml',
-    );
-
-    reminderService.addReminder(reminder);
-
-    if (context.mounted) {
-      FloatingPill.success(context, 'Water added', color: reminder.color);
-    }
-  }
-
-  static Future<void> showExerciseReminderDialog(
+  /// Shows a template picker with all available reminder types grouped by category.
+  static Future<void> showTemplatePicker(
     BuildContext context,
     ReminderService reminderService,
   ) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) => _ExerciseTypeDialog(),
+      barrierColor: Colors.black.withValues(alpha: 0.6),
+      builder: (context) => _TemplatePickerDialog(
+        existingTypes: reminderService.reminders
+            .map((r) => r.type)
+            .toSet(),
+      ),
     );
 
-    if (result != null && context.mounted) {
-      final reminder = Reminder(
-        id: const Uuid().v4(),
-        type: result['type'],
-        title: result['title'],
-        description: result['description'],
-        interval: const Duration(minutes: 10),
-        icon: result['icon'],
-        color: result['color'],
-        isEnabled: true,
-        exerciseCount: result['defaultCount'],
-        minQuantity: 1,
-        maxQuantity: 50,
-        stepSize: 1,
-        unit: 'reps',
-      );
-
-      reminderService.addReminder(reminder);
-
-      FloatingPill.success(context, '${result['title']} added', color: reminder.color);
-    }
-  }
-
-  static Future<void> showEyeRestReminderDialog(
-    BuildContext context,
-    ReminderService reminderService,
-  ) async {
-    final localizations = AppLocalizations.of(context);
+    if (result == null || !context.mounted) return;
 
     final reminder = Reminder(
       id: const Uuid().v4(),
-      type: ReminderType.eyeRest,
-      title: '👁️ ${localizations?.restYourEyes ?? 'Rest Your Eyes'}',
-      description:
-          localizations?.lookAwayFromScreen ??
-          'Look away from screen and blink',
-      interval: const Duration(minutes: 20),
-      icon: Icons.remove_red_eye,
-      color: const Color(0xFF3B82F6),
+      type: result['type'] as ReminderType,
+      title: result['title'] as String,
+      description: result['description'] as String,
+      interval: result['interval'] as Duration,
+      icon: result['icon'] as IconData,
+      color: result['color'] as Color,
       isEnabled: true,
-      minQuantity: 20,
-      maxQuantity: 60,
-      stepSize: 10,
-      unit: 'seconds',
+      exerciseCount: (result['defaultCount'] as int?) ?? 0,
+      minQuantity: (result['minQuantity'] as int?) ?? 1,
+      maxQuantity: (result['maxQuantity'] as int?) ?? 100,
+      stepSize: (result['stepSize'] as int?) ?? 1,
+      unit: (result['unit'] as String?) ?? 'reps',
     );
 
     reminderService.addReminder(reminder);
 
     if (context.mounted) {
-      FloatingPill.success(context, 'Eye rest added', color: reminder.color);
-    }
-  }
-
-  static Future<void> showCustomReminderDialog(
-    BuildContext context,
-    ReminderService reminderService,
-  ) async {
-    final result = await showDialog<Reminder>(
-      context: context,
-      builder: (context) => _CustomReminderDialog(),
-    );
-
-    if (result != null && context.mounted) {
-      reminderService.addReminder(result);
-
-      FloatingPill.success(context, '${result.title} added', color: result.color);
+      FloatingPill.success(context, '${reminder.title} added',
+          color: reminder.color);
     }
   }
 }
 
-class _ExerciseTypeDialog extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+class _TemplatePickerDialog extends StatelessWidget {
+  final Set<ReminderType> existingTypes;
 
-    final exerciseTypes = [
-      {
-        'type': ReminderType.pushUps,
-        'title': '🏋️ Push-ups',
-        'description':
-            localizations?.upperBodyStrengthExercise ??
-            'Upper body strength exercise',
-        'icon': Icons.fitness_center,
-        'color': const Color(0xFFEF4444),
-        'defaultCount': 5,
-      },
-      {
-        'type': ReminderType.pullUps,
-        'title': '🏃 Pull-ups',
-        'description':
-            localizations?.backAndArmStrengthening ??
-            'Back and arm strengthening',
-        'icon': Icons.sports_gymnastics,
-        'color': const Color(0xFFF97316),
-        'defaultCount': 3,
-      },
-      {
-        'type': ReminderType.squats,
-        'title': '🤸 Squats',
-        'description':
-            localizations?.lowerBodyStrengtheningExercise ??
-            'Lower body strengthening exercise',
-        'icon': Icons.accessibility_new,
-        'color': const Color(0xFF10B981),
-        'defaultCount': 10,
-      },
-      {
-        'type': ReminderType.stretch,
-        'title': '� Stretching',
-        'description':
-            localizations?.bodyFlexibilityAndMobility ??
-            'Body flexibility and mobility',
-        'icon': Icons.self_improvement,
-        'color': const Color(0xFF8B5CF6),
-        'defaultCount': 1,
-      },
-      {
-        'type': ReminderType.jumpingJacks,
-        'title': '⭐ Jumping Jacks',
-        'description':
-            localizations?.fullBodyCardioExercise ??
-            'Full body cardio exercise',
-        'icon': Icons.directions_run,
-        'color': const Color(0xFF06B6D4),
-        'defaultCount': 15,
-      },
-      {
-        'type': ReminderType.planks,
-        'title': '💪 Planks',
-        'description':
-            localizations?.coreStrengtheningExercise ??
-            'Core strengthening exercise',
-        'icon': Icons.horizontal_rule,
-        'color': const Color(0xFFEC4899),
-        'defaultCount': 1,
-      },
-      {
-        'type': ReminderType.burpees,
-        'title': '🔥 Burpees',
-        'description':
-            localizations?.fullBodyHighIntensityExercise ??
-            'Full body high intensity exercise',
-        'icon': Icons.bolt,
-        'color': const Color(0xFFDC2626),
-        'defaultCount': 5,
-      },
-    ];
-
-    return AlertDialog(
-      title: Text(localizations?.chooseExerciseType ?? 'Choose Exercise Type'),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: exerciseTypes.length,
-          itemBuilder: (context, index) {
-            final exercise = exerciseTypes[index];
-            return Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: (exercise['color'] as Color).withValues(
-                    alpha: 0.2,
-                  ),
-                  child: Icon(
-                    exercise['icon'] as IconData,
-                    color: exercise['color'] as Color,
-                  ),
-                ),
-                title: Text(
-                  exercise['title'] as String,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                subtitle: Text(exercise['description'] as String),
-                onTap: () => Navigator.of(context).pop(exercise),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(localizations?.cancel ?? 'Cancel'),
-        ),
-      ],
-    );
-  }
-}
-
-class _CustomReminderDialog extends StatefulWidget {
-  @override
-  State<_CustomReminderDialog> createState() => _CustomReminderDialogState();
-}
-
-class _CustomReminderDialogState extends State<_CustomReminderDialog> {
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  int _intervalMinutes = 30;
-  IconData _selectedIcon = Icons.notifications;
-  Color _selectedColor = const Color(0xFF6366F1);
-
-  final List<IconData> _iconOptions = [
-    Icons.notifications,
-    Icons.local_cafe,
-    Icons.directions_walk,
-    Icons.laptop,
-    Icons.phone,
-    Icons.book,
-    Icons.music_note,
-    Icons.spa,
-    Icons.psychology,
-    Icons.schedule,
-  ];
-
-  final List<Color> _colorOptions = [
-    const Color(0xFF6366F1),
-    const Color(0xFF10B981),
-    const Color(0xFFF59E0B),
-    const Color(0xFFEF4444),
-    const Color(0xFF8B5CF6),
-    const Color(0xFF06B6D4),
-    const Color(0xFFF97316),
-    const Color(0xFFEC4899),
-  ];
+  const _TemplatePickerDialog({required this.existingTypes});
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    final categories = _buildCategories(l);
 
     return AlertDialog(
-      title: Text(localizations?.customReminder ?? 'Custom Reminder'),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title field
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Reminder Title',
-                border: OutlineInputBorder(),
-              ),
-              maxLength: 50,
-            ),
-
-            const SizedBox(height: 16),
-
-            // Description field
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Description (optional)',
-                border: OutlineInputBorder(),
-              ),
-              maxLength: 100,
-              maxLines: 2,
-            ),
-
-            const SizedBox(height: 16),
-
-            // Interval slider
-            Text(
-              'Interval: $_intervalMinutes minutes',
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-            Slider(
-              value: _intervalMinutes.toDouble(),
-              min: 1,
-              max: 240,
-              divisions: 239,
-              onChanged:
-                  (value) => setState(() => _intervalMinutes = value.round()),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Icon selection
-            Text(
-              AppLocalizations.of(context)?.icon ?? 'Icon:',
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            Builder(
-              builder: (context) {
-                final theme = Theme.of(context);
-                final isDark = theme.brightness == Brightness.dark;
-                return Wrap(
-                  spacing: 8,
-                  children:
-                      _iconOptions.map((icon) {
-                        final isSelected = icon == _selectedIcon;
-                        return GestureDetector(
-                          onTap: () => setState(() => _selectedIcon = icon),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color:
-                                  isSelected
-                                      ? _selectedColor.withValues(alpha: 0.2)
-                                      : (isDark ? Colors.grey[800] : Colors.grey[100]),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color:
-                                    isSelected ? _selectedColor : (isDark ? Colors.grey[600]! : Colors.grey[300]!),
-                                width: isSelected ? 2 : 1,
-                              ),
-                            ),
-                            child: Icon(
-                              icon,
-                              color: isSelected ? _selectedColor : (isDark ? Colors.grey[400] : Colors.grey[600]),
-                              size: 24,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                );
-              },
-            ),
-
-            const SizedBox(height: 16),
-
-            // Color selection
-            Text(
-              AppLocalizations.of(context)?.color ?? 'Color:',
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            Builder(
-              builder: (context) {
-                final theme = Theme.of(context);
-                final isDark = theme.brightness == Brightness.dark;
-                return Wrap(
-                  spacing: 8,
-                  children:
-                      _colorOptions.map((color) {
-                        final isSelected = color == _selectedColor;
-                        return GestureDetector(
-                          onTap: () => setState(() => _selectedColor = color),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: color,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color:
-                                    isSelected ? (isDark ? Colors.white : Colors.black) : (isDark ? Colors.grey[600]! : Colors.grey[300]!),
-                                width: isSelected ? 3 : 1,
-                              ),
-                            ),
-                            child:
-                                isSelected
-                                    ? const Icon(
-                                      Icons.check,
-                                      color: Colors.white,
-                                      size: 20,
-                                    )
-                                    : null,
-                          ),
-                        );
-                      }).toList(),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
-        ),
-        ElevatedButton(
-          onPressed:
-              _titleController.text.trim().isEmpty
-                  ? null
-                  : () {
-                    final reminder = Reminder(
-                      id: const Uuid().v4(),
-                      type: ReminderType.custom,
-                      title: _titleController.text.trim(),
-                      description:
-                          _descriptionController.text.trim().isEmpty
-                              ? 'Custom reminder'
-                              : _descriptionController.text.trim(),
-                      interval: Duration(minutes: _intervalMinutes),
-                      icon: _selectedIcon,
-                      color: _selectedColor,
-                      isEnabled: true,
-                    );
-                    Navigator.of(context).pop(reminder);
-                  },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _selectedColor,
-            foregroundColor: Colors.white,
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(l?.addReminder ?? 'Add Reminder'),
           ),
-          child: Text(localizations?.addReminder ?? 'Add Reminder'),
+          _HoverScale(
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () => Navigator.of(context).pop(),
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Icon(
+                  Icons.close,
+                  size: 20,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ListView(
+          shrinkWrap: true,
+          children: categories.entries.expand((category) {
+            return [
+              Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 4, left: 4),
+                child: Text(
+                  category.key,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurfaceVariant,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              ...category.value.map((t) {
+                final alreadyAdded = existingTypes.contains(t['type']);
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 4),
+                  child: ListTile(
+                    dense: true,
+                    leading: CircleAvatar(
+                      radius: 18,
+                      backgroundColor:
+                          (t['color'] as Color).withValues(alpha: 0.2),
+                      child: Icon(
+                        t['icon'] as IconData,
+                        color: t['color'] as Color,
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      t['title'] as String,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    subtitle: Text(
+                      t['description'] as String,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    trailing: alreadyAdded
+                        ? Icon(Icons.check_circle,
+                            color: theme.colorScheme.primary, size: 18)
+                        : null,
+                    onTap: () => Navigator.of(context).pop(t),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                );
+              }),
+            ];
+          }).toList(),
+        ),
+      ),
+      actions: [
+        _HoverScale(
+          child: TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l?.cancel ?? 'Cancel'),
+          ),
         ),
       ],
     );
   }
 
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
+  Map<String, List<Map<String, dynamic>>> _buildCategories(
+      AppLocalizations? l) {
+    return {
+      (l?.categoryHealth ?? 'Health').toUpperCase(): [
+        {
+          'type': ReminderType.water,
+          'title': '\u{1F4A7} ${l?.stayHydrated ?? 'Stay Hydrated'}',
+          'description':
+              l?.drinkWaterRegularly ?? 'Drink water regularly',
+          'icon': Icons.water_drop,
+          'color': const Color(0xFF06B6D4),
+          'interval': const Duration(minutes: 30),
+          'minQuantity': 0,
+          'maxQuantity': 1000,
+          'stepSize': 25,
+          'unit': 'ml',
+        },
+        {
+          'type': ReminderType.eyeRest,
+          'title': '\u{1F441}\u{FE0F} ${l?.restYourEyes ?? 'Rest Your Eyes'}',
+          'description':
+              l?.lookAwayFromScreen ?? 'Look away from screen and blink',
+          'icon': Icons.remove_red_eye,
+          'color': const Color(0xFF3B82F6),
+          'interval': const Duration(minutes: 20),
+          'minQuantity': 5,
+          'maxQuantity': 60,
+          'stepSize': 5,
+          'unit': 'sec',
+        },
+        {
+          'type': ReminderType.standUp,
+          'title': '\u{1F9CD} ${l?.standAndMove ?? 'Stand and Move'}',
+          'description':
+              l?.getUpFromYourDesk ?? 'Get up from your desk and move around',
+          'icon': Icons.directions_walk,
+          'color': const Color(0xFF14B8A6),
+          'interval': const Duration(minutes: 45),
+          'minQuantity': 1,
+          'maxQuantity': 10,
+          'stepSize': 1,
+          'unit': 'min',
+        },
+      ],
+      (l?.categoryExercise ?? 'Exercise').toUpperCase(): [
+        {
+          'type': ReminderType.pushUps,
+          'title': '\u{1F3CB}\u{FE0F} ${l?.pushUps ?? 'Push-ups'}',
+          'description':
+              l?.upperBodyStrengthExercise ?? 'Upper body strength exercise',
+          'icon': Icons.fitness_center,
+          'color': const Color(0xFFEF4444),
+          'interval': const Duration(minutes: 10),
+          'defaultCount': 5,
+          'maxQuantity': 50,
+          'unit': 'reps',
+        },
+        {
+          'type': ReminderType.pullUps,
+          'title': '\u{1F3C3} ${l?.pullUps ?? 'Pull-ups'}',
+          'description':
+              l?.backAndArmStrengthening ?? 'Back and arm strengthening',
+          'icon': Icons.sports_gymnastics,
+          'color': const Color(0xFFF97316),
+          'interval': const Duration(minutes: 10),
+          'defaultCount': 3,
+          'maxQuantity': 30,
+          'unit': 'reps',
+        },
+        {
+          'type': ReminderType.squats,
+          'title': '\u{1F938} ${l?.squats ?? 'Squats'}',
+          'description': l?.lowerBodyStrengtheningExercise ??
+              'Lower body strengthening exercise',
+          'icon': Icons.accessibility_new,
+          'color': const Color(0xFF10B981),
+          'interval': const Duration(minutes: 10),
+          'defaultCount': 10,
+          'maxQuantity': 50,
+          'unit': 'reps',
+        },
+        {
+          'type': ReminderType.jumpingJacks,
+          'title': '\u{2B50} ${l?.jumpingJacks ?? 'Jumping Jacks'}',
+          'description':
+              l?.fullBodyCardioExercise ?? 'Full body cardio exercise',
+          'icon': Icons.directions_run,
+          'color': const Color(0xFF06B6D4),
+          'interval': const Duration(minutes: 10),
+          'defaultCount': 15,
+          'maxQuantity': 50,
+          'unit': 'reps',
+        },
+        {
+          'type': ReminderType.burpees,
+          'title': '\u{1F525} ${l?.burpees ?? 'Burpees'}',
+          'description': l?.fullBodyHighIntensityExercise ??
+              'Full body high intensity exercise',
+          'icon': Icons.bolt,
+          'color': const Color(0xFFDC2626),
+          'interval': const Duration(minutes: 10),
+          'defaultCount': 5,
+          'maxQuantity': 30,
+          'unit': 'reps',
+        },
+      ],
+      (l?.categoryMindBody ?? 'Mind & Body').toUpperCase(): [
+        {
+          'type': ReminderType.stretch,
+          'title': '\u{1F9D8} ${l?.stretching ?? 'Stretching'}',
+          'description':
+              l?.bodyFlexibilityAndMobility ?? 'Body flexibility and mobility',
+          'icon': Icons.self_improvement,
+          'color': const Color(0xFF8B5CF6),
+          'interval': const Duration(minutes: 15),
+          'defaultCount': 30,
+          'maxQuantity': 120,
+          'unit': 'sec',
+        },
+        {
+          'type': ReminderType.planks,
+          'title': '\u{1F4AA} ${l?.planks ?? 'Planks'}',
+          'description': l?.coreStrengtheningExercise ??
+              'Core strengthening exercise',
+          'icon': Icons.horizontal_rule,
+          'color': const Color(0xFFEC4899),
+          'interval': const Duration(minutes: 15),
+          'defaultCount': 30,
+          'maxQuantity': 120,
+          'unit': 'sec',
+        },
+        {
+          'type': ReminderType.deepBreathing,
+          'title': '\u{1F32C}\u{FE0F} ${l?.deepBreathing ?? 'Deep Breathing'}',
+          'description': l?.deepBreathingDescription ??
+              'Calm your mind with breathing exercises',
+          'icon': Icons.air,
+          'color': const Color(0xFF6366F1),
+          'interval': const Duration(minutes: 30),
+          'defaultCount': 60,
+          'maxQuantity': 300,
+          'unit': 'sec',
+        },
+        {
+          'type': ReminderType.meditation,
+          'title': '\u{1F9D8} ${l?.meditationTitle ?? 'Meditation'}',
+          'description': l?.meditationDescription ??
+              'Clear your mind and find focus',
+          'icon': Icons.spa,
+          'color': const Color(0xFF7C3AED),
+          'interval': const Duration(minutes: 60),
+          'defaultCount': 120,
+          'maxQuantity': 600,
+          'unit': 'sec',
+        },
+      ],
+    };
   }
 }

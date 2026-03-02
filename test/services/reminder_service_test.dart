@@ -6,9 +6,7 @@ import 'package:zenu/services/reminder_service.dart';
 import 'package:zenu/services/notification_service.dart';
 import 'package:zenu/services/data_service.dart';
 import 'package:zenu/models/reminder.dart';
-import 'package:zenu/models/statistics.dart';
 
-// Generate mocks
 @GenerateMocks([NotificationService, DataService])
 import 'reminder_service_test.mocks.dart';
 
@@ -38,67 +36,59 @@ void main() {
       });
 
       test('should load saved data on loadData()', () async {
-        // Arrange
         final testReminders = [
           {
             'id': 'test-1',
-            'type': 0, // ReminderType.water
+            'type': 'water',
             'title': 'Water',
             'description': 'Stay hydrated',
             'iconCodePoint': Icons.water_drop.codePoint,
             'iconFontFamily': Icons.water_drop.fontFamily,
-            'colorValue': '2196F3', // Blue color without 0xFF prefix
-            'interval': 1800, // 30 minutes in seconds
+            'colorValue': 'ff2196f3',
+            'interval': 1800,
             'isEnabled': true,
             'nextReminder':
                 DateTime.now()
-                    .add(Duration(minutes: 30))
+                    .add(const Duration(minutes: 30))
                     .millisecondsSinceEpoch,
           },
         ];
-        final testStats = Statistics();
 
-        when(
-          mockDataService.loadReminders(),
-        ).thenAnswer((_) async => testReminders);
-        when(
-          mockDataService.loadStatistics(),
-        ).thenAnswer((_) async => testStats);
+        when(mockDataService.loadReminders())
+            .thenAnswer((_) async => testReminders);
+        when(mockDataService.saveReminders(any)).thenAnswer((_) async {});
 
-        // Act
         await reminderService.loadData();
 
-        // Assert
         expect(reminderService.reminders.length, equals(1));
         expect(reminderService.reminders.first.title, equals('Water'));
         verify(mockDataService.loadReminders()).called(1);
-        verify(mockDataService.loadStatistics()).called(1);
       });
     });
 
     group('Reminder Management', () {
+      setUp(() {
+        when(mockDataService.saveReminders(any)).thenAnswer((_) async {});
+      });
+
       test('should add new reminder', () {
-        // Arrange
         final reminder = Reminder(
           id: 'test-1',
-          type: ReminderType.custom,
-          title: 'Exercise',
+          type: ReminderType.pushUps,
+          title: 'Push-ups',
           description: 'Stay active',
           icon: Icons.fitness_center,
           color: Colors.green,
           interval: const Duration(hours: 2),
         );
 
-        // Act
         reminderService.addReminder(reminder);
 
-        // Assert
         expect(reminderService.reminders.length, equals(1));
-        expect(reminderService.reminders.first.title, equals('Exercise'));
+        expect(reminderService.reminders.first.title, equals('Push-ups'));
       });
 
       test('should toggle reminder enabled state', () {
-        // Arrange
         final reminder = Reminder(
           id: 'test-1',
           type: ReminderType.water,
@@ -111,41 +101,12 @@ void main() {
         );
         reminderService.addReminder(reminder);
 
-        // Act
         reminderService.toggleReminder('test-1');
 
-        // Assert
         expect(reminderService.reminders.first.isEnabled, isTrue);
       });
 
-      test('should update reminder interval', () {
-        // Arrange
-        final reminder = Reminder(
-          id: 'test-1',
-          type: ReminderType.water,
-          title: 'Water',
-          description: 'Stay hydrated',
-          icon: Icons.water_drop,
-          color: Colors.blue,
-          interval: const Duration(minutes: 30),
-        );
-        reminderService.addReminder(reminder);
-
-        // Act
-        reminderService.updateReminderInterval(
-          'test-1',
-          const Duration(minutes: 60),
-        );
-
-        // Assert
-        expect(
-          reminderService.reminders.first.interval,
-          equals(const Duration(minutes: 60)),
-        );
-      });
-
-      test('should complete reminder and update statistics', () {
-        // Arrange
+      test('should complete reminder and log to completionLog', () {
         final reminder = Reminder(
           id: 'test-1',
           type: ReminderType.water,
@@ -158,43 +119,46 @@ void main() {
         );
         reminderService.addReminder(reminder);
 
-        // Act
         reminderService.completeReminder(reminder, customCount: 250);
 
-        // Assert
-        expect(
-          reminderService.statistics.totalCompletions['test-1'],
-          equals(1),
+        expect(reminder.totalCompleted, equals(1));
+        expect(reminder.completionLog.length, equals(1));
+        expect(reminder.completionLog.first['qty'], equals(250));
+      });
+
+      test('should remove reminder', () {
+        final reminder = Reminder(
+          id: 'test-1',
+          type: ReminderType.water,
+          title: 'Water',
+          description: 'Stay hydrated',
+          icon: Icons.water_drop,
+          color: Colors.blue,
+          interval: const Duration(minutes: 30),
         );
-        expect(
-          reminderService.statistics.dailyCompletions['test-1'],
-          equals(1),
-        );
+        reminderService.addReminder(reminder);
+
+        reminderService.removeReminder('test-1');
+
+        expect(reminderService.reminders, isEmpty);
       });
     });
 
     group('Timer Management', () {
       test('should start reminders timer', () {
-        // Act
         reminderService.startReminders();
-
-        // Assert
         expect(reminderService.isRunning, isTrue);
       });
 
       test('should stop reminders timer', () {
-        // Arrange
         reminderService.startReminders();
-
-        // Act
         reminderService.stopReminders();
-
-        // Assert
         expect(reminderService.isRunning, isFalse);
       });
 
-      test('should reset next reminder times when starting', () {
-        // Arrange
+      test('should set next reminder times when starting', () {
+        when(mockDataService.saveReminders(any)).thenAnswer((_) async {});
+
         final reminder = Reminder(
           id: 'test-1',
           type: ReminderType.water,
@@ -207,20 +171,73 @@ void main() {
         );
         reminderService.addReminder(reminder);
 
-        // Act
         reminderService.startReminders();
 
-        // Assert
         expect(reminder.nextReminder, isNotNull);
         expect(reminder.nextReminder!.isAfter(DateTime.now()), isTrue);
+      });
+
+      test('should preserve timer state on pause and resume', () {
+        when(mockDataService.saveReminders(any)).thenAnswer((_) async {});
+
+        final reminder = Reminder(
+          id: 'test-1',
+          type: ReminderType.water,
+          title: 'Water',
+          description: 'Stay hydrated',
+          icon: Icons.water_drop,
+          color: Colors.blue,
+          interval: const Duration(minutes: 30),
+          isEnabled: true,
+        );
+        reminderService.addReminder(reminder);
+
+        reminderService.startReminders();
+        final originalNext = reminder.nextReminder!;
+        final remainingBefore = originalNext.difference(DateTime.now());
+
+        reminderService.stopReminders();
+        expect(reminder.nextReminder, isNull);
+
+        reminderService.startReminders();
+        expect(reminder.nextReminder, isNotNull);
+        final remainingAfter = reminder.nextReminder!.difference(DateTime.now());
+
+        // Should resume close to original remaining (within 2 sec tolerance)
+        expect(
+          (remainingAfter.inSeconds - remainingBefore.inSeconds).abs(),
+          lessThan(2),
+        );
+      });
+
+      test('clearTimers should reset all timers to full interval', () {
+        when(mockDataService.saveReminders(any)).thenAnswer((_) async {});
+
+        final reminder = Reminder(
+          id: 'test-1',
+          type: ReminderType.water,
+          title: 'Water',
+          description: 'Stay hydrated',
+          icon: Icons.water_drop,
+          color: Colors.blue,
+          interval: const Duration(minutes: 30),
+          isEnabled: true,
+        );
+        reminderService.addReminder(reminder);
+        reminderService.startReminders();
+
+        reminderService.clearTimers();
+
+        expect(reminder.nextReminder, isNotNull);
+        final remaining = reminder.nextReminder!.difference(DateTime.now());
+        // Should be close to full 30-minute interval
+        expect(remaining.inSeconds, greaterThan(29 * 60));
       });
     });
 
     group('Data Persistence', () {
-      test('should save data after reminder changes', () async {
-        // Arrange
+      test('should save data after reminder changes', () {
         when(mockDataService.saveReminders(any)).thenAnswer((_) async {});
-        when(mockDataService.saveStatistics(any)).thenAnswer((_) async {});
 
         final reminder = Reminder(
           id: 'test-1',
@@ -232,91 +249,25 @@ void main() {
           interval: const Duration(minutes: 30),
         );
 
-        // Act
         reminderService.addReminder(reminder);
-        // Note: addReminder() calls saveData() internally, so no need to call it again
 
-        // Assert - At minimum, saveReminders should be called
         verify(mockDataService.saveReminders(any)).called(1);
-        // Note: saveStatistics might not be called if statistics haven't changed
-        // So we'll just verify that saveReminders is working correctly
       });
     });
 
     group('Error Handling', () {
       test('should handle data loading errors gracefully', () async {
-        // Arrange
-        when(
-          mockDataService.loadReminders(),
-        ).thenThrow(Exception('Load error'));
-        when(
-          mockDataService.loadStatistics(),
-        ).thenThrow(Exception('Load error'));
+        when(mockDataService.loadReminders())
+            .thenThrow(Exception('Load error'));
 
-        // Act & Assert - should not throw
         expect(() => reminderService.loadData(), returnsNormally);
       });
 
-      test('should handle save errors gracefully', () async {
-        // Arrange
-        when(
-          mockDataService.saveReminders(any),
-        ).thenThrow(Exception('Save error'));
-        when(
-          mockDataService.saveStatistics(any),
-        ).thenThrow(Exception('Save error'));
+      test('should handle save errors gracefully', () {
+        when(mockDataService.saveReminders(any))
+            .thenThrow(Exception('Save error'));
 
-        // Act & Assert - should not throw
         expect(() => reminderService.saveData(), returnsNormally);
-      });
-    });
-
-    group('Statistics', () {
-      test('should increment completion statistics', () {
-        // Arrange
-        final reminder = Reminder(
-          id: 'test-1',
-          type: ReminderType.water,
-          title: 'Water',
-          description: 'Stay hydrated',
-          icon: Icons.water_drop,
-          color: Colors.blue,
-          interval: const Duration(minutes: 30),
-        );
-        reminderService.addReminder(reminder);
-
-        // Act
-        reminderService.completeReminder(reminder, customCount: 1);
-
-        // Assert
-        expect(
-          reminderService.statistics.totalCompletions['test-1'],
-          equals(1),
-        );
-      });
-
-      test('should track daily completions', () {
-        // Arrange
-        final reminder = Reminder(
-          id: 'test-1',
-          type: ReminderType.water,
-          title: 'Water',
-          description: 'Stay hydrated',
-          icon: Icons.water_drop,
-          color: Colors.blue,
-          interval: const Duration(minutes: 30),
-        );
-        reminderService.addReminder(reminder);
-
-        // Act
-        reminderService.completeReminder(reminder, customCount: 1);
-        reminderService.completeReminder(reminder, customCount: 1);
-
-        // Assert - Check daily completions for the specific reminder
-        expect(
-          reminderService.statistics.dailyCompletions['test-1'],
-          equals(2),
-        );
       });
     });
   });

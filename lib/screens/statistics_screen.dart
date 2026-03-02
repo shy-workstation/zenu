@@ -1,284 +1,446 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/reminder.dart';
 import '../services/reminder_service.dart';
+import '../services/theme_service.dart';
 import '../utils/state_management.dart';
-import '../l10n/app_localizations.dart';
-import '../widgets/floating_pill.dart';
 
 class StatisticsScreen extends StatelessWidget {
-  final ReminderService reminderService;
-
-  const StatisticsScreen({super.key, required this.reminderService});
+  const StatisticsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.statistics),
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: AppLocalizations.of(context)!.resetStatistics,
-            onPressed: () => _showResetStatsDialog(context, reminderService),
-          ),
-        ],
-      ),
-      body: Consumer<ReminderService>(
-        builder: (context, service, child) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildOverviewCards(context, service),
-                const SizedBox(height: 24),
-                _buildDailyStats(context, service),
-                const SizedBox(height: 24),
-                _buildWeeklyStats(context, service),
-                const SizedBox(height: 24),
-                _buildAllTimeStats(context, service),
-              ],
-            ),
-          );
-        },
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return Consumer<ReminderService>(
+          builder: (context, service, _) {
+            final l = AppLocalizations.of(context);
+            final reminders = service.reminders;
+
+            return Scaffold(
+              backgroundColor: themeService.backgroundColor,
+              appBar: AppBar(
+                title: Text(l?.statistics ?? 'Statistics'),
+                backgroundColor: themeService.cardColor,
+                foregroundColor: themeService.textPrimary,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+              ),
+              body: reminders.isEmpty
+                  ? Center(
+                      child: Text(
+                        l?.noCompletionsYet ?? 'No completions yet',
+                        style: TextStyle(
+                          color: themeService.textPrimary
+                              .withValues(alpha: 0.5),
+                          fontSize: 16,
+                        ),
+                      ),
+                    )
+                  : ListView(
+                      padding: const EdgeInsets.all(16),
+                      children: [
+                        _SectionHeader(
+                          title: l?.today ?? 'Today',
+                          color: themeService.textPrimary,
+                        ),
+                        const SizedBox(height: 8),
+                        _TodaySection(
+                          reminders: reminders,
+                          themeService: themeService,
+                          l: l,
+                        ),
+                        const SizedBox(height: 24),
+                        _SectionHeader(
+                          title: l?.last30Days ?? 'Last 30 Days',
+                          color: themeService.textPrimary,
+                        ),
+                        const SizedBox(height: 8),
+                        _Last30DaysSection(
+                          reminders: reminders,
+                          themeService: themeService,
+                          l: l,
+                        ),
+                      ],
+                    ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final Color color;
+
+  const _SectionHeader({required this.title, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        color: color,
       ),
     );
   }
+}
 
-  Widget _buildOverviewCards(BuildContext context, ReminderService service) {
-    final stats = service.statistics;
-    final activeReminders = service.reminders.where((r) => r.isEnabled).length;
-    final totalCompletions = stats.totalCompletions.values.fold(
-      0,
-      (sum, count) => sum + count,
-    );
-    final todayCompletions = stats.dailyCompletions.values.fold(
-      0,
-      (sum, count) => sum + count,
-    );
+class _TodaySection extends StatelessWidget {
+  final List<Reminder> reminders;
+  final ThemeService themeService;
+  final AppLocalizations? l;
 
-    return Row(
+  const _TodaySection({
+    required this.reminders,
+    required this.themeService,
+    required this.l,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final withCompletions =
+        reminders.where((r) => r.todayCount > 0).toList();
+
+    if (withCompletions.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: themeService.cardColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Center(
+          child: Text(
+            l?.noCompletionsYet ?? 'No completions yet',
+            style: TextStyle(
+              color: themeService.textPrimary.withValues(alpha: 0.5),
+              fontSize: 14,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: withCompletions.map((r) {
+        final stripped = r.title.replaceAll(
+          RegExp(r'^[\p{So}\p{Sk}\s]+', unicode: true),
+          '',
+        );
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: themeService.cardColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: r.color.withValues(alpha: 0.2),
+                child: Icon(r.icon, color: r.color, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      stripped,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: themeService.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l?.times(r.todayCount) ?? '${r.todayCount} times',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: themeService.textPrimary
+                            .withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                '${r.todayTotal} ${r.unit}',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: r.color,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _Last30DaysSection extends StatelessWidget {
+  final List<Reminder> reminders;
+  final ThemeService themeService;
+  final AppLocalizations? l;
+
+  const _Last30DaysSection({
+    required this.reminders,
+    required this.themeService,
+    required this.l,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final withHistory =
+        reminders.where((r) => r.completionLog.isNotEmpty).toList();
+
+    if (withHistory.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: themeService.cardColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Center(
+          child: Text(
+            l?.noCompletionsYet ?? 'No completions yet',
+            style: TextStyle(
+              color: themeService.textPrimary.withValues(alpha: 0.5),
+              fontSize: 14,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: withHistory.map((r) {
+        final stripped = r.title.replaceAll(
+          RegExp(r'^[\p{So}\p{Sk}\s]+', unicode: true),
+          '',
+        );
+        final dailyTotals = r.dailyTotals;
+        final totalQty =
+            r.completionLog.fold<int>(0, (s, e) => s + (e['qty'] as int));
+        final totalCount = r.completionLog.length;
+        final daysWithData = dailyTotals.length;
+        final dailyAvg =
+            daysWithData > 0 ? (totalQty / daysWithData).round() : 0;
+        final maxDaily = dailyTotals.values.fold<int>(0, max);
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: themeService.cardColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header row
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundColor: r.color.withValues(alpha: 0.2),
+                    child: Icon(r.icon, color: r.color, size: 18),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      stripped,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: themeService.textPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Stats row
+              Row(
+                children: [
+                  _StatChip(
+                    label: l?.total ?? 'Total',
+                    value: '$totalQty ${r.unit}',
+                    themeService: themeService,
+                  ),
+                  const SizedBox(width: 12),
+                  _StatChip(
+                    label: l?.times(totalCount) ?? '$totalCount times',
+                    value: '',
+                    themeService: themeService,
+                  ),
+                  const SizedBox(width: 12),
+                  _StatChip(
+                    label: l?.dailyAverage ?? 'Daily avg',
+                    value: '$dailyAvg ${r.unit}',
+                    themeService: themeService,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Simple bar chart for last 30 days
+              if (maxDaily > 0) _DailyBars(
+                dailyTotals: dailyTotals,
+                maxDaily: maxDaily,
+                color: r.color,
+                themeService: themeService,
+                unit: r.unit,
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  final String label;
+  final String value;
+  final ThemeService themeService;
+
+  const _StatChip({
+    required this.label,
+    required this.value,
+    required this.themeService,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: _buildOverviewCard(
-            context,
-            AppLocalizations.of(context)!.activeReminders,
-            '$activeReminders',
-            Icons.notifications_active,
-            Colors.blue,
+        if (value.isNotEmpty)
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: themeService.textPrimary,
+            ),
           ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: _buildOverviewCard(
-            context,
-            AppLocalizations.of(context)!.today,
-            '$todayCompletions',
-            Icons.today,
-            Colors.green,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: _buildOverviewCard(
-            context,
-            AppLocalizations.of(context)!.allTime,
-            '$totalCompletions',
-            Icons.emoji_events,
-            Colors.orange,
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: themeService.textPrimary.withValues(alpha: 0.5),
           ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildOverviewCard(
-    BuildContext context,
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Semantics(
-      label: '$value $title',
-      excludeSemantics: true,
-      child: Card(
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
+class _DailyBars extends StatelessWidget {
+  final Map<String, int> dailyTotals;
+  final int maxDaily;
+  final Color color;
+  final ThemeService themeService;
+  final String unit;
+
+  const _DailyBars({
+    required this.dailyTotals,
+    required this.maxDaily,
+    required this.color,
+    required this.themeService,
+    required this.unit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Build days newest-first, only days that have data
+    final now = DateTime.now();
+    final days = <String>[];
+    for (int i = 0; i < 30; i++) {
+      final d = now.subtract(Duration(days: i));
+      final key = d.toIso8601String().substring(0, 10);
+      if (dailyTotals.containsKey(key)) {
+        days.add(key);
+      }
+    }
+
+    return Column(
+      children: days.map((date) {
+        final val = dailyTotals[date]!;
+        final fraction = val / maxDaily;
+        // Format date as "Mar 2" or "02.03"
+        final parts = date.split('-');
+        final month = int.parse(parts[1]);
+        final day = int.parse(parts[2]);
+        final label = '$day.${month.toString().padLeft(2, '0')}';
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Row(
             children: [
-              Icon(icon, color: color, size: 32),
-              const SizedBox(height: 8),
-              Text(
-                value,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              SizedBox(
+                width: 40,
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: themeService.textPrimary.withValues(alpha: 0.45),
+                  ),
+                ),
               ),
-              Text(
-                title,
-                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                textAlign: TextAlign.center,
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Stack(
+                      children: [
+                        Container(
+                          height: 14,
+                          decoration: BoxDecoration(
+                            color: themeService.textPrimary
+                                .withValues(alpha: 0.04),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                        Container(
+                          height: 14,
+                          width: max(4, fraction * constraints.maxWidth),
+                          decoration: BoxDecoration(
+                            color:
+                                color.withValues(alpha: 0.3 + 0.7 * fraction),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 6),
+              SizedBox(
+                width: 48,
+                child: Text(
+                  '$val $unit',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: themeService.textPrimary.withValues(alpha: 0.6),
+                  ),
+                  textAlign: TextAlign.right,
+                ),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDailyStats(BuildContext context, ReminderService service) {
-    return _buildStatsSection(
-      context,
-      AppLocalizations.of(context)!.todaysProgress,
-      service.reminders,
-      service.statistics.dailyCompletions,
-      Colors.green,
-    );
-  }
-
-  Widget _buildWeeklyStats(BuildContext context, ReminderService service) {
-    return _buildStatsSection(
-      context,
-      AppLocalizations.of(context)!.thisWeek,
-      service.reminders,
-      service.statistics.weeklyCompletions,
-      Colors.blue,
-    );
-  }
-
-  Widget _buildAllTimeStats(BuildContext context, ReminderService service) {
-    return _buildStatsSection(
-      context,
-      AppLocalizations.of(context)!.allTime,
-      service.reminders,
-      service.statistics.totalCompletions,
-      Colors.purple,
-    );
-  }
-
-  Widget _buildStatsSection(
-    BuildContext context,
-    String title,
-    List<Reminder> reminders,
-    Map<String, int> completions,
-    Color color,
-  ) {
-    final theme = Theme.of(context);
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ...reminders.map((reminder) {
-              final count = completions[reminder.id] ?? 0;
-              return _buildStatItem(context, reminder, count, color);
-            }),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatItem(BuildContext context, Reminder reminder, int count, Color color) {
-    final theme = Theme.of(context);
-    return Semantics(
-      label: '${reminder.title}: $count completions',
-      excludeSemantics: true,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: reminder.color.withValues(alpha: 0.2),
-              child: Icon(reminder.icon, color: reminder.color, size: 16),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                reminder.title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(
-                '$count',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showResetStatsDialog(
-    BuildContext context,
-    ReminderService service,
-  ) async {
-    final theme = Theme.of(context);
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: theme.cardColor,
-          title: Text(
-            AppLocalizations.of(dialogContext)!.resetStatistics,
-            style: TextStyle(color: theme.colorScheme.onSurface),
-          ),
-          content: Text(
-            AppLocalizations.of(dialogContext)!.resetStatisticsDialog,
-            style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(AppLocalizations.of(dialogContext)!.cancel),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // Reset statistics
-                service.statistics.reset();
-                service.saveData();
-                Navigator.of(dialogContext).pop();
-                FloatingPill.success(context, 'Stats reset');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              child: Text(AppLocalizations.of(dialogContext)!.reset),
-            ),
-          ],
         );
-      },
+      }).toList(),
     );
   }
 }

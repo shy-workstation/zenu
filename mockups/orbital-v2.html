@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Zenu</title>
+<style>
+:root{
+  --water:#06b6d4;--exercise:#ef4444;--eye:#3b82f6;--custom:#8b5cf6;
+  --primary:#6366f1;--amber:#f59e0b;--green:#10b981;
+  --surface:#1e293b;--bg:#0f172a;--text:#f1f5f9;--muted:#94a3b8;--border:#334155;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100dvh;touch-action:none;user-select:none}
+#app{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+
+/* Appbar */
+.appbar{padding:calc(12px + var(--safe-top)) 20px 8px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
+.appbar h1{font-size:clamp(18px,5vw,22px);font-weight:700}
+.appbar .actions{display:flex;gap:8px;align-items:center}
+.abtn{padding:6px 10px;border-radius:8px;background:var(--surface);font-size:12px;color:var(--muted);cursor:pointer;border:none;font-family:inherit}
+.abtn:active{transform:scale(.95)}
+/* Main area: orbit + shelf */
+#main-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;position:relative;overflow:hidden}
+
+/* Orbit container */
+#orbit-wrap{position:relative;flex-shrink:0;transition:all .4s cubic-bezier(.4,0,.2,1);overflow:visible}
+#orbit-rings-svg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;overflow:visible}
+#center-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border:none;color:#fff;font-family:inherit;transition:all .3s;z-index:2}
+#center-btn:active{transform:translate(-50%,-50%) scale(.92)}
+.orbit-item{position:absolute;top:50%;left:50%;text-align:center;cursor:pointer;transition:all .4s cubic-bezier(.4,0,.2,1);z-index:1}
+.orbit-item .bubble{border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;transition:all .3s;position:relative}
+.orbit-item .bubble-label{font-size:11px;font-weight:600;margin-top:4px;transition:.3s}
+.orbit-item .bubble-time{font-size:10px;font-family:'SF Mono',ui-monospace,monospace;font-weight:600;transition:.3s}
+.orbit-item.disabled{opacity:.25;pointer-events:none}
+.orbit-item .edit-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s;font-size:14px;pointer-events:none}
+.orbit-item:hover .edit-overlay{opacity:1}
+@media(hover:none){.orbit-item:hover .edit-overlay{opacity:0}}
+/* "+" add bubble */
+.orbit-item.add-bubble .bubble{border:2px dashed var(--border);background:transparent}
+.orbit-item.add-bubble .bubble:hover{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,transparent)}
+.orbit-item.add-bubble .bubble-label{color:var(--muted)}
+
+/* Progress ring */
+.progress-ring{position:absolute;top:0;left:0;transform:rotate(-90deg)}
+
+/* Inactive shelf */
+#shelf{flex-shrink:0;padding:8px 0 4px;transition:all .4s}
+#shelf-label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:1px;text-align:center;margin-bottom:6px}
+#shelf-items{display:flex;justify-content:center;gap:12px;padding:0 20px;flex-wrap:wrap}
+.shelf-bubble{display:flex;flex-direction:column;align-items:center;cursor:pointer;opacity:.4;transition:.3s}
+.shelf-bubble:hover{opacity:.7}
+.shelf-bubble:active{transform:scale(.9)}
+.shelf-bubble .sb-circle{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px dashed var(--border);transition:.3s}
+.shelf-bubble:hover .sb-circle{border-style:solid}
+.shelf-bubble .sb-name{font-size:9px;font-weight:600;color:var(--muted);margin-top:3px}
+.shelf-bubble .sb-hint{font-size:8px;color:var(--border);margin-top:1px}
+
+/* Drawer */
+#drawer{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:24px 24px 0 0;box-shadow:0 -4px 30px rgba(0,0,0,.4);transition:transform .4s cubic-bezier(.4,0,.2,1);z-index:20;max-height:calc(100dvh - 60px)}
+#drawer.collapsed{transform:translateY(calc(100% - var(--peek-h,0px)))}
+#drawer.expanded{transform:translateY(0)}
+#drawer.hidden{transform:translateY(100%)}
+#drawer-content{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;max-height:calc(100dvh - 120px);padding-bottom:calc(16px + var(--safe-bottom))}
+.drawer-handle{padding:10px 20px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center}
+.drawer-handle .grip{width:36px;height:4px;border-radius:2px;background:var(--border);margin-bottom:6px}
+.drawer-handle .grip-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:1px}
+
+/* Edit panel */
+.edit-section{padding:0 20px}
+.edit-header{display:flex;align-items:center;gap:12px;padding:10px 0 14px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.eh-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.eh-title{font-size:16px;font-weight:700;flex:1}
+.toggle{width:44px;height:24px;border-radius:12px;position:relative;cursor:pointer;transition:.3s;border:none;flex-shrink:0}
+.toggle.on{background:var(--green)}.toggle.off{background:var(--border)}
+.toggle::after{content:'';width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;transition:.3s}
+.toggle.on::after{right:2px}.toggle.off::after{left:2px}
+.field-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;margin-bottom:6px}
+.field-group{margin-bottom:14px}
+.chip-row{display:flex;gap:5px;flex-wrap:wrap}
+.chip{padding:7px 0;border-radius:8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--muted);flex:1;min-width:0;transition:.15s}
+.chip:active{transform:scale(.95)}.chip.sel{border-color:var(--c);background:color-mix(in srgb,var(--c) 15%,transparent);color:var(--c)}
+.icon-chip{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:1px solid var(--border);background:var(--bg);transition:.15s;flex:0 0 36px}
+.icon-chip.sel{border-color:var(--c);background:color-mix(in srgb,var(--c) 15%,transparent)}
+.color-chip{width:36px;height:36px;border-radius:8px;cursor:pointer;border:2px solid transparent;opacity:.5;transition:.15s;flex:0 0 36px}
+.color-chip.sel{border-color:#fff;opacity:1}
+.text-input{width:100%;padding:10px 12px;background:var(--bg);border-radius:10px;border:1px solid var(--border);font-size:14px;color:var(--text);font-family:inherit;outline:none}
+.text-input:focus{border-color:var(--primary)}
+.btn-row{display:flex;gap:8px}
+.btn{padding:12px;border-radius:12px;text-align:center;font-weight:700;font-size:14px;cursor:pointer;border:none;color:#fff;font-family:inherit;transition:.15s;flex:1}
+.btn:active{transform:scale(.97)}
+.btn-del{width:44px;flex:0 0 44px;font-size:16px;border-radius:12px;border:none;cursor:pointer;transition:.15s}
+.btn-del:active{transform:scale(.95)}
+
+/* Triggered overlay */
+#triggered{position:absolute;inset:0;background:var(--bg);z-index:30;display:none;flex-direction:column}
+#triggered.show{display:flex}
+.trig-icon{border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;animation:trigPulse 1.5s infinite}
+.qty-picker{display:flex;align-items:center;justify-content:center;gap:16px;padding:8px 0}
+.qty-btn{width:44px;height:44px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;color:var(--text);font-family:inherit}
+.qty-btn:active{transform:scale(.9)}
+.qty-val{font-size:clamp(28px,8vw,36px);font-weight:700;font-family:'SF Mono',monospace;min-width:90px;text-align:center}
+.act-row{display:flex;gap:10px;padding:0 20px}
+.act-btn{padding:16px;border-radius:14px;text-align:center;cursor:pointer;border:none;font-family:inherit;color:var(--text);transition:.15s}
+.act-btn:active{transform:scale(.96)}
+.still-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:12px;margin:0 20px 4px;opacity:.7}
+
+/* Long press visual feedback */
+.orbit-item.pressing .bubble{animation:pressScale .5s forwards}
+@keyframes pressScale{0%{transform:scale(1)}100%{transform:scale(.88);filter:brightness(1.2)}}
+@keyframes trigPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(6,182,212,.3)}50%{transform:scale(1.05);box-shadow:0 0 0 15px rgba(6,182,212,0)}}
+
+/* Toast */
+.toast{position:fixed;top:calc(20px + var(--safe-top));left:50%;transform:translateX(-50%) translateY(-60px);background:var(--surface);border:1px solid var(--border);padding:8px 16px;border-radius:12px;font-size:12px;color:var(--muted);z-index:50;transition:.3s;opacity:0;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="appbar">
+    <h1>Zenu</h1>
+    <div class="actions">
+      <button class="abtn" id="theme-btn" onclick="cycleTheme()">&#9790;</button>
+    </div>
+  </div>
+
+  <div id="main-area">
+    <div id="orbit-wrap">
+      <svg id="orbit-rings-svg"></svg>
+      <button id="center-btn"></button>
+      <div id="orbit-items"></div>
+    </div>
+    <div id="shelf"></div>
+  </div>
+
+  <div id="drawer" class="hidden">
+    <div class="drawer-handle" id="drawer-handle">
+      <div class="grip"></div>
+      <span class="grip-label" id="drawer-label"></span>
+    </div>
+    <div id="drawer-content"></div>
+  </div>
+
+  <div id="triggered"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const C={water:'#06b6d4',exercise:'#ef4444',eye:'#3b82f6',custom:'#8b5cf6',primary:'#6366f1',amber:'#f59e0b',green:'#10b981',surface:'#1e293b',bg:'#0f172a',text:'#f1f5f9',muted:'#94a3b8',border:'#334155'};
+
+let reminders=[
+  {id:0,title:'Water',icon:'\u{1F4A7}',color:C.water,interval:30,next:'12:45',qty:'250ml',enabled:true,pct:58},
+  {id:1,title:'Eye Rest',icon:'\u{1F440}',color:C.eye,interval:20,next:'5:12',qty:'20 sec',enabled:true,pct:75},
+  {id:2,title:'Stretch',icon:'\u{1F9D8}',color:C.green,interval:45,next:'32:10',qty:'',enabled:true,pct:29},
+  {id:3,title:'Push Ups',icon:'\u{1F4AA}',color:C.exercise,interval:60,next:'48:30',qty:'15 reps',enabled:false,pct:0},
+  {id:4,title:'Posture',icon:'\u{1F9CD}',color:C.custom,interval:30,next:'--:--',qty:'',enabled:false,pct:0}
+];
+let nextId=5;
+
+let isRunning=false, editingId=null, triggeredId=null;
+
+// ===== HELPERS =====
+const active=()=>reminders.filter(r=>r.enabled);
+const inactive=()=>reminders.filter(r=>!r.enabled);
+
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+const isTouchDevice=matchMedia('(hover:none)').matches;
+
+// ===== ORBIT =====
+// Each orbit ring is a tilted ellipse. Bubbles are assigned to rings and placed along them.
+// Rings cross each other at different tilt angles — like an atom.
+
+// Predefined orbit ring configs: [tiltDeg, eccentricity, phase offset, color tint]
+const orbitDefs=[
+  {tilt:0,   ecc:1.0,  phase:0,    col:C.water},    // flat horizontal
+  {tilt:60,  ecc:0.75, phase:40,   col:C.eye},      // tilted right
+  {tilt:-60, ecc:0.75, phase:-40,  col:C.green},    // tilted left (mirror)
+  {tilt:120, ecc:0.7,  phase:20,   col:C.exercise}, // steep opposite
+  {tilt:-30, ecc:0.85, phase:60,   col:C.custom},   // gentle left
+  {tilt:90,  ecc:0.6,  phase:-20,  col:C.amber},    // vertical
+];
+
+function chaos(id,salt){const n=Math.sin(id*127.1+salt*311.7)*43758.5453;return n-Math.floor(n);}
+
+// Get x,y position on a tilted elliptical orbit
+// tilt rotates the ellipse, ecc squashes it vertically (simulates 3D perspective)
+function orbitPos(angleDeg, radius, tilt, ecc){
+  const a=(angleDeg+tilt)*Math.PI/180;
+  const x=radius*Math.cos(a);
+  const y=radius*Math.sin(a)*ecc;
+  // Rotate back by tilt to get final position
+  const tr=-tilt*Math.PI/180;
+  return {
+    x: x*Math.cos(tr)-y*Math.sin(tr),
+    y: x*Math.sin(tr)+y*Math.cos(tr)
+  };
+}
+
+function renderOrbit(){
+  const wrap=document.getElementById('orbit-wrap');
+  const ringsSvg=document.getElementById('orbit-rings-svg');
+  const itemsEl=document.getElementById('orbit-items');
+  const centerBtn=document.getElementById('center-btn');
+  const isSmall=editingId!==null;
+  const vw=window.innerWidth;
+  const vh=window.innerHeight;
+  const maxOrbitW=isSmall?Math.min(220,vw-40):Math.min(340,vw-30,vh*0.45);
+  const w=maxOrbitW, h=w;
+
+  wrap.style.width=w+'px';wrap.style.height=h+'px';
+
+  const items=[...active()];
+  const count=items.length+1; // +1 for add bubble
+  const baseR=w*0.38;
+  const bubbleS=isSmall?36:Math.min(54,w*0.17);
+  const centerS=isSmall?56:Math.min(84,w*0.26);
+
+  // Assign each bubble to an orbit ring, spread across different rings
+  const assignments=[];
+  const minDist=bubbleS*2.5; // generous spacing between bubble centers
+  for(let i=0;i<count;i++){
+    const id=i<items.length?items[i].id:999;
+    const ringIdx=i%orbitDefs.length;
+    // Start evenly spaced with slight jitter
+    const baseAngle=(i*360/count)-90;
+    const jitter=(chaos(id,1)-0.5)*20;
+    assignments.push({ringIdx, angle:baseAngle+jitter, id});
+  }
+
+  // --- Collision avoidance: push bubbles apart until none overlap ---
+  function getPos(a){
+    const od=orbitDefs[a.ringIdx];
+    return orbitPos(a.angle+od.phase, baseR, od.tilt, od.ecc);
+  }
+  function dist(p1,p2){return Math.sqrt((p1.x-p2.x)**2+(p1.y-p2.y)**2);}
+
+  const centerR=centerS/2+20;
+  for(let pass=0;pass<120;pass++){
+    let moved=false;
+    for(let i=0;i<assignments.length;i++){
+      const pi=getPos(assignments[i]);
+      // Push away from center button
+      const dc=Math.sqrt(pi.x*pi.x+pi.y*pi.y);
+      if(dc<centerR+bubbleS){
+        assignments[i].angle+=12;moved=true;continue;
+      }
+      // Push away from every other bubble
+      for(let j=i+1;j<assignments.length;j++){
+        const pj=getPos(assignments[j]);
+        const d=dist(pi,pj);
+        if(d<minDist){
+          const push=Math.max(8, Math.round((minDist-d)/3));
+          assignments[i].angle-=push;
+          assignments[j].angle+=push;
+          moved=true;
+        }
+      }
+    }
+    if(!moved)break;
+  }
+
+  // --- Draw the ring ellipses as SVG paths ---
+  const svgS2=Math.ceil(baseR*2+40);
+  const cx=svgS2/2, cy=svgS2/2;
+  ringsSvg.setAttribute('width',svgS2);
+  ringsSvg.setAttribute('height',svgS2);
+  ringsSvg.setAttribute('viewBox',`0 0 ${svgS2} ${svgS2}`);
+  ringsSvg.style.width=svgS2+'px';
+  ringsSvg.style.height=svgS2+'px';
+
+  const usedRings=new Set(assignments.map(a=>a.ringIdx));
+
+  let svgPaths='';
+  orbitDefs.forEach((od,ri)=>{
+    if(!usedRings.has(ri)&&items.length<6) return;
+    const segs=72;
+    let d='';
+    for(let s=0;s<=segs;s++){
+      const ang=(s/segs)*360;
+      const p=orbitPos(ang+od.phase, baseR, od.tilt, od.ecc);
+      d+=(s===0?'M':'L')+(cx+p.x).toFixed(1)+','+(cy+p.y).toFixed(1);
+    }
+    d+='Z';
+    const opacity=usedRings.has(ri)?0.18:0.06;
+    const strokeCol=isRunning?od.col:C.border;
+    const dashArr=isRunning?'none':'4,8';
+    svgPaths+=`<path d="${d}" fill="none" stroke="${strokeCol}" stroke-width="1" stroke-dasharray="${dashArr}" opacity="${opacity}"/>`;
+  });
+  ringsSvg.innerHTML=svgPaths;
+
+  // --- Center button ---
+  centerBtn.style.width=centerS+'px';centerBtn.style.height=centerS+'px';
+  if(isRunning){
+    centerBtn.style.background=`linear-gradient(135deg,${C.exercise},#dc2626)`;
+    centerBtn.style.boxShadow=`0 0 25px ${C.exercise}20`;
+    centerBtn.innerHTML=`<span style="font-size:${isSmall?10:13}px;font-weight:700;letter-spacing:2px">STOP</span>`;
+  } else {
+    centerBtn.style.background=`linear-gradient(135deg,${C.amber},#f97316)`;
+    centerBtn.style.boxShadow=`0 0 25px ${C.amber}25`;
+    centerBtn.innerHTML=`<span style="font-size:${isSmall?10:13}px;font-weight:700;letter-spacing:2px">START</span>${!isSmall?`<span style="font-size:10px;opacity:.7;margin-top:2px">${active().length} active</span>`:''}`;
+  }
+
+  // --- Render bubbles on their assigned orbits ---
+  let html='';
+  for(let idx=0;idx<count;idx++){
+    const asgn=assignments[idx];
+    const od=orbitDefs[asgn.ringIdx];
+    const id=asgn.id;
+
+    // Position on this ring's ellipse
+    const pos=orbitPos(asgn.angle+od.phase, baseR, od.tilt, od.ecc);
+    const x=pos.x, y=pos.y;
+
+    // Per-bubble size variation
+    const sizeJitter=1+(chaos(id,3)-0.5)*0.25;
+    const bS=isSmall?36:Math.round(bubbleS*sizeJitter);
+
+    if(idx<items.length){
+      const r=items[idx];
+      const isSel=editingId===r.id;
+      html+=`<div class="orbit-item${isSel?' selected':''}" style="transform:translate(calc(-50% + ${x.toFixed(1)}px),calc(-50% + ${y.toFixed(1)}px))${isSel?' scale(1.12)':''}" data-id="${r.id}"
+        onpointerdown="pressStart(${r.id},event)" onpointerup="pressEnd(${r.id},event)" onpointerleave="pressCancel(${r.id})"
+        oncontextmenu="ctxEdit(${r.id},event)">`;
+
+      if(isRunning&&!isSmall){
+        const svgS=Math.max(48,bS+8);const cr=svgS/2-3;const circ=2*Math.PI*cr;
+        html+=`<div class="bubble" style="width:${svgS}px;height:${svgS}px;background:transparent;border:none">
+          <svg viewBox="0 0 ${svgS} ${svgS}" class="progress-ring" width="${svgS}" height="${svgS}">
+            <circle cx="${svgS/2}" cy="${svgS/2}" r="${cr}" fill="${r.color}10" stroke="${C.border}" stroke-width="2"/>
+            <circle cx="${svgS/2}" cy="${svgS/2}" r="${cr}" fill="none" stroke="${r.color}" stroke-width="2.5" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-r.pct/100)}" stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:${svgS*0.38}px">${r.icon}</div>
+          <div class="edit-overlay">\u270E</div></div>`;
+      } else {
+        html+=`<div class="bubble" style="width:${bS}px;height:${bS}px;background:${isSel?r.color+'25':r.color+'12'};border:2px solid ${isSel?r.color:r.color+'60'};font-size:${bS*0.4}px;${isSel?'box-shadow:0 0 20px '+r.color+'30':''}">${r.icon}
+          <div class="edit-overlay">\u270E</div></div>`;
+      }
+      if(!isSmall){
+        html+=`<div class="bubble-label" style="color:${C.text}">${r.title}</div>`;
+        html+=`<div class="bubble-time" style="color:${r.color}">${r.next}</div>`;
+      } else if(isSel){
+        html+=`<div class="bubble-label" style="color:${r.color}">Editing</div>`;
+      }
+      html+=`</div>`;
+    } else {
+      // Add bubble
+      const addS=isSmall?36:Math.round(bubbleS*0.85);
+      html+=`<div class="orbit-item add-bubble" style="transform:translate(calc(-50% + ${x.toFixed(1)}px),calc(-50% + ${y.toFixed(1)}px))" onclick="addReminder()">
+        <div class="bubble" style="width:${addS}px;height:${addS}px;font-size:${addS*0.4}px;color:${C.muted}">+</div>
+        ${!isSmall?`<div class="bubble-label">Add</div>`:''}</div>`;
+    }
+  }
+  itemsEl.innerHTML=html;
+}
+
+// ===== SHELF (inactive) =====
+function renderShelf(){
+  const shelf=document.getElementById('shelf');
+  const inact=inactive();
+  if(inact.length===0||editingId!==null){shelf.innerHTML='';return;}
+  shelf.innerHTML=`
+    <div id="shelf-label">INACTIVE \u2014 tap to activate</div>
+    <div id="shelf-items">${inact.map(r=>`
+      <div class="shelf-bubble" onclick="activateReminder(${r.id})">
+        <div class="sb-circle" style="border-color:${r.color}50">${r.icon}</div>
+        <div class="sb-name">${r.title}</div>
+      </div>`).join('')}
+    </div>`;
+}
+
+// ===== DRAWER =====
+function renderDrawer(){
+  const drawer=document.getElementById('drawer');
+  const label=document.getElementById('drawer-label');
+  const content=document.getElementById('drawer-content');
+
+  if(editingId!==null){
+    const r=reminders.find(x=>x.id===editingId);
+    if(!r){editingId=null;renderAll();return;}
+    drawer.className='expanded';
+    label.textContent=`EDITING ${r.title.toUpperCase()}`;
+    content.innerHTML=renderEditPanel(r);
+    return;
+  }
+
+  // No drawer in normal/running states - orbit + shelf is enough
+  drawer.className='hidden';
+}
+
+function renderEditPanel(r){
+  const intervals=[5,10,15,20,30,45,60,90];
+  const icons=['\u{1F4A7}','\u{1F440}','\u{1F9D8}','\u{1F4AA}','\u{2615}','\u{1F34E}','\u{1F6B6}','\u{2728}','\u{1F9CD}','\u{1F3CB}'];
+  const colors=[C.water,C.eye,C.green,C.primary,C.exercise,C.amber,C.custom,'#ec4899'];
+  const hasQty=!!r.qty;
+  const qtyOpts=r.title==='Water'?['150ml','250ml','350ml','500ml']:r.qty&&r.qty.includes('rep')?['10 reps','15 reps','20 reps','30 reps']:r.qty&&r.qty.includes('sec')?['10 sec','20 sec','30 sec','60 sec']:[];
+
+  return`<div class="edit-section">
+    <div class="edit-header">
+      <div class="eh-icon" style="background:${r.color}20">${r.icon}</div>
+      <div class="eh-title">${r.title}</div>
+      <button class="toggle ${r.enabled?'on':'off'}" onclick="toggleEnabled(${r.id})"></button>
+    </div>
+    <div class="field-group">
+      <div class="field-label">TITLE</div>
+      <input class="text-input" value="${r.title}" onchange="updateField(${r.id},'title',this.value)">
+    </div>
+    <div class="field-group">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span class="field-label" style="margin:0">EVERY</span>
+        <span style="font-size:14px;font-weight:700;color:${r.color}">${r.interval} min</span>
+      </div>
+      <div class="chip-row" style="--c:${r.color}">
+        ${intervals.map(v=>`<div class="chip${v===r.interval?' sel':''}" style="--c:${r.color}" onclick="updateField(${r.id},'interval',${v})">${v}</div>`).join('')}
+      </div>
+    </div>
+    ${qtyOpts.length?`<div class="field-group">
+      <div class="field-label">QUANTITY</div>
+      <div class="chip-row" style="--c:${r.color}">
+        ${qtyOpts.map(q=>`<div class="chip${q===r.qty?' sel':''}" style="--c:${r.color}" onclick="updateField(${r.id},'qty','${q}')">${q}</div>`).join('')}
+      </div>
+    </div>`:''}
+    <div style="display:flex;gap:10px;margin-bottom:14px">
+      <div style="flex:1"><div class="field-label">ICON</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          ${icons.map(ic=>`<div class="icon-chip${ic===r.icon?' sel':''}" style="--c:${r.color}" onclick="updateField(${r.id},'icon','${ic}')">${ic}</div>`).join('')}
+        </div></div>
+      <div style="flex:1"><div class="field-label">COLOR</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          ${colors.map(c=>`<div class="color-chip${c===r.color?' sel':''}" style="background:${c}" onclick="updateField(${r.id},'color','${c}')"></div>`).join('')}
+        </div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" style="background:${r.color}" onclick="saveEdit()">Done</button>
+      <button class="btn-del" style="background:color-mix(in srgb,${C.exercise} 15%,transparent);color:${C.exercise}" onclick="deleteReminder(${r.id})">\u{1F5D1}</button>
+    </div>
+  </div><div style="height:calc(16px + var(--safe-bottom))"></div>`;
+}
+
+// ===== TRIGGERED =====
+function renderTriggered(){
+  const el=document.getElementById('triggered');
+  if(triggeredId===null){el.classList.remove('show');return;}
+  el.classList.add('show');
+  const r=reminders.find(x=>x.id===triggeredId);
+  if(!r){triggeredId=null;el.classList.remove('show');return;}
+
+  el.innerHTML=`
+    <div class="appbar"><h1>Zenu</h1></div>
+    <div style="flex:1;overflow-y:auto">
+      <div style="text-align:center;padding:clamp(12px,4vh,28px) 20px 10px">
+        <div class="trig-icon" style="width:clamp(80px,22vw,110px);height:clamp(80px,22vw,110px);background:${r.color}15;border:3px solid ${r.color};font-size:clamp(36px,10vw,52px)">${r.icon}</div>
+        <div style="font-size:clamp(18px,5vw,24px);font-weight:700;margin:12px 0 4px">${r.title}!</div>
+        <div style="font-size:14px;color:${C.muted}">Time for ${r.qty||'a break'}</div>
+      </div>
+      ${r.qty?`<div style="background:${C.surface};border-radius:16px;padding:16px;margin:0 20px 12px">
+        <div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:10px;text-align:center">HOW MUCH?</div>
+        <div class="qty-picker">
+          <button class="qty-btn">&minus;</button>
+          <span class="qty-val" style="color:${r.color}">${r.qty}</span>
+          <button class="qty-btn">+</button>
+        </div></div>`:''}
+      <div class="act-row" style="margin-bottom:16px">
+        <button class="act-btn" style="flex:1;background:${C.surface}" onclick="dismissTriggered()"><div style="font-size:18px;margin-bottom:4px">\u23ED</div><div style="font-size:12px;color:${C.muted}">Skip</div></button>
+        <button class="act-btn" style="flex:2;background:${r.color}" onclick="completeTriggered()"><div style="font-size:18px;margin-bottom:4px">\u2705</div><div style="font-size:13px;font-weight:700">Done!</div></button>
+      </div>
+      ${active().filter(x=>x.id!==triggeredId).length?`<div style="padding:0 20px">
+        <div style="font-size:11px;color:${C.muted};font-weight:600;letter-spacing:1px;margin-bottom:8px">STILL RUNNING</div>
+        ${active().filter(x=>x.id!==triggeredId).map(x=>`
+          <div class="still-row" style="border-left:3px solid ${x.color}">
+            <span>${x.icon}</span><span style="font-size:13px;flex:1">${x.title}</span>
+            <span style="font-size:12px;font-family:monospace;color:${x.color}">${x.next}</span>
+          </div>`).join('')}</div>`:''}
+      <div style="height:calc(16px + var(--safe-bottom))"></div>
+    </div>`;
+}
+
+// ===== ACTIONS =====
+function toggleRunning(){isRunning=!isRunning;if(editingId!==null){editingId=null;}toast(isRunning?'Reminders started':'Reminders paused');renderAll();}
+document.getElementById('center-btn').addEventListener('click',toggleRunning);
+
+// Long press / tap
+let pressTimers={};
+function pressStart(id,e){
+  e.preventDefault();
+  const el=e.currentTarget;
+  pressTimers[id]={started:Date.now(),timer:setTimeout(()=>{
+    el.classList.remove('pressing');
+    startEdit(id);
+    toast('Editing '+reminders.find(r=>r.id===id)?.title);
+    pressTimers[id].long=true;
+  },500)};
+  el.classList.add('pressing');
+}
+function pressEnd(id,e){
+  const p=pressTimers[id];if(!p)return;
+  clearTimeout(p.timer);
+  const el=document.querySelector(`.orbit-item[data-id="${id}"]`);
+  if(el)el.classList.remove('pressing');
+  if(p.long)return; // long press already handled
+  // Short tap
+  if(isRunning){triggeredId=id;renderTriggered();}
+  else{toggleEnabled(id);renderAll();}
+  delete pressTimers[id];
+}
+function pressCancel(id){
+  const p=pressTimers[id];if(!p)return;
+  clearTimeout(p.timer);
+  const el=document.querySelector(`.orbit-item[data-id="${id}"]`);
+  if(el)el.classList.remove('pressing');
+  delete pressTimers[id];
+}
+function ctxEdit(id,e){
+  e.preventDefault();startEdit(id);
+}
+
+function startEdit(id){editingId=id;renderAll();}
+function saveEdit(){editingId=null;toast('Saved');renderAll();}
+function toggleEnabled(id){
+  const r=reminders.find(x=>x.id===id);
+  r.enabled=!r.enabled;
+  if(!r.enabled)r.pct=0;
+  toast(r.enabled?r.title+' activated':r.title+' deactivated');
+  renderAll();
+}
+function updateField(id,field,val){reminders.find(x=>x.id===id)[field]=val;renderAll();}
+function deleteReminder(id){
+  const name=reminders.find(x=>x.id===id)?.title;
+  reminders=reminders.filter(x=>x.id!==id);editingId=null;
+  toast(name+' deleted');renderAll();
+}
+function addReminder(){
+  const r={id:nextId++,title:'New',icon:'\u{2728}',color:C.custom,interval:30,next:'30:00',qty:'',enabled:true,pct:0};
+  reminders.push(r);startEdit(r.id);toast('New reminder created');
+}
+function activateReminder(id){
+  const r=reminders.find(x=>x.id===id);r.enabled=true;
+  toast(r.title+' activated');renderAll();
+}
+function dismissTriggered(){triggeredId=null;renderTriggered();}
+function completeTriggered(){
+  const r=reminders.find(x=>x.id===triggeredId);
+  if(r){r.pct=0;r.next=String(r.interval).padStart(2,'0')+':00';}
+  triggeredId=null;toast('Completed!');renderTriggered();renderOrbit();
+}
+function cycleTheme(){toast('Theme cycling (demo)');}
+
+// Drawer handle: tap to close edit
+document.getElementById('drawer-handle').addEventListener('click',()=>{
+  if(editingId!==null){editingId=null;renderAll();}
+});
+
+function renderAll(){renderOrbit();renderShelf();renderDrawer();renderTriggered();}
+window.addEventListener('resize',renderAll);
+
+renderAll();
+
+// ===== LIVE TIMER =====
+setInterval(()=>{
+  if(!isRunning||triggeredId!==null)return;
+  reminders.forEach(r=>{
+    if(!r.enabled)return;
+    r.pct=Math.min(100,r.pct+0.5);
+    let[m,s]=r.next.split(':').map(Number);
+    s--;if(s<0){s=59;m--;}
+    if(m<0){r.pct=100;triggeredId=r.id;renderTriggered();m=0;s=0;}
+    r.next=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  });
+  renderOrbit();
+},1000);
+</script>
+</body>
+</html>

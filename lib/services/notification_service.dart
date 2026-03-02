@@ -4,17 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:window_manager/window_manager.dart';
 import '../models/reminder.dart';
 import '../l10n/app_localizations.dart';
-import 'reminder_service.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
   static NotificationService? _instance;
-  static ReminderService? _reminderService;
   AppLocalizations? _localizations;
-
-  // Debounce mechanism to prevent duplicate activations
-  static DateTime? _lastActivationTime;
-  static const Duration _debounceDelay = Duration(milliseconds: 1000);
 
   NotificationService._(this._flutterLocalNotificationsPlugin);
 
@@ -23,14 +17,22 @@ class NotificationService {
       final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
           FlutterLocalNotificationsPlugin();
 
-      const initializationSettings = InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-        iOS: DarwinInitializationSettings(
+      final initializationSettings = InitializationSettings(
+        android: const AndroidInitializationSettings('@mipmap/ic_launcher'),
+        iOS: const DarwinInitializationSettings(
           requestAlertPermission: true,
           requestBadgePermission: true,
           requestSoundPermission: true,
         ),
-        windows: WindowsInitializationSettings(
+        macOS: const DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        ),
+        linux: const LinuxInitializationSettings(
+          defaultActionName: 'Open',
+        ),
+        windows: const WindowsInitializationSettings(
           appName: 'Zenu',
           appUserModelId: 'YousofShehada.Zenu',
           guid: 'BE46DC6D-FD4E-4ABB-A08C-68EABDEC1169',
@@ -38,11 +40,20 @@ class NotificationService {
       );
 
       await flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
+        settings: initializationSettings,
         onDidReceiveNotificationResponse: _onNotificationResponse,
         onDidReceiveBackgroundNotificationResponse:
             _onBackgroundNotificationResponse,
       );
+
+      // Request notification permission on Android 13+ (API 33+)
+      if (Platform.isAndroid) {
+        await flutterLocalNotificationsPlugin
+            .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin>()
+            ?.requestNotificationsPermission();
+      }
+
       _instance = NotificationService._(flutterLocalNotificationsPlugin);
     }
 
@@ -53,192 +64,56 @@ class NotificationService {
     _localizations = localizations;
   }
 
-  void setReminderService(ReminderService reminderService) {
-    _reminderService = reminderService;
-  }
-
   static void _onNotificationResponse(NotificationResponse response) {
-    if (kDebugMode) {
-      debugPrint(
-          '🔔 Notification response: id=${response.id}, actionId=${response.actionId}, payload=${response.payload}, input=${response.input}');
-    }
-    _handleNotificationAction(response.actionId, response.payload);
+    _handleNotificationTap(response.payload);
   }
 
   @pragma('vm:entry-point')
   static void _onBackgroundNotificationResponse(NotificationResponse response) {
-    if (kDebugMode) {
-      debugPrint(
-          '🔔 Background notification response: id=${response.id}, actionId=${response.actionId}, payload=${response.payload}');
-    }
-    _handleNotificationAction(response.actionId, response.payload);
+    _handleNotificationTap(response.payload);
   }
 
-  static void _handleNotificationAction(
-    String? actionId,
-    String? payload,
-  ) async {
-    if (_reminderService == null) return;
+  /// User tapped the notification — bring app to foreground.
+  static void _handleNotificationTap(String? payload) async {
+    if (payload == null || !payload.startsWith('reminder_')) return;
 
-    // Debounce rapid duplicate notifications
-    final now = DateTime.now();
-    if (_lastActivationTime != null &&
-        now.difference(_lastActivationTime!) < _debounceDelay) {
-      return; // Ignore duplicate activation within debounce period
+    final reminderId = payload.substring(9);
+
+    // Dismiss the system notification
+    if (_instance != null) {
+      final notificationId = reminderId.hashCode.abs();
+      await _instance!._flutterLocalNotificationsPlugin.cancel(id: notificationId);
     }
 
-    // Handle different platforms and response formats
-    String? reminderId;
-    String? action;
-
-    // Windows: When clicking action buttons, arguments should be in actionId
-    // But if actionId starts with "reminder_", it means the notification body was clicked
-    // Android: actionId is the action ID (e.g., "skip_123")
-    // iOS: payload contains the data
-
-    // Check if actionId looks like a payload (starts with "reminder_")
-    if (actionId != null && actionId.startsWith('reminder_')) {
-      // User clicked notification body, not an action button
-      reminderId = actionId.substring(9); // Remove "reminder_" prefix
-      action = 'open'; // Default to open when notification body is tapped
-    }
-    // Otherwise, try to parse actionId as action_reminderId
-    else if (actionId != null && actionId.contains('_')) {
-      final parts = actionId.split('_');
-      if (parts.length >= 2) {
-        action = parts[0];
-        reminderId = parts.sublist(1).join('_');
-      }
-    }
-
-    // If still no action, check payload as fallback
-    if (action == null && payload != null) {
-      if (payload.startsWith('reminder_')) {
-        reminderId = payload.substring(9);
-        action = 'open'; // Default to open when notification is tapped
-      } else if (payload.contains('_')) {
-        final parts = payload.split('_');
-        if (parts.length >= 2) {
-          action = parts[0];
-          reminderId = parts.sublist(1).join('_');
-        }
-      }
-    }
-
-    // Log for debugging
-    if (kDebugMode) {
-      debugPrint(
-          '🔔 Notification action: actionId=$actionId, payload=$payload, parsed: action=$action, reminderId=$reminderId');
-    }
-
-    if (reminderId == null || action == null) return;
-
-    final reminders = _reminderService!.reminders;
-    final reminderIndex = reminders.indexWhere((r) => r.id == reminderId);
-
-    if (reminderIndex == -1) return;
-
-    final reminder = reminders[reminderIndex];
-
-    if (action == 'skip') {
-      // Update debounce time
-      _lastActivationTime = now;
-
-      // User chose to skip the reminder - reset the next reminder time
-      reminder.resetNextReminder();
-      // Clear the triggered flag so it can notify again next time
-      _reminderService!.clearTriggeredNotification(reminderId);
-      _reminderService!.saveData();
-    } else if (action == 'open') {
-      // Update debounce time
-      _lastActivationTime = now;
-
-      // User chose to open app - reset reminder time
-      reminder.resetNextReminder();
-      // Clear the triggered flag so it can notify again next time
-      _reminderService!.clearTriggeredNotification(reminderId);
-      _reminderService!.saveData();
-
-      // Use professional window manager to bring app to foreground
-      await _professionalWindowActivation();
-
-      // For "Open App", show the in-app reminder dialog
-      _reminderService!.triggerTestReminder(reminder);
-    }
+    // Bring app to foreground
+    await _bringToForeground();
   }
 
-  /// Professional window activation using window_manager (desktop only)
-  /// This is the industry standard approach used by Discord, VS Code, etc.
-  static Future<void> _professionalWindowActivation() async {
-    // Skip window management on mobile platforms
-    if (!Platform.isWindows && !Platform.isMacOS && !Platform.isLinux) {
-      return;
-    }
-
+  /// Bring the app window to the foreground.
+  static Future<void> _bringToForeground() async {
+    if (!Platform.isWindows && !Platform.isMacOS && !Platform.isLinux) return;
     try {
-      // Stop any ongoing flashing when user opens the app
-      await _stopTaskbarFlashing();
-
-      // Restore if minimized
       if (await windowManager.isMinimized()) {
         await windowManager.restore();
       }
-
-      // Show and focus the window
       await windowManager.show();
       await windowManager.focus();
+    } catch (_) {}
+  }
 
-      // Bring window to front (temporarily set always on top to bypass Windows focus stealing prevention)
-      await windowManager.setAlwaysOnTop(true);
-      await Future.delayed(const Duration(milliseconds: 100));
-      await windowManager.setAlwaysOnTop(false);
-
-      // Final focus to ensure visibility
-      await windowManager.focus();
-    } catch (e) {
-      // Fallback to basic window manager methods
-      try {
-        await windowManager.show();
+  /// Flash the taskbar icon without bringing the window to the foreground.
+  static Future<void> _flashTaskbar() async {
+    if (!Platform.isWindows && !Platform.isMacOS && !Platform.isLinux) return;
+    try {
+      final isFocused = await windowManager.isFocused();
+      if (!isFocused) {
+        // On Windows, calling focus() on an unfocused window flashes the taskbar
         await windowManager.focus();
-      } catch (fallbackError) {
-        // Silent fallback failure
       }
-    }
-  }
-
-  /// Start flashing taskbar to get user attention (like Discord, Teams, etc.)
-  static Future<void> _startTaskbarFlashing() async {
-    if (!Platform.isWindows) return;
-
-    try {
-      // Bring window to attention without flashing (flash method not available)
-      if (!await windowManager.isFocused()) {
-        // Show and focus window to get user attention
-        await windowManager.show();
-      }
-    } catch (e) {
-      // Silent fallback failure
-    }
-  }
-
-  /// Stop taskbar flashing
-  static Future<void> _stopTaskbarFlashing() async {
-    if (!Platform.isWindows) return;
-
-    try {
-      // Window manager handles this automatically when window gets focus
-      await windowManager.focus();
-    } catch (e) {
-      // Silent failure
-    }
+    } catch (_) {}
   }
 
   Future<void> showReminderNotification(Reminder reminder) async {
-    // Start flashing taskbar to get user attention (desktop only)
-    if (Platform.isWindows) {
-      await _startTaskbarFlashing();
-    }
-
     final notificationDetails = NotificationDetails(
       android: AndroidNotificationDetails(
         'health_reminder_channel',
@@ -247,58 +122,40 @@ class NotificationService {
             'Notifications for health reminders',
         importance: Importance.high,
         priority: Priority.high,
-        sound: RawResourceAndroidNotificationSound('notification'),
+        playSound: true,
         enableVibration: true,
-        actions: [
-          AndroidNotificationAction(
-            'skip_${reminder.id}',
-            _localizations?.skip ?? 'Skip',
-          ),
-          AndroidNotificationAction('open_${reminder.id}', 'Open App'),
-        ],
       ),
       iOS: const DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
       ),
-      windows: WindowsNotificationDetails(
-        actions: [
-          WindowsAction(
-            content: _localizations?.skip ?? 'Skip',
-            arguments: 'skip_${reminder.id}',
-            activationType: WindowsActivationType.foreground,
-          ),
-          WindowsAction(
-            content: 'Open App',
-            arguments: 'open_${reminder.id}',
-            activationType: WindowsActivationType.foreground,
-          ),
-        ],
+      macOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
       ),
+      linux: const LinuxNotificationDetails(),
+      windows: const WindowsNotificationDetails(),
     );
 
-    // Use a unique notification ID based on the reminder's ID hash
-    // This ensures each reminder gets its own notification slot
     final notificationId = reminder.id.hashCode.abs();
 
     if (kDebugMode) {
       debugPrint(
-          '📢 Attempting to show notification: id=$notificationId, title=${reminder.title}');
+          '📢 Showing notification: id=$notificationId, title=${reminder.title}');
     }
 
     try {
       await _flutterLocalNotificationsPlugin.show(
-        notificationId,
-        reminder.title,
-        _getNotificationBody(reminder),
-        notificationDetails,
+        id: notificationId,
+        title: reminder.title,
+        body: _getNotificationBody(reminder),
+        notificationDetails: notificationDetails,
         payload: 'reminder_${reminder.id}',
       );
-
-      if (kDebugMode) {
-        debugPrint('✅ Notification shown successfully');
-      }
+      // Flash taskbar icon to get user attention
+      await _flashTaskbar();
     } catch (e) {
       if (kDebugMode) {
         debugPrint('❌ Error showing notification: $e');
@@ -308,81 +165,68 @@ class NotificationService {
 
   String _getNotificationBody(Reminder reminder) {
     if (_localizations == null) {
-      // Fallback to English if localizations not set
-      switch (reminder.type) {
-        case ReminderType.eyeRest:
-          return 'Time to rest your eyes! Look away from your screen.';
-        case ReminderType.standUp:
-          return 'Stand up and move around for a few minutes.';
-        case ReminderType.pullUps:
-          return 'Time for ${reminder.exerciseCount} pull-ups!';
-        case ReminderType.pushUps:
-          return 'Time for ${reminder.exerciseCount} push-ups!';
-        case ReminderType.squats:
-          return 'Time for ${reminder.exerciseCount} squats!';
-        case ReminderType.jumpingJacks:
-          return 'Time for ${reminder.exerciseCount} jumping jacks!';
-        case ReminderType.planks:
-          return 'Time for a ${reminder.exerciseCount} second plank!';
-        case ReminderType.burpees:
-          return 'Time for ${reminder.exerciseCount} burpees!';
-        case ReminderType.water:
-          return 'Don\'t forget to drink water!';
-        case ReminderType.stretch:
-          return 'Take a moment to stretch your body.';
-        case ReminderType.exercise:
-          return 'Time to exercise! Keep your body active!';
-        case ReminderType.stretching:
-          return 'Time for stretching! Improve flexibility and reduce tension.';
-        case ReminderType.custom:
-          return reminder.description;
-      }
+      return _getDefaultBody(reminder);
     }
 
     switch (reminder.type) {
+      case ReminderType.water:
+        return _localizations!.notificationTimeToDrinkWater;
       case ReminderType.eyeRest:
         return _localizations!.notificationTimeToRestEyes;
       case ReminderType.standUp:
         return _localizations!.notificationTimeToStandUp;
-      case ReminderType.pullUps:
-        return _localizations!.notificationTimeForPullUps(
-          reminder.exerciseCount,
-        );
       case ReminderType.pushUps:
-        return _localizations!.notificationTimeForPushUps(
-          reminder.exerciseCount,
-        );
+        return _localizations!.notificationTimeForPushUps(reminder.exerciseCount);
+      case ReminderType.pullUps:
+        return _localizations!.notificationTimeForPullUps(reminder.exerciseCount);
       case ReminderType.squats:
-        return _localizations!.notificationTimeForSquats(
-          reminder.exerciseCount,
-        );
+        return _localizations!.notificationTimeForSquats(reminder.exerciseCount);
       case ReminderType.jumpingJacks:
-        return _localizations!.notificationTimeForJumpingJacks(
-          reminder.exerciseCount,
-        );
-      case ReminderType.planks:
-        return _localizations!.notificationTimeForPlanks(
-          reminder.exerciseCount,
-        );
+        return _localizations!.notificationTimeForJumpingJacks(reminder.exerciseCount);
       case ReminderType.burpees:
-        return _localizations!.notificationTimeForBurpees(
-          reminder.exerciseCount,
-        );
-      case ReminderType.water:
-        return _localizations!.notificationTimeToDrinkWater;
+        return _localizations!.notificationTimeForBurpees(reminder.exerciseCount);
       case ReminderType.stretch:
         return _localizations!.notificationTimeToStretch;
-      case ReminderType.exercise:
-        return 'Time to exercise! Keep your body active!'; // fallback until localized
-      case ReminderType.stretching:
-        return 'Time for stretching! Improve flexibility and reduce tension.'; // fallback until localized
-      case ReminderType.custom:
-        return reminder.description;
+      case ReminderType.planks:
+        return _localizations!.notificationTimeForPlanks(reminder.exerciseCount);
+      case ReminderType.deepBreathing:
+        return _localizations!.notificationTimeForDeepBreathing;
+      case ReminderType.meditation:
+        return _localizations!.notificationTimeForMeditation;
+    }
+  }
+
+  String _getDefaultBody(Reminder reminder) {
+    switch (reminder.type) {
+      case ReminderType.water:
+        return 'Don\'t forget to drink water!';
+      case ReminderType.eyeRest:
+        return 'Time to rest your eyes! Look away from your screen.';
+      case ReminderType.standUp:
+        return 'Stand up and move around for a few minutes.';
+      case ReminderType.pushUps:
+        return 'Time for ${reminder.exerciseCount} push-ups!';
+      case ReminderType.pullUps:
+        return 'Time for ${reminder.exerciseCount} pull-ups!';
+      case ReminderType.squats:
+        return 'Time for ${reminder.exerciseCount} squats!';
+      case ReminderType.jumpingJacks:
+        return 'Time for ${reminder.exerciseCount} jumping jacks!';
+      case ReminderType.burpees:
+        return 'Time for ${reminder.exerciseCount} burpees!';
+      case ReminderType.stretch:
+        return 'Take a moment to stretch your body.';
+      case ReminderType.planks:
+        return 'Time for a ${reminder.exerciseCount} second plank!';
+      case ReminderType.deepBreathing:
+        return 'Take a deep breath and relax.';
+      case ReminderType.meditation:
+        return 'Take a moment to clear your mind.';
     }
   }
 
   Future<void> cancelNotification(int id) async {
-    await _flutterLocalNotificationsPlugin.cancel(id);
+    await _flutterLocalNotificationsPlugin.cancel(id: id);
   }
 
   Future<void> cancelAllNotifications() async {

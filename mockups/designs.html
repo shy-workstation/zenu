@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zenu UI Mockups</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#111;color:#fff;overflow:hidden;height:100vh}
+#nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.9);backdrop-filter:blur(10px);padding:8px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #333}
+#nav .title{font-size:14px;font-weight:700;color:#6366f1;margin-right:8px;white-space:nowrap}
+#nav .pills{display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none}
+#nav .pills::-webkit-scrollbar{display:none}
+#nav .pill{padding:4px 10px;border-radius:12px;font-size:11px;cursor:pointer;white-space:nowrap;border:1px solid #333;background:#1a1a2e;transition:.2s;flex-shrink:0}
+#nav .pill:hover{border-color:#6366f1}
+#nav .pill.active{background:#6366f1;border-color:#6366f1;color:#fff}
+#phone{width:390px;height:844px;margin:60px auto 20px;border-radius:40px;overflow:hidden;position:relative;border:3px solid #333;background:#0f172a}
+#phone .notch{width:160px;height:34px;background:#000;border-radius:0 0 20px 20px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10}
+#screen{width:100%;height:100%;overflow-y:auto;scrollbar-width:none}
+#screen::-webkit-scrollbar{display:none}
+.appbar{padding:54px 20px 16px;display:flex;align-items:center;justify-content:space-between}
+.appbar h1{font-size:22px;font-weight:700}
+.appbar .actions{display:flex;gap:8px}
+.appbar .btn{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.card{border-radius:16px;padding:16px;margin:8px 0;position:relative;overflow:hidden}
+.fab{position:absolute;bottom:24px;right:24px;width:56px;height:56px;border-radius:16px;background:#6366f1;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,.4);z-index:5}
+.tag{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.slider{width:100%;height:4px;border-radius:2px;background:#334155;position:relative;margin:8px 0}
+.slider .fill{height:100%;border-radius:2px;position:absolute;left:0;top:0}
+.timer-text{font-family:'SF Mono',monospace;font-weight:600}
+.desc{font-size:12px;color:#94a3b8;margin-top:2px}
+.icon-circle{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.bottom-bar{position:absolute;bottom:0;left:0;right:0;padding:12px 20px 34px;z-index:5}
+.big-btn{width:100%;padding:16px;border-radius:16px;text-align:center;font-size:16px;font-weight:700;cursor:pointer;border:none;letter-spacing:1px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.flex-col{display:flex;flex-direction:column}
+.flex-row{display:flex;align-items:center}
+.gap-8{gap:8px}
+.gap-12{gap:12px}
+.gap-4{gap:4px}
+.p-20{padding:0 20px}
+.mb-8{margin-bottom:8px}
+.mb-12{margin-bottom:12px}
+.mb-16{margin-bottom:16px}
+.f-12{font-size:12px}
+.f-13{font-size:13px}
+.f-14{font-size:14px}
+.f-11{font-size:11px}
+.fw-600{font-weight:600}
+.fw-700{font-weight:700}
+.muted{color:#94a3b8}
+.w-full{width:100%}
+.text-center{text-align:center}
+.relative{position:relative}
+.pb-100{padding-bottom:100px}
+.swipe-hint{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:10px;color:#475569;display:flex;align-items:center;gap:4px}
+@media(max-height:920px){#phone{transform:scale(.85);margin-top:50px;transform-origin:top center}}
+</style>
+</head>
+<body>
+<div id="nav">
+<span class="title">ZENU MOCKUPS</span>
+<div class="pills" id="pills"></div>
+</div>
+<div id="phone"><div class="notch"></div><div id="screen"></div></div>
+<script>
+const C={water:'#06b6d4',exercise:'#ef4444',eye:'#3b82f6',custom:'#8b5cf6',primary:'#6366f1',amber:'#f59e0b',green:'#10b981',surface:'#1e293b',bg:'#0f172a',text:'#f1f5f9',muted:'#94a3b8',border:'#334155'};
+const reminders=[
+{title:'Drink Water',icon:'\u{1F4A7}',color:C.water,interval:30,next:'12 min',enabled:true},
+{title:'Eye Rest',icon:'\u{1F440}',color:C.eye,interval:20,next:'5 min',enabled:true},
+{title:'Stretch',icon:'\u{1F9D8}',color:C.green,interval:45,next:'32 min',enabled:true},
+{title:'Push Ups',icon:'\u{1F4AA}',color:C.exercise,interval:60,next:'48 min',enabled:false}
+];
+
+const mockups=[
+// 1
+{name:'Clean Cards',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.primary}">&#9881;</div><div class="btn" style="background:${C.surface}">&#9790;</div></div></div>
+<div class="p-20 pb-100 flex-col gap-8">
+${reminders.map(r=>`<div class="card" style="background:${C.surface};opacity:${r.enabled?1:.5}">
+<div class="flex-row gap-12"><div class="icon-circle" style="background:${r.color}30;color:${r.color}">${r.icon}</div>
+<div class="flex-col" style="flex:1"><div class="flex-row" style="justify-content:space-between"><span class="fw-600 f-14">${r.title}</span><span class="timer-text f-13" style="color:${r.color}">${r.next}</span></div>
+<span class="f-12 muted">Every ${r.interval} min</span></div></div></div>`).join('')}
+</div>
+<div class="bottom-bar" style="background:linear-gradient(transparent,${C.bg} 30%)"><div class="big-btn" style="background:${C.amber};color:#000">&#9654; START REMINDERS</div></div>
+<div class="fab">+</div>`},
+
+// 2
+{name:'Status Header',render:()=>`
+<div style="background:${C.surface};padding:54px 20px 20px">
+<div class="flex-row" style="justify-content:space-between;margin-bottom:16px"><h1 style="font-size:22px">Zenu</h1><div class="flex-row gap-8"><div class="btn" style="background:${C.primary}">&#9881;</div></div></div>
+<div class="card" style="background:${C.amber}15;border:1px solid ${C.amber}40;margin:0">
+<div class="flex-row gap-12"><div style="width:12px;height:12px;border-radius:50%;background:${C.amber};animation:pulse 2s infinite"></div>
+<div><span class="fw-700 f-14" style="color:${C.amber}">System Paused</span><br><span class="f-12 muted">Tap to start all reminders</span></div></div></div></div>
+<div class="p-20 pb-100 flex-col gap-8" style="margin-top:12px">
+${reminders.map(r=>`<div class="card" style="background:${C.surface}">
+<div class="flex-row gap-12"><div class="icon-circle" style="background:${r.color}30">${r.icon}</div>
+<div style="flex:1"><span class="fw-600 f-14">${r.title}</span><div class="f-12 muted">Every ${r.interval} min</div></div>
+<span class="timer-text f-13" style="color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'Off'}</span></div></div>`).join('')}
+</div><div class="fab">+</div>`},
+
+// 3
+{name:'Big Timer Focus',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.surface}">&#9881;</div><div class="btn" style="background:${C.surface}">&#9790;</div></div></div>
+<div class="p-20 text-center" style="padding-top:20px">
+<div style="width:160px;height:160px;border-radius:50%;border:4px solid ${C.water};margin:0 auto 8px;display:flex;align-items:center;justify-content:center;flex-direction:column">
+<span style="font-size:36px;font-weight:700;font-family:monospace">5:12</span><span class="f-12 muted">Eye Rest</span></div>
+<span class="f-12 muted">Next reminder</span></div>
+<div class="p-20 pb-100 flex-col gap-8" style="margin-top:16px">
+<span class="f-12 fw-600 muted" style="letter-spacing:1px">ALL REMINDERS</span>
+${reminders.map(r=>`<div class="flex-row gap-12" style="padding:12px 0;border-bottom:1px solid ${C.border}">
+<span style="font-size:20px">${r.icon}</span><div style="flex:1"><span class="fw-600 f-14">${r.title}</span></div>
+<span class="f-13 muted">${r.next}</span></div>`).join('')}
+</div>
+<div class="bottom-bar" style="background:linear-gradient(transparent,${C.bg} 30%)"><div class="big-btn" style="background:${C.primary};color:#fff">START ALL</div></div>`},
+
+// 4
+{name:'Compact List',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.amber};color:#000">&#9654;</div></div></div>
+<div class="p-20 flex-col gap-4 pb-100">
+<div class="flex-row" style="justify-content:space-between;padding:8px 0"><span class="f-12 fw-600 muted" style="letter-spacing:1px">ACTIVE</span><span class="f-12" style="color:${C.primary}">3 reminders</span></div>
+${reminders.filter(r=>r.enabled).map(r=>`<div class="card" style="background:${C.surface};padding:12px 16px">
+<div class="flex-row gap-12"><span style="font-size:16px">${r.icon}</span><span class="fw-600 f-14" style="flex:1">${r.title}</span>
+<div class="flex-col gap-4" style="align-items:flex-end"><span class="timer-text f-13" style="color:${r.color}">${r.next}</span><span class="f-11 muted">${r.interval}m</span></div></div></div>`).join('')}
+<div style="padding:12px 0 4px"><span class="f-12 fw-600 muted" style="letter-spacing:1px">PAUSED</span></div>
+${reminders.filter(r=>!r.enabled).map(r=>`<div class="card" style="background:${C.surface};padding:12px 16px;opacity:.5">
+<div class="flex-row gap-12"><span style="font-size:16px">${r.icon}</span><span class="fw-600 f-14" style="flex:1">${r.title}</span>
+<span class="f-12 muted">Off</span></div></div>`).join('')}
+</div><div class="fab">+</div>`},
+
+// 5
+{name:'Pill Cards',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.surface}">&#9881;</div></div></div>
+<div class="p-20 pb-100">
+<div class="card mb-16" style="background:linear-gradient(135deg,${C.primary},${C.custom});padding:20px;text-align:center">
+<div style="font-size:14px;opacity:.8">All reminders paused</div>
+<div style="font-size:20px;font-weight:700;margin:8px 0">Tap to Start</div>
+<div style="font-size:12px;opacity:.7">4 reminders configured</div></div>
+<div class="flex-col gap-8">
+${reminders.map(r=>`<div class="card" style="background:${C.surface};border-left:3px solid ${r.color}">
+<div class="flex-row gap-12"><div style="flex:1"><div class="flex-row gap-8"><span>${r.icon}</span><span class="fw-600 f-14">${r.title}</span></div>
+<div class="slider" style="margin-top:10px"><div class="fill" style="width:${100-parseInt(r.next)*3}%;background:${r.color}"></div></div>
+<div class="flex-row" style="justify-content:space-between"><span class="f-11 muted">Every ${r.interval}m</span><span class="f-11" style="color:${r.color}">${r.next} left</span></div></div></div></div>`).join('')}
+</div></div><div class="fab">+</div>`},
+
+// 6
+{name:'Bottom Tabs',render:()=>`
+<div class="appbar"><h1>Zenu</h1></div>
+<div class="p-20 pb-100 flex-col gap-8">
+${reminders.map(r=>`<div class="card" style="background:${C.surface}">
+<div class="flex-row gap-12"><div class="icon-circle" style="background:${r.color}25">${r.icon}</div>
+<div style="flex:1"><span class="fw-600">${r.title}</span><br><span class="f-12 muted">Every ${r.interval} min</span></div>
+<div class="flex-col" style="align-items:flex-end"><span class="timer-text f-14" style="color:${r.color}">${r.next}</span></div></div></div>`).join('')}
+</div>
+<div style="position:absolute;bottom:0;left:0;right:0;background:${C.surface};padding:8px 0 28px;display:flex;justify-content:space-around;border-top:1px solid ${C.border}">
+<div class="flex-col" style="align-items:center;gap:2px;color:${C.primary}"><span style="font-size:20px">&#9776;</span><span class="f-11">Home</span></div>
+<div style="width:56px;height:56px;border-radius:50%;background:${C.amber};display:flex;align-items:center;justify-content:center;margin-top:-28px;font-size:22px;font-weight:700;box-shadow:0 4px 15px ${C.amber}40">&#9654;</div>
+<div class="flex-col" style="align-items:center;gap:2px;color:${C.muted}"><span style="font-size:20px">&#9881;</span><span class="f-11">Settings</span></div>
+</div>`},
+
+// 7
+{name:'Single Focus',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.surface}">&#9790;</div></div></div>
+<div class="p-20" style="padding-top:20px">
+<div class="card" style="background:linear-gradient(135deg,${C.water}20,${C.water}05);border:1px solid ${C.water}30;padding:24px;text-align:center">
+<div style="font-size:40px;margin-bottom:8px">\u{1F4A7}</div>
+<div class="fw-700" style="font-size:18px">Drink Water</div>
+<div class="f-12 muted mb-12">250ml every 30 minutes</div>
+<div class="timer-text" style="font-size:48px;color:${C.water}">12:45</div>
+<div class="f-12 muted" style="margin-top:4px">until next reminder</div>
+<div class="slider" style="margin-top:16px"><div class="fill" style="width:58%;background:${C.water}"></div></div>
+</div>
+<div style="display:flex;gap:6px;margin-top:12px;overflow-x:auto">
+${reminders.map((r,i)=>`<div style="min-width:60px;padding:10px;border-radius:12px;background:${i===0?r.color+'20':C.surface};text-align:center;border:1px solid ${i===0?r.color:C.border}">
+<div style="font-size:20px">${r.icon}</div><div class="f-11 muted" style="margin-top:4px">${r.next}</div></div>`).join('')}
+</div></div>
+<div class="bottom-bar" style="background:linear-gradient(transparent,${C.bg} 30%)"><div class="big-btn" style="background:${C.water};color:#fff">START</div></div>`},
+
+// 8
+{name:'Timeline',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.amber};color:#000;font-size:12px;width:auto;padding:0 12px">START</div></div></div>
+<div style="padding:0 20px 100px 40px;position:relative">
+<div style="position:absolute;left:30px;top:0;bottom:0;width:2px;background:${C.border}"></div>
+${reminders.map((r,i)=>`<div style="position:relative;padding:20px 0 20px 30px">
+<div style="position:absolute;left:-7px;top:24px;width:16px;height:16px;border-radius:50%;background:${r.enabled?r.color:C.border};border:3px solid ${C.bg}"></div>
+<div class="card" style="background:${C.surface};margin:0">
+<div class="flex-row" style="justify-content:space-between;margin-bottom:4px"><span class="fw-600 f-14">${r.icon} ${r.title}</span><span class="timer-text f-13" style="color:${r.color}">${r.next}</span></div>
+<span class="f-12 muted">Every ${r.interval} min</span>
+${r.enabled?`<div class="slider" style="margin-top:8px"><div class="fill" style="width:${60-i*15}%;background:${r.color}"></div></div>`:''}</div></div>`).join('')}
+</div>`},
+
+// 9
+{name:'Minimal Zen',render:()=>`
+<div style="padding:54px 24px 100px">
+<div class="flex-row" style="justify-content:space-between;margin-bottom:32px"><div><h1 style="font-size:28px;font-weight:300">Zenu</h1><span class="f-12 muted">4 reminders paused</span></div>
+<div class="btn" style="background:${C.surface};font-size:14px">&#9881;</div></div>
+${reminders.map(r=>`<div style="padding:20px 0;border-bottom:1px solid ${C.surface}">
+<div class="flex-row" style="justify-content:space-between"><div class="flex-row gap-12"><span style="font-size:14px">${r.icon}</span>
+<div><span class="fw-600" style="font-size:15px">${r.title}</span><br><span class="f-12 muted">${r.interval} min</span></div></div>
+<span class="timer-text" style="font-size:18px;color:${r.enabled?r.color:C.muted}">${r.next}</span></div></div>`).join('')}
+</div>
+<div class="bottom-bar" style="text-align:center;background:linear-gradient(transparent,${C.bg} 30%)">
+<div style="width:72px;height:72px;border-radius:50%;border:2px solid ${C.amber};margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;letter-spacing:2px;color:${C.amber}">START</div></div>`},
+
+// 10
+{name:'Dashboard Grid',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.surface}">&#9881;</div></div></div>
+<div class="p-20 pb-100">
+<div class="card mb-12" style="background:${C.surface};display:flex;align-items:center;justify-content:space-between;padding:14px 16px">
+<div><span class="f-12 muted">STATUS</span><br><span class="fw-700" style="color:${C.amber}">Paused</span></div>
+<div class="big-btn" style="width:auto;padding:10px 20px;background:${C.amber};color:#000;font-size:13px;border-radius:10px">&#9654; Start</div></div>
+<div class="grid-2">
+${reminders.map(r=>`<div class="card" style="background:${C.surface};padding:14px;opacity:${r.enabled?1:.5}">
+<div class="flex-row gap-8 mb-8"><span>${r.icon}</span><span class="fw-600 f-13">${r.title}</span></div>
+<div class="timer-text" style="font-size:24px;color:${r.color};margin:8px 0">${r.next}</div>
+<div class="slider"><div class="fill" style="width:60%;background:${r.color}"></div></div>
+<span class="f-11 muted">${r.interval}m interval</span></div>`).join('')}
+</div></div><div class="fab">+</div>`},
+
+// 11
+{name:'Swipe Reveal',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.surface}">&#9881;</div></div></div>
+<div class="p-20 pb-100 flex-col gap-8">
+<div class="card" style="background:${C.amber}15;border:1px solid ${C.amber}30;padding:12px 16px;cursor:pointer">
+<div class="flex-row gap-8"><span style="color:${C.amber}">&#9654;</span><span class="fw-600 f-14" style="color:${C.amber}">Start All Reminders</span></div></div>
+${reminders.map(r=>`<div style="position:relative;overflow:hidden;border-radius:16px">
+<div style="position:absolute;right:0;top:0;bottom:0;width:80px;background:${C.primary};display:flex;align-items:center;justify-content:center;border-radius:0 16px 16px 0">
+<span style="font-size:14px">&#9998;</span></div>
+<div class="card" style="background:${C.surface};margin:0;position:relative;z-index:1">
+<div class="flex-row gap-12"><div class="icon-circle" style="background:${r.color}25">${r.icon}</div>
+<div style="flex:1"><span class="fw-600 f-14">${r.title}</span><br><span class="f-12 muted">Every ${r.interval}m</span></div>
+<span class="timer-text f-14" style="color:${r.color}">${r.next}</span></div>
+<div class="swipe-hint">&larr; swipe to edit</div></div></div>`).join('')}
+</div><div class="fab">+</div>`},
+
+// 12
+{name:'Radial Layout',render:()=>`
+<div class="appbar"><h1 style="font-size:18px">Zenu</h1><div class="actions"><div class="btn" style="background:${C.surface};font-size:14px">&#9881;</div></div></div>
+<div style="position:relative;width:280px;height:280px;margin:20px auto">
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100px;height:100px;border-radius:50%;background:${C.amber}20;border:2px solid ${C.amber};display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer">
+<span style="font-size:12px;font-weight:700;letter-spacing:2px;color:${C.amber}">START</span></div>
+${reminders.map((r,i)=>{const a=i*90-90;const x=130*Math.cos(a*Math.PI/180);const y=130*Math.sin(a*Math.PI/180);
+return`<div style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + ${x}px),calc(-50% + ${y}px));text-align:center">
+<div style="width:52px;height:52px;border-radius:50%;background:${r.color}25;border:2px solid ${r.color};display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto">${r.icon}</div>
+<div class="f-11 fw-600" style="margin-top:4px">${r.next}</div></div>`}).join('')}
+</div>
+<div class="p-20 pb-100 flex-col gap-4" style="margin-top:8px">
+<span class="f-12 fw-600 muted" style="letter-spacing:1px">QUEUE</span>
+${reminders.filter(r=>r.enabled).map(r=>`<div class="flex-row gap-12" style="padding:10px;background:${C.surface};border-radius:12px">
+<span>${r.icon}</span><span class="f-14 fw-600" style="flex:1">${r.title}</span><span class="f-12" style="color:${r.color}">${r.next}</span></div>`).join('')}
+</div>`},
+
+// 13
+{name:'Notification Style',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.surface}">&#9790;</div></div></div>
+<div class="p-20 pb-100 flex-col gap-6">
+<div class="text-center" style="padding:16px 0"><span class="f-12 muted">NEXT UP IN</span>
+<div class="timer-text" style="font-size:40px;color:${C.eye};margin:4px 0">5:12</div>
+<span class="f-14 fw-600">\u{1F440} Eye Rest</span></div>
+<div style="height:1px;background:${C.border};margin:4px 0"></div>
+<span class="f-12 fw-600 muted" style="letter-spacing:1px;margin-top:4px">UPCOMING</span>
+${reminders.map(r=>`<div class="flex-row gap-12" style="padding:14px;background:${C.surface};border-radius:14px;${!r.enabled?'opacity:.4':''}">
+<div class="icon-circle" style="background:${r.color}20">${r.icon}</div>
+<div style="flex:1"><span class="fw-600 f-14">${r.title}</span><div class="flex-row gap-8" style="margin-top:2px"><span class="f-12 muted">${r.interval}m</span></div></div>
+<div class="flex-col" style="align-items:flex-end"><span class="timer-text f-14" style="color:${r.color}">${r.next}</span>
+${r.enabled?'<span class="f-11" style="color:'+C.green+'">Active</span>':'<span class="f-11 muted">Paused</span>'}</div></div>`).join('')}
+</div>
+<div class="bottom-bar" style="background:linear-gradient(transparent,${C.bg} 40%)"><div class="big-btn" style="background:${C.primary};color:#fff">START REMINDERS</div></div>`},
+
+// 14
+{name:'Widget Tiles',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.surface}">&#9881;</div></div></div>
+<div class="p-20 pb-100">
+<div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto;gap:10px">
+<div class="card" style="background:linear-gradient(135deg,${C.water}30,${C.water}10);border:1px solid ${C.water}30;grid-column:span 2;padding:20px">
+<div class="flex-row gap-12"><span style="font-size:28px">\u{1F4A7}</span><div style="flex:1"><span class="fw-700" style="font-size:16px">Drink Water</span><br><span class="f-12 muted">250ml \u00b7 30m interval</span></div>
+<div class="timer-text" style="font-size:28px;color:${C.water}">12:45</div></div></div>
+${reminders.slice(1).map(r=>`<div class="card" style="background:${r.color}12;border:1px solid ${r.color}25;padding:14px">
+<div style="font-size:24px;margin-bottom:8px">${r.icon}</div>
+<span class="fw-600 f-13">${r.title}</span>
+<div class="timer-text" style="font-size:22px;color:${r.color};margin:6px 0">${r.next}</div>
+<span class="f-11 muted">${r.interval}m</span></div>`).join('')}
+</div></div>
+<div class="bottom-bar" style="background:linear-gradient(transparent,${C.bg} 30%)"><div class="big-btn" style="background:${C.amber};color:#000">&#9654; START</div></div>`},
+
+// 15
+{name:'iOS Inspired',render:()=>`
+<div style="padding:54px 20px 100px">
+<h1 style="font-size:32px;font-weight:700;margin-bottom:4px">Zenu</h1>
+<span class="f-14 muted" style="display:block;margin-bottom:20px">Health Reminders</span>
+<div class="card" style="background:${C.surface};border-radius:20px;padding:0;overflow:hidden">
+${reminders.map((r,i)=>`<div class="flex-row gap-12" style="padding:14px 16px;${i<reminders.length-1?'border-bottom:1px solid '+C.border:''}">
+<div class="icon-circle" style="background:${r.color};font-size:16px">${r.icon}</div>
+<div style="flex:1"><span class="fw-600 f-14">${r.title}</span><br><span class="f-12 muted">${r.interval} min interval</span></div>
+<span class="timer-text f-13" style="color:${r.enabled?C.text:C.muted}">${r.enabled?r.next:'Off'}</span>
+<span style="color:${C.muted}">&rsaquo;</span></div>`).join('')}
+</div>
+<div class="card" style="background:${C.primary};border-radius:16px;margin-top:16px;text-align:center;padding:18px;cursor:pointer">
+<span class="fw-700" style="font-size:16px">Start All Reminders</span></div>
+<div class="card" style="background:${C.surface};border-radius:16px;margin-top:10px;text-align:center;padding:14px;cursor:pointer">
+<span class="fw-600 f-14" style="color:${C.primary}">+ Add Reminder</span></div></div>`},
+
+// 16
+{name:'Kanban Columns',render:()=>`
+<div class="appbar"><h1 style="font-size:18px">Zenu</h1><div class="actions"><div class="btn" style="background:${C.amber};color:#000;font-size:11px;width:auto;padding:0 10px">START</div><div class="btn" style="background:${C.surface}">+</div></div></div>
+<div style="display:flex;gap:10px;padding:0 12px 100px;overflow-x:auto;min-height:600px">
+<div style="min-width:180px;flex:1"><div class="f-11 fw-600 muted" style="letter-spacing:1px;padding:8px 4px">ACTIVE (3)</div>
+${reminders.filter(r=>r.enabled).map(r=>`<div class="card" style="background:${C.surface};padding:12px;margin-bottom:6px">
+<div class="flex-row gap-8 mb-8"><span>${r.icon}</span><span class="fw-600 f-13">${r.title}</span></div>
+<div class="timer-text f-14" style="color:${r.color}">${r.next}</div>
+<div class="f-11 muted" style="margin-top:4px">${r.interval}m</div></div>`).join('')}</div>
+<div style="min-width:180px;flex:1"><div class="f-11 fw-600 muted" style="letter-spacing:1px;padding:8px 4px">PAUSED (1)</div>
+${reminders.filter(r=>!r.enabled).map(r=>`<div class="card" style="background:${C.surface};padding:12px;opacity:.6">
+<div class="flex-row gap-8 mb-8"><span>${r.icon}</span><span class="fw-600 f-13">${r.title}</span></div>
+<div class="f-11 muted">${r.interval}m</div></div>`).join('')}</div>
+</div>`},
+
+// 17
+{name:'Bubble UI',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.surface}">&#9881;</div></div></div>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px;padding:20px;padding-bottom:120px">
+${reminders.map((r,i)=>{const s=[110,95,100,85][i];return`
+<div style="width:${s}px;height:${s}px;border-radius:50%;background:${r.color}20;border:2px solid ${r.enabled?r.color:C.border};display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;${!r.enabled?'opacity:.4':''}">
+<span style="font-size:${s/4}px">${r.icon}</span>
+<span class="fw-600" style="font-size:${s/9}px;margin-top:4px">${r.next}</span>
+<span class="f-11 muted">${r.title}</span></div>`}).join('')}
+</div>
+<div class="bottom-bar" style="text-align:center;background:linear-gradient(transparent,${C.bg} 30%)">
+<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,${C.amber},${C.exercise});margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;letter-spacing:1px;box-shadow:0 4px 20px ${C.amber}40;cursor:pointer">START</div>
+<div style="margin-top:8px"><span class="f-12 muted">Tap to begin</span></div></div>`},
+
+// 18
+{name:'Split Panel',render:()=>`
+<div class="appbar"><h1 style="font-size:18px">Zenu</h1></div>
+<div style="display:flex;height:calc(100% - 90px)">
+<div style="width:50%;padding:12px;border-right:1px solid ${C.border};overflow-y:auto">
+<span class="f-11 fw-600 muted" style="letter-spacing:1px">REMINDERS</span>
+${reminders.map((r,i)=>`<div class="flex-row gap-8" style="padding:12px 8px;border-radius:10px;cursor:pointer;${i===1?'background:'+C.surface:''}">
+<span>${r.icon}</span><div style="flex:1"><span class="fw-600 f-13">${r.title}</span><br><span class="f-11 muted">${r.interval}m</span></div></div>`).join('')}
+<div style="padding:12px 8px;color:${C.primary};cursor:pointer" class="f-13 fw-600">+ Add New</div>
+</div>
+<div style="width:50%;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+<div style="font-size:40px;margin-bottom:12px">\u{1F440}</div>
+<span class="fw-700" style="font-size:18px">Eye Rest</span>
+<span class="f-12 muted mb-12">Look away for 20 seconds</span>
+<div class="timer-text" style="font-size:36px;color:${C.eye}">5:12</div>
+<span class="f-12 muted mb-16">remaining</span>
+<div class="big-btn" style="background:${C.amber};color:#000;border-radius:12px;padding:12px;font-size:14px">&#9654; Start</div>
+</div></div>`},
+
+// 19
+{name:'Dark Neon',render:()=>`
+<div style="background:#050510;min-height:100%;padding-bottom:100px">
+<div style="padding:54px 20px 16px;display:flex;align-items:center;justify-content:space-between">
+<h1 style="font-size:24px;background:linear-gradient(90deg,${C.primary},${C.water});-webkit-background-clip:text;-webkit-text-fill-color:transparent">Zenu</h1>
+<div class="btn" style="background:#ffffff10;border:1px solid #ffffff15">&#9881;</div></div>
+<div style="padding:0 20px" class="flex-col gap-10">
+${reminders.map(r=>`<div class="card" style="background:#0a0a1a;border:1px solid ${r.color}30;box-shadow:0 0 20px ${r.color}10">
+<div class="flex-row gap-12"><div class="icon-circle" style="background:${r.color}15;box-shadow:0 0 10px ${r.color}30">${r.icon}</div>
+<div style="flex:1"><span class="fw-600 f-14">${r.title}</span><div class="slider" style="margin-top:8px;background:#1a1a2e"><div class="fill" style="width:65%;background:linear-gradient(90deg,${r.color},${r.color}60);box-shadow:0 0 8px ${r.color}50"></div></div></div>
+<span class="timer-text f-14" style="color:${r.color};text-shadow:0 0 10px ${r.color}50">${r.next}</span></div></div>`).join('')}
+</div></div>
+<div class="bottom-bar" style="background:linear-gradient(transparent,#050510 40%)"><div class="big-btn" style="background:linear-gradient(90deg,${C.amber},${C.exercise});color:#000;box-shadow:0 0 30px ${C.amber}30">&#9654; START</div></div>`},
+
+// 20
+{name:'Playful Color',render:()=>`
+<div style="background:#fefce8;min-height:100%;padding-bottom:100px;color:#1a1a1a">
+<div style="padding:54px 20px 16px;display:flex;align-items:center;justify-content:space-between">
+<h1 style="font-size:24px;color:#7c3aed">Zenu \u{2728}</h1>
+<div class="btn" style="background:#7c3aed;color:#fff;border-radius:50%">&#9881;</div></div>
+<div style="padding:0 16px" class="flex-col gap-10">
+${reminders.map(r=>`<div class="card" style="background:#fff;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+<div class="flex-row gap-12"><div style="width:48px;height:48px;border-radius:14px;background:${r.color}20;display:flex;align-items:center;justify-content:center;font-size:22px">${r.icon}</div>
+<div style="flex:1"><span class="fw-700 f-14" style="color:#1e293b">${r.title}</span><br><span class="f-12" style="color:#64748b">${r.interval} min</span></div>
+<div style="padding:6px 12px;border-radius:20px;background:${r.color}15"><span class="fw-600 f-13" style="color:${r.color}">${r.next}</span></div></div></div>`).join('')}
+</div></div>
+<div class="bottom-bar" style="background:linear-gradient(transparent,#fefce8 40%)"><div class="big-btn" style="background:#7c3aed;color:#fff;border-radius:24px;box-shadow:0 4px 15px rgba(124,58,237,.3)">Start Reminders &#9654;</div></div>`},
+
+// 21
+{name:'Glassmorphism',render:()=>`
+<div style="background:linear-gradient(135deg,#1a1040,#0f2847,#0a3535);min-height:100%;padding-bottom:100px">
+<div style="padding:54px 20px 16px;display:flex;align-items:center;justify-content:space-between">
+<h1 style="font-size:22px">Zenu</h1><div class="btn" style="background:rgba(255,255,255,.1);backdrop-filter:blur(10px)">&#9881;</div></div>
+<div style="padding:0 16px" class="flex-col gap-10">
+${reminders.map(r=>`<div class="card" style="background:rgba(255,255,255,.08);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12)">
+<div class="flex-row gap-12"><div class="icon-circle" style="background:rgba(255,255,255,.1)">${r.icon}</div>
+<div style="flex:1"><span class="fw-600 f-14">${r.title}</span><br><span class="f-12" style="color:rgba(255,255,255,.5)">${r.interval}m interval</span></div>
+<span class="timer-text f-14" style="color:${r.color}">${r.next}</span></div></div>`).join('')}
+</div></div>
+<div class="bottom-bar" style="background:linear-gradient(transparent,#0f1a2e 40%)"><div class="big-btn" style="background:rgba(245,158,11,.9);color:#000;backdrop-filter:blur(10px)">START</div></div>`},
+
+// 22
+{name:'Material You',render:()=>`
+<div style="background:#1c1b2e;min-height:100%;padding-bottom:100px">
+<div style="padding:54px 20px 20px;background:#2a2844;border-radius:0 0 28px 28px">
+<div class="flex-row" style="justify-content:space-between;margin-bottom:16px"><h1 style="font-size:22px">Zenu</h1>
+<div style="width:40px;height:40px;border-radius:50%;background:#3d3860;display:flex;align-items:center;justify-content:center">&#9881;</div></div>
+<div class="flex-row gap-8"><div style="padding:8px 16px;border-radius:20px;background:#6366f140;border:1px solid #6366f1" class="f-13 fw-600" style="color:#a5b4fc">All</div>
+<div style="padding:8px 16px;border-radius:20px;background:#3d3860" class="f-13">Active</div>
+<div style="padding:8px 16px;border-radius:20px;background:#3d3860" class="f-13">Paused</div></div></div>
+<div style="padding:16px" class="flex-col gap-10">
+${reminders.map(r=>`<div class="card" style="background:#2a2844;border-radius:20px">
+<div class="flex-row gap-12"><div style="width:48px;height:48px;border-radius:16px;background:${r.color}20;display:flex;align-items:center;justify-content:center;font-size:20px">${r.icon}</div>
+<div style="flex:1"><span class="fw-600 f-14">${r.title}</span><br><span class="f-12" style="color:#8b8aa8">${r.interval}m</span></div>
+<span class="timer-text f-14" style="color:${r.color}">${r.next}</span></div></div>`).join('')}
+</div></div>
+<div class="bottom-bar" style="background:linear-gradient(transparent,#1c1b2e 40%)"><div class="big-btn" style="background:#a78bfa;color:#1c1b2e;border-radius:24px">Start Reminders</div></div>
+<div class="fab" style="border-radius:16px;background:#6366f1;bottom:100px">+</div>`},
+
+// 23
+{name:'Neumorphic',render:()=>`
+<div style="background:#e0e5ec;min-height:100%;padding-bottom:100px;color:#2d3436">
+<div style="padding:54px 20px 16px;display:flex;align-items:center;justify-content:space-between">
+<h1 style="font-size:22px;color:#2d3436">Zenu</h1>
+<div style="width:40px;height:40px;border-radius:12px;background:#e0e5ec;box-shadow:5px 5px 10px #b8bec7,-5px -5px 10px #fff;display:flex;align-items:center;justify-content:center">&#9881;</div></div>
+<div style="padding:0 16px" class="flex-col gap-12">
+${reminders.map(r=>`<div style="padding:16px;border-radius:16px;background:#e0e5ec;box-shadow:5px 5px 15px #b8bec7,-5px -5px 15px #fff">
+<div class="flex-row gap-12"><div style="width:44px;height:44px;border-radius:12px;background:#e0e5ec;box-shadow:inset 3px 3px 6px #b8bec7,inset -3px -3px 6px #fff;display:flex;align-items:center;justify-content:center;font-size:18px">${r.icon}</div>
+<div style="flex:1"><span class="fw-600 f-14" style="color:#2d3436">${r.title}</span><br><span class="f-12" style="color:#636e72">${r.interval}m</span></div>
+<span class="timer-text f-14" style="color:${r.color}">${r.next}</span></div></div>`).join('')}
+</div></div>
+<div class="bottom-bar" style="background:linear-gradient(transparent,#e0e5ec 40%)"><div class="big-btn" style="background:#e0e5ec;color:#6366f1;box-shadow:5px 5px 15px #b8bec7,-5px -5px 15px #fff;font-weight:700">START</div></div>`},
+
+// 24
+{name:'Card Stack',render:()=>`
+<div class="appbar"><h1>Zenu</h1><div class="actions"><div class="btn" style="background:${C.surface}">&#9881;</div></div></div>
+<div style="position:relative;height:400px;margin:20px">
+${reminders.map((r,i)=>`<div style="position:absolute;top:${i*8}px;left:${i*4}px;right:${i*4}px;z-index:${4-i};transform:scale(${1-i*0.03})">
+<div class="card" style="background:${i===0?`linear-gradient(135deg,${r.color}30,${r.color}10)`:`${C.surface}`};border:1px solid ${i===0?r.color+'40':C.border};padding:${i===0?'24px':'20px'}">
+${i===0?`<div style="text-align:center"><div style="font-size:36px;margin-bottom:8px">${r.icon}</div>
+<div class="fw-700" style="font-size:18px">${r.title}</div>
+<div class="f-12 muted mb-12">Every ${r.interval} minutes</div>
+<div class="timer-text" style="font-size:32px;color:${r.color}">${r.next}</div>
+<div class="f-12 muted" style="margin-top:12px">&larr; Swipe to see next &rarr;</div></div>`
+:`<div class="flex-row gap-8"><span>${r.icon}</span><span class="fw-600">${r.title}</span></div>`}</div></div>`).join('')}
+</div>
+<div class="bottom-bar" style="background:linear-gradient(transparent,${C.bg} 30%)"><div class="big-btn" style="background:${C.amber};color:#000">&#9654; START</div></div>`},
+
+// 25
+{name:'Action Bar Bottom',render:()=>`
+<div class="appbar"><h1>Zenu</h1></div>
+<div class="p-20 flex-col gap-8" style="padding-bottom:160px">
+<div class="flex-row" style="justify-content:space-between"><span class="f-12 fw-600 muted" style="letter-spacing:1px">YOUR REMINDERS</span></div>
+${reminders.map(r=>`<div class="card" style="background:${C.surface};padding:14px;opacity:${r.enabled?1:.5}">
+<div class="flex-row gap-12"><div class="icon-circle" style="background:${r.color}20">${r.icon}</div>
+<div style="flex:1"><div class="flex-row" style="justify-content:space-between"><span class="fw-600 f-14">${r.title}</span><span class="timer-text f-13" style="color:${r.color}">${r.next}</span></div>
+<div class="flex-row gap-8" style="margin-top:6px"><span class="tag" style="background:${C.border};color:${C.muted}">${r.interval}m</span>
+${r.enabled?`<span class="tag" style="background:${C.green}20;color:${C.green}">Active</span>`:`<span class="tag" style="background:${C.border};color:${C.muted}">Paused</span>`}</div></div></div></div>`).join('')}
+</div>
+<div style="position:absolute;bottom:0;left:0;right:0;background:${C.surface};border-top:1px solid ${C.border};padding:12px 20px 34px">
+<div class="flex-row gap-8">
+<div class="big-btn" style="background:${C.amber};color:#000;flex:2;padding:14px;border-radius:14px">&#9654; START ALL</div>
+<div style="width:52px;height:52px;border-radius:14px;background:${C.primary};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;cursor:pointer">+</div>
+<div style="width:52px;height:52px;border-radius:14px;background:${C.border};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;cursor:pointer">&#9881;</div>
+</div></div>`}
+];
+
+// Render nav pills
+const pillsEl=document.getElementById('pills');
+mockups.forEach((m,i)=>{
+const p=document.createElement('div');
+p.className='pill'+(i===0?' active':'');
+p.textContent=`${i+1}. ${m.name}`;
+p.onclick=()=>show(i);
+pillsEl.appendChild(p);
+});
+
+let current=0;
+function show(i){
+current=i;
+document.getElementById('screen').innerHTML=mockups[i].render();
+document.querySelectorAll('.pill').forEach((p,j)=>p.classList.toggle('active',j===i));
+document.querySelectorAll('.pill')[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+show(0);
+
+// Keyboard nav
+document.addEventListener('keydown',e=>{
+if(e.key==='ArrowRight'&&current<mockups.length-1)show(current+1);
+if(e.key==='ArrowLeft'&&current>0)show(current-1);
+});
+</script>
+<style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}</style>
+</body>
+</html>

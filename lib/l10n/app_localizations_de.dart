@@ -498,4 +498,117 @@ class AppLocalizationsDe extends AppLocalizations {
   String reminderDisabled(String reminderTitle) {
     return '$reminderTitle deaktiviert';
   }
+
+  @override
+  String get categoryHealth => 'Gesundheit';
+
+  @override
+  String get categoryExercise => 'Übungen';
+
+  @override
+  String get categoryMindBody => 'Geist & Körper';
+
+  @override
+  String get pushUps => 'Liegestütze';
+
+  @override
+  String get pullUps => 'Klimmzüge';
+
+  @override
+  String get squats => 'Kniebeugen';
+
+  @override
+  String get stretching => 'Dehnen';
+
+  @override
+  String get jumpingJacks => 'Hampelmänner';
+
+  @override
+  String get planks => 'Planks';
+
+  @override
+  String get burpees => 'Burpees';
+
+  @override
+  String get deepBreathing => 'Tiefes Atmen';
+
+  @override
+  String get meditationTitle => 'Meditation';
+
+  @override
+  String get deepBreathingDescription =>
+      'Beruhige deinen Geist mit Atemübungen';
+
+  @override
+  String get meditationDescription => 'Geist klären und Fokus finden';
+
+  @override
+  String get notificationTimeForDeepBreathing =>
+      'Atme tief durch und entspanne dich.';
+
+  @override
+  String get notificationTimeForMeditation =>
+      'Nimm dir einen Moment, um deinen Geist zu klären.';
+
+  @override
+  String get stillRunning => 'Läuft noch';
+
+  @override
+  String get interval => 'Intervall';
+
+  @override
+  String get enabledLabel => 'Aktiviert';
+
+  @override
+  String get inactive => 'Inaktiv';
+
+  @override
+  String tapToEnable(String title) {
+    return '$title — tippen zum Aktivieren';
+  }
+
+  @override
+  String get doneButton => 'Fertig';
+
+  @override
+  String get doubleTapToToggle => 'Doppeltippen zum Umschalten';
+
+  @override
+  String get doubleTapToCycleTheme => 'Doppeltippen zum Themenwechsel';
+
+  @override
+  String get doubleTapToAddReminder =>
+      'Doppeltippen, um erste Erinnerung hinzuzufügen';
+
+  @override
+  String get themeSystem => 'Design: System';
+
+  @override
+  String get themeLight => 'Design: Hell';
+
+  @override
+  String get themeDark => 'Design: Dunkel';
+
+  @override
+  String get due => 'fällig';
+
+  @override
+  String get last30Days => 'Letzte 30 Tage';
+
+  @override
+  String times(int count) {
+    return '$count Mal';
+  }
+
+  @override
+  String get dailyAverage => 'Tagesschnitt';
+
+  @override
+  String get noCompletionsYet => 'Noch keine Abschlüsse';
+
+  @override
+  String get total => 'Gesamt';
+
+  @override
+  String get timersReset => 'Timer zurückgesetzt';
 }

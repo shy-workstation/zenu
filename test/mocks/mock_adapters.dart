@@ -1,5 +1,3 @@
-import 'package:flutter/services.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 /// Mock notification adapter for testing platform-specific notifications
@@ -101,23 +99,6 @@ class MockSharedPreferencesAdapter extends Mock {
   bool containsKey(String key) => _storage.containsKey(key);
   
   void reset() => _storage.clear();
-}
-
-/// Mock platform channel for testing platform-specific functionality
-class MockPlatformChannel {
-  static const MethodChannel _channel = MethodChannel('test/platform');
-  
-  static void setMockMethodCallHandler(Future<dynamic> Function(MethodCall call)? handler) {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(_channel, handler);
-  }
-  
-  static Future<T?> invokeMethod<T>(String method, [dynamic arguments]) {
-    return _channel.invokeMethod<T>(method, arguments);
-  }
-  
-  static void reset() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(_channel, null);
-  }
 }
 
 /// Mock file system adapter for testing file operations

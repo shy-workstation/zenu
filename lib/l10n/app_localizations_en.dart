@@ -494,4 +494,117 @@ class AppLocalizationsEn extends AppLocalizations {
   String reminderDisabled(String reminderTitle) {
     return '$reminderTitle disabled';
   }
+
+  @override
+  String get categoryHealth => 'Health';
+
+  @override
+  String get categoryExercise => 'Exercise';
+
+  @override
+  String get categoryMindBody => 'Mind & Body';
+
+  @override
+  String get pushUps => 'Push-ups';
+
+  @override
+  String get pullUps => 'Pull-ups';
+
+  @override
+  String get squats => 'Squats';
+
+  @override
+  String get stretching => 'Stretching';
+
+  @override
+  String get jumpingJacks => 'Jumping Jacks';
+
+  @override
+  String get planks => 'Planks';
+
+  @override
+  String get burpees => 'Burpees';
+
+  @override
+  String get deepBreathing => 'Deep Breathing';
+
+  @override
+  String get meditationTitle => 'Meditation';
+
+  @override
+  String get deepBreathingDescription =>
+      'Calm your mind with breathing exercises';
+
+  @override
+  String get meditationDescription => 'Clear your mind and find focus';
+
+  @override
+  String get notificationTimeForDeepBreathing =>
+      'Take a deep breath and relax.';
+
+  @override
+  String get notificationTimeForMeditation =>
+      'Take a moment to clear your mind.';
+
+  @override
+  String get stillRunning => 'Still running';
+
+  @override
+  String get interval => 'Interval';
+
+  @override
+  String get enabledLabel => 'Enabled';
+
+  @override
+  String get inactive => 'Inactive';
+
+  @override
+  String tapToEnable(String title) {
+    return '$title — tap to enable';
+  }
+
+  @override
+  String get doneButton => 'Done';
+
+  @override
+  String get doubleTapToToggle => 'Double tap to toggle';
+
+  @override
+  String get doubleTapToCycleTheme => 'Double tap to cycle theme';
+
+  @override
+  String get doubleTapToAddReminder =>
+      'Double tap to add your first health reminder';
+
+  @override
+  String get themeSystem => 'Theme: System';
+
+  @override
+  String get themeLight => 'Theme: Light';
+
+  @override
+  String get themeDark => 'Theme: Dark';
+
+  @override
+  String get due => 'due';
+
+  @override
+  String get last30Days => 'Last 30 Days';
+
+  @override
+  String times(int count) {
+    return '$count times';
+  }
+
+  @override
+  String get dailyAverage => 'Daily avg';
+
+  @override
+  String get noCompletionsYet => 'No completions yet';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get timersReset => 'Timers reset';
 }

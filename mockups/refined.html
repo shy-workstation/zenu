@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zenu - Refined Mockups</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#111;color:#fff;overflow:hidden;height:100vh}
+#nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);padding:10px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #333}
+#nav .title{font-size:14px;font-weight:700;color:#6366f1;white-space:nowrap}
+#nav .pills{display:flex;gap:6px;flex:1}
+#nav .pill{padding:6px 14px;border-radius:12px;font-size:12px;cursor:pointer;white-space:nowrap;border:1px solid #333;background:#1a1a2e;transition:.2s}
+#nav .pill:hover{border-color:#6366f1}
+#nav .pill.active{background:#6366f1;border-color:#6366f1}
+#nav .state-toggle{margin-left:auto;display:flex;gap:4px}
+#nav .st-btn{padding:5px 10px;border-radius:8px;font-size:11px;cursor:pointer;border:1px solid #333;background:#1a1a2e;transition:.2s}
+#nav .st-btn.active{background:#f59e0b;border-color:#f59e0b;color:#000}
+#phone{width:390px;height:844px;margin:56px auto 20px;border-radius:40px;overflow:hidden;position:relative;border:3px solid #333;background:#0f172a}
+#phone .notch{width:160px;height:34px;background:#000;border-radius:0 0 20px 20px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10}
+#screen{width:100%;height:100%;overflow-y:auto;scrollbar-width:none;position:relative}
+#screen::-webkit-scrollbar{display:none}
+.hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);backdrop-filter:blur(10px);padding:8px 16px;border-radius:20px;font-size:12px;color:#94a3b8;z-index:100;white-space:nowrap}
+@media(max-height:920px){#phone{transform:scale(.82);margin-top:48px;transform-origin:top center}}
+</style>
+</head>
+<body>
+<div id="nav">
+<span class="title">REFINED</span>
+<div class="pills">
+<div class="pill active" onclick="show(0)">A. Orbital</div>
+<div class="pill" onclick="show(1)">B. Bubbles</div>
+<div class="pill" onclick="show(2)">C. Focus Split</div>
+</div>
+<div class="state-toggle">
+<div class="st-btn active" onclick="setState('normal')">Normal</div>
+<div class="st-btn" onclick="setState('editing')">Editing</div>
+<div class="st-btn" onclick="setState('running')">Running</div>
+<div class="st-btn" onclick="setState('triggered')">Triggered</div>
+</div>
+</div>
+<div id="phone"><div class="notch"></div><div id="screen"></div></div>
+<div class="hint">Click pills to switch design &middot; Toggle states on the right &middot; Arrow keys to navigate</div>
+
+<script>
+const C={water:'#06b6d4',exercise:'#ef4444',eye:'#3b82f6',custom:'#8b5cf6',primary:'#6366f1',amber:'#f59e0b',green:'#10b981',surface:'#1e293b',bg:'#0f172a',text:'#f1f5f9',muted:'#94a3b8',border:'#334155',dark:'#0f172a'};
+const R=[
+{title:'Water',icon:'\u{1F4A7}',color:C.water,interval:30,next:'12:45',qty:'250ml',enabled:true},
+{title:'Eye Rest',icon:'\u{1F440}',color:C.eye,interval:20,next:'5:12',qty:'20 sec',enabled:true},
+{title:'Stretch',icon:'\u{1F9D8}',color:C.green,interval:45,next:'32:10',qty:'',enabled:true},
+{title:'Push Ups',icon:'\u{1F4AA}',color:C.exercise,interval:60,next:'48:30',qty:'15 reps',enabled:false}
+];
+
+let currentMockup=0, currentState='normal';
+
+function setState(s){
+  currentState=s;
+  document.querySelectorAll('.st-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===s));
+  render();
+}
+function show(i){
+  currentMockup=i;
+  document.querySelectorAll('.pill').forEach((p,j)=>p.classList.toggle('active',j===i));
+  render();
+}
+function render(){mockups[currentMockup][currentState]?document.getElementById('screen').innerHTML=mockups[currentMockup][currentState]():document.getElementById('screen').innerHTML=mockups[currentMockup].normal()}
+
+// ============== MOCKUP A: ORBITAL ==============
+const A={};
+
+A.normal=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between">
+<div style="font-size:20px;font-weight:700">Zenu</div>
+<div style="display:flex;gap:6px">
+<div style="padding:6px 10px;border-radius:8px;background:${C.surface};font-size:12px;color:${C.muted}">&#9790;</div>
+</div></div>
+
+<div style="position:relative;width:300px;height:300px;margin:10px auto 0">
+<!-- Orbit ring -->
+<div style="position:absolute;top:50%;left:50%;width:240px;height:240px;border-radius:50%;border:1px dashed ${C.border};transform:translate(-50%,-50%)"></div>
+
+<!-- Center START button -->
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,${C.amber},#f97316);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 30px ${C.amber}25">
+<span style="font-size:13px;font-weight:700;letter-spacing:2px">START</span>
+<span style="font-size:10px;opacity:.7;margin-top:2px">4 reminders</span>
+</div>
+
+<!-- Orbital items -->
+${R.map((r,i)=>{const a=i*90-90;const x=120*Math.cos(a*Math.PI/180);const y=120*Math.sin(a*Math.PI/180);return`
+<div style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + ${x}px),calc(-50% + ${y}px));text-align:center;cursor:pointer;${!r.enabled?'opacity:.35':''}">
+<div style="width:56px;height:56px;border-radius:50%;background:${r.color}18;border:2px solid ${r.enabled?r.color+'80':C.border};display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto;transition:.2s">${r.icon}</div>
+<div style="font-size:11px;font-weight:600;margin-top:5px;color:${r.enabled?C.text:C.muted}">${r.title}</div>
+<div style="font-size:10px;color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'Off'}</div>
+</div>`}).join('')}
+</div>
+
+<!-- List below orbit -->
+<div style="padding:8px 20px 34px">
+<div style="font-size:11px;font-weight:600;color:${C.muted};letter-spacing:1px;margin-bottom:8px;padding-left:4px">TAP A BUBBLE TO EDIT</div>
+${R.map(r=>`
+<div style="display:flex;align-items:center;gap:12px;padding:12px;background:${C.surface};border-radius:14px;margin-bottom:6px;${!r.enabled?'opacity:.4':''}">
+<span style="font-size:16px">${r.icon}</span>
+<div style="flex:1">
+<span style="font-size:13px;font-weight:600">${r.title}</span>
+<span style="font-size:11px;color:${C.muted};margin-left:8px">${r.interval}m${r.qty?' \u00b7 '+r.qty:''}</span>
+</div>
+<span style="font-size:13px;font-family:monospace;font-weight:600;color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'--:--'}</span>
+<div style="width:28px;height:28px;border-radius:8px;background:${C.border};display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer">\u270E</div>
+</div>`).join('')}
+
+<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:1px dashed ${C.border};border-radius:14px;margin-top:6px;cursor:pointer;color:${C.primary}">
+<span style="font-size:18px">+</span><span style="font-size:13px;font-weight:600">Add Reminder</span>
+</div>
+</div>`;
+
+A.editing=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between">
+<div style="font-size:20px;font-weight:700">Zenu</div>
+<div style="padding:6px 10px;border-radius:8px;background:${C.surface};font-size:12px;color:${C.muted}">&#9790;</div>
+</div>
+
+<div style="position:relative;width:300px;height:300px;margin:10px auto 0">
+<div style="position:absolute;top:50%;left:50%;width:240px;height:240px;border-radius:50%;border:1px dashed ${C.border};transform:translate(-50%,-50%)"></div>
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:88px;height:88px;border-radius:50%;background:${C.surface};display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:.3">
+<span style="font-size:13px;font-weight:700;letter-spacing:2px">START</span></div>
+
+${R.map((r,i)=>{const a=i*90-90;const x=120*Math.cos(a*Math.PI/180);const y=120*Math.sin(a*Math.PI/180);const sel=i===0;return`
+<div style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + ${x}px),calc(-50% + ${y}px)) ${sel?'scale(1.15)':''};text-align:center;${!r.enabled&&!sel?'opacity:.35':''}">
+<div style="width:56px;height:56px;border-radius:50%;background:${sel?r.color+'30':r.color+'18'};border:2px solid ${sel?r.color:r.enabled?r.color+'80':C.border};display:flex;align-items:center;justify-content:center;font-size:22px;${sel?'box-shadow:0 0 20px '+r.color+'30':''}">${r.icon}</div>
+<div style="font-size:11px;font-weight:600;margin-top:5px">${r.title}</div></div>`}).join('')}
+</div>
+
+<!-- Expanded edit panel for selected reminder (Water) -->
+<div style="padding:0 20px 34px">
+<div style="background:${C.surface};border-radius:20px;border:1px solid ${R[0].color}40;overflow:hidden">
+<div style="padding:16px 16px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid ${C.border}">
+<div style="width:40px;height:40px;border-radius:50%;background:${R[0].color}20;display:flex;align-items:center;justify-content:center;font-size:20px">${R[0].icon}</div>
+<div style="flex:1"><span style="font-size:16px;font-weight:700">Drink Water</span></div>
+<div style="padding:4px 10px;border-radius:6px;background:${C.green}20;color:${C.green};font-size:11px;font-weight:600">Enabled</div>
+</div>
+
+<div style="padding:16px">
+<!-- Title -->
+<div style="margin-bottom:14px">
+<div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:6px">TITLE</div>
+<div style="padding:10px 12px;background:${C.bg};border-radius:10px;border:1px solid ${C.border};font-size:14px">Drink Water</div>
+</div>
+
+<!-- Interval -->
+<div style="margin-bottom:14px">
+<div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:6px">INTERVAL</div>
+<div style="display:flex;align-items:center;gap:8px">
+<div style="flex:1;height:6px;border-radius:3px;background:${C.bg};position:relative">
+<div style="width:50%;height:100%;border-radius:3px;background:${R[0].color}"></div>
+<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:${R[0].color};border:2px solid #fff"></div>
+</div>
+<span style="font-size:14px;font-weight:700;color:${R[0].color};min-width:45px;text-align:right">30 min</span>
+</div></div>
+
+<!-- Quantity -->
+<div style="margin-bottom:14px">
+<div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:6px">QUANTITY</div>
+<div style="display:flex;gap:6px">
+${['150ml','250ml','350ml','500ml'].map((q,i)=>`<div style="flex:1;padding:8px;border-radius:8px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;${i===1?`background:${R[0].color}20;border:1px solid ${R[0].color};color:${R[0].color}`:`background:${C.bg};border:1px solid ${C.border};color:${C.muted}`}">${q}</div>`).join('')}
+</div></div>
+
+<!-- Icon & Color row -->
+<div style="display:flex;gap:10px;margin-bottom:16px">
+<div style="flex:1"><div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:6px">ICON</div>
+<div style="display:flex;gap:4px">
+${['\u{1F4A7}','\u{1F6B0}','\u{1FAD7}','\u{2615}'].map((ic,i)=>`<div style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;${i===0?`background:${R[0].color}20;border:1px solid ${R[0].color}`:`background:${C.bg};border:1px solid ${C.border}`}">${ic}</div>`).join('')}
+</div></div>
+<div style="flex:1"><div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:6px">COLOR</div>
+<div style="display:flex;gap:4px">
+${[C.water,C.eye,C.green,C.primary].map((c,i)=>`<div style="width:36px;height:36px;border-radius:8px;background:${c};cursor:pointer;${i===0?'border:2px solid #fff':''};opacity:${i===0?1:.5}"></div>`).join('')}
+</div></div>
+</div>
+
+<!-- Actions -->
+<div style="display:flex;gap:8px">
+<div style="flex:1;padding:12px;border-radius:10px;background:${R[0].color};text-align:center;font-weight:700;font-size:14px;cursor:pointer">Save</div>
+<div style="width:44px;padding:12px;border-radius:10px;background:${C.exercise}20;text-align:center;font-size:16px;cursor:pointer;color:${C.exercise}">\u{1F5D1}</div>
+</div>
+</div></div>
+</div>`;
+
+A.running=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between">
+<div style="font-size:20px;font-weight:700">Zenu</div>
+<div style="padding:6px 10px;border-radius:8px;background:${C.green}15;font-size:12px;color:${C.green};border:1px solid ${C.green}30">\u25CF Running</div>
+</div>
+
+<div style="position:relative;width:300px;height:300px;margin:10px auto 0">
+<div style="position:absolute;top:50%;left:50%;width:240px;height:240px;border-radius:50%;border:1px solid ${C.green}30;transform:translate(-50%,-50%)"></div>
+
+<!-- Center STOP button -->
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,${C.exercise},#dc2626);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 30px ${C.exercise}20">
+<span style="font-size:13px;font-weight:700;letter-spacing:2px">STOP</span>
+</div>
+
+${R.map((r,i)=>{const a=i*90-90;const x=120*Math.cos(a*Math.PI/180);const y=120*Math.sin(a*Math.PI/180);
+const pct=i===0?58:i===1?75:i===2?29:0;
+return`
+<div style="position:absolute;top:50%;left:50%;transform:translate(calc(-50% + ${x}px),calc(-50% + ${y}px));text-align:center;${!r.enabled?'opacity:.3':''}">
+<div style="position:relative;width:60px;height:60px">
+<svg viewBox="0 0 60 60" style="position:absolute;top:0;left:0;transform:rotate(-90deg)">
+<circle cx="30" cy="30" r="27" fill="${r.color}12" stroke="${C.border}" stroke-width="2"/>
+${r.enabled?`<circle cx="30" cy="30" r="27" fill="none" stroke="${r.color}" stroke-width="2.5" stroke-dasharray="${2*Math.PI*27}" stroke-dashoffset="${2*Math.PI*27*(1-pct/100)}" stroke-linecap="round"/>`:''}</svg>
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px">${r.icon}</div>
+</div>
+<div style="font-size:11px;font-weight:600;margin-top:4px">${r.title}</div>
+<div style="font-size:11px;font-family:monospace;font-weight:600;color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'Off'}</div>
+</div>`}).join('')}
+</div>
+
+<div style="padding:8px 20px 34px">
+<div style="font-size:11px;font-weight:600;color:${C.muted};letter-spacing:1px;margin-bottom:8px;padding-left:4px">ACTIVE TIMERS</div>
+${R.filter(r=>r.enabled).map(r=>`
+<div style="display:flex;align-items:center;gap:12px;padding:12px;background:${C.surface};border-radius:14px;margin-bottom:6px">
+<span style="font-size:16px">${r.icon}</span>
+<div style="flex:1"><span style="font-size:13px;font-weight:600">${r.title}</span></div>
+<span style="font-size:15px;font-family:monospace;font-weight:700;color:${r.color}">${r.next}</span>
+</div>`).join('')}
+</div>`;
+
+A.triggered=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between">
+<div style="font-size:20px;font-weight:700">Zenu</div>
+<div style="padding:6px 10px;border-radius:8px;background:${C.green}15;font-size:12px;color:${C.green};border:1px solid ${C.green}30">\u25CF Running</div>
+</div>
+
+<!-- Triggered overlay -->
+<div style="padding:20px;text-align:center">
+<div style="width:100px;height:100px;border-radius:50%;background:${R[0].color}20;border:3px solid ${R[0].color};margin:20px auto;display:flex;align-items:center;justify-content:center;font-size:48px;animation:pulse 1.5s infinite">${R[0].icon}</div>
+<div style="font-size:22px;font-weight:700;margin:8px 0">Drink Water!</div>
+<div style="font-size:14px;color:${C.muted};margin-bottom:24px">Time for 250ml of water</div>
+
+<!-- Quantity adjuster -->
+<div style="background:${C.surface};border-radius:16px;padding:16px;margin-bottom:16px">
+<div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:10px">HOW MUCH?</div>
+<div style="display:flex;align-items:center;justify-content:center;gap:16px">
+<div style="width:40px;height:40px;border-radius:50%;background:${C.border};display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer">&minus;</div>
+<span style="font-size:32px;font-weight:700;color:${R[0].color};font-family:monospace;min-width:80px">250ml</span>
+<div style="width:40px;height:40px;border-radius:50%;background:${C.border};display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer">+</div>
+</div></div>
+
+<!-- Action buttons -->
+<div style="display:flex;gap:10px">
+<div style="flex:1;padding:16px;border-radius:14px;background:${C.surface};text-align:center;cursor:pointer">
+<div style="font-size:18px;margin-bottom:4px">\u23ED</div>
+<div style="font-size:12px;color:${C.muted}">Skip</div>
+</div>
+<div style="flex:2;padding:16px;border-radius:14px;background:${R[0].color};text-align:center;cursor:pointer">
+<div style="font-size:18px;margin-bottom:4px">\u2705</div>
+<div style="font-size:13px;font-weight:700">Done!</div>
+</div>
+</div>
+</div>
+
+<!-- Other reminders still visible below -->
+<div style="padding:12px 20px 34px">
+<div style="font-size:11px;font-weight:600;color:${C.muted};letter-spacing:1px;margin-bottom:6px">STILL RUNNING</div>
+${R.filter(r=>r.enabled&&r.title!=='Water').map(r=>`
+<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:${C.surface};border-radius:12px;margin-bottom:4px;opacity:.7">
+<span>${r.icon}</span><span style="font-size:13px;flex:1">${r.title}</span>
+<span style="font-size:12px;font-family:monospace;color:${r.color}">${r.next}</span></div>`).join('')}
+</div>`;
+
+
+// ============== MOCKUP B: BUBBLES ==============
+const B={};
+
+B.normal=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between">
+<div style="font-size:20px;font-weight:700">Zenu</div>
+<div style="display:flex;gap:6px">
+<div style="padding:6px 10px;border-radius:8px;background:${C.surface};font-size:12px;color:${C.muted}">&#9790;</div>
+</div></div>
+
+<!-- Bubble area -->
+<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px;padding:16px 20px 10px;min-height:240px">
+${R.map((r,i)=>{const s=[108,96,100,80][i];return`
+<div style="width:${s}px;height:${s}px;border-radius:50%;background:${r.color}12;border:2px solid ${r.enabled?r.color:C.border};display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:.2s;${!r.enabled?'opacity:.3':''}">
+<span style="font-size:${s/3.5}px">${r.icon}</span>
+<span style="font-size:12px;font-weight:700;margin-top:3px;color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'Off'}</span>
+<span style="font-size:10px;color:${C.muted};margin-top:1px">${r.title}</span>
+</div>`}).join('')}
+</div>
+
+<!-- Bottom section -->
+<div style="padding:4px 20px 120px">
+<div style="font-size:11px;font-weight:600;color:${C.muted};letter-spacing:1px;margin-bottom:10px">REMINDERS</div>
+${R.map(r=>`
+<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:${C.surface};border-radius:14px;margin-bottom:6px;border-left:3px solid ${r.enabled?r.color:C.border};${!r.enabled?'opacity:.45':''}">
+<span style="font-size:16px">${r.icon}</span>
+<div style="flex:1">
+<div style="font-size:13px;font-weight:600">${r.title}</div>
+<div style="font-size:11px;color:${C.muted}">${r.interval}m${r.qty?' \u00b7 '+r.qty:''}</div>
+</div>
+<span style="font-size:13px;font-family:monospace;font-weight:600;color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'--:--'}</span>
+<div style="width:28px;height:28px;border-radius:8px;background:${C.border};display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer">\u270E</div>
+</div>`).join('')}
+
+<!-- Add button -->
+<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border:1px dashed ${C.border};border-radius:14px;margin-top:6px;cursor:pointer;color:${C.primary}">
+<span style="font-size:18px">+</span><span style="font-size:13px;font-weight:600">Add Reminder</span>
+</div>
+</div>
+
+<!-- Fixed bottom START -->
+<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,${C.bg} 35%);padding:20px 20px 34px">
+<div style="padding:16px;border-radius:16px;background:linear-gradient(135deg,${C.amber},#f97316);text-align:center;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;color:#000;box-shadow:0 4px 20px ${C.amber}30">\u25B6 START REMINDERS</div>
+</div>`;
+
+B.editing=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between">
+<div style="font-size:20px;font-weight:700">Zenu</div>
+<div style="padding:6px 10px;border-radius:8px;background:${C.surface};font-size:12px;color:${C.muted}">&#9790;</div>
+</div>
+
+<!-- Bubbles dimmed -->
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px;padding:16px 20px 10px;opacity:.25">
+${R.map((r,i)=>{const s=[100,88,94,76][i];return`
+<div style="width:${s}px;height:${s}px;border-radius:50%;background:${r.color}12;border:2px solid ${i===1?r.color:C.border};display:flex;flex-direction:column;align-items:center;justify-content:center">
+<span style="font-size:${s/3.5}px">${r.icon}</span></div>`}).join('')}
+</div>
+
+<!-- Inline edit card (Eye Rest selected) -->
+<div style="padding:0 20px 34px">
+<div style="background:${C.surface};border-radius:20px;border:1px solid ${R[1].color}40;overflow:hidden">
+<!-- Header -->
+<div style="padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid ${C.border}">
+<div style="width:44px;height:44px;border-radius:50%;background:${R[1].color}20;display:flex;align-items:center;justify-content:center;font-size:22px">${R[1].icon}</div>
+<div style="flex:1"><div style="font-size:16px;font-weight:700">Eye Rest</div><div style="font-size:11px;color:${C.muted}">20-20-20 rule</div></div>
+<div style="width:44px;height:24px;border-radius:12px;background:${C.green};position:relative;cursor:pointer"><div style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;right:2px;top:2px"></div></div>
+</div>
+
+<div style="padding:14px 16px">
+<!-- Interval -->
+<div style="margin-bottom:14px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:11px;color:${C.muted};font-weight:600">EVERY</span><span style="font-size:15px;font-weight:700;color:${R[1].color}">20 min</span></div>
+<div style="display:flex;gap:6px">
+${[10,15,20,30,45,60].map(v=>`<div style="flex:1;padding:7px 0;border-radius:8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;${v===20?`background:${R[1].color}25;border:1px solid ${R[1].color};color:${R[1].color}`:`background:${C.bg};border:1px solid ${C.border};color:${C.muted}`}">${v}</div>`).join('')}
+</div>
+</div>
+
+<!-- Duration -->
+<div style="margin-bottom:14px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:11px;color:${C.muted};font-weight:600">LOOK AWAY FOR</span><span style="font-size:15px;font-weight:700;color:${R[1].color}">20 sec</span></div>
+<div style="display:flex;gap:6px">
+${[10,20,30,60].map(v=>`<div style="flex:1;padding:7px 0;border-radius:8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;${v===20?`background:${R[1].color}25;border:1px solid ${R[1].color};color:${R[1].color}`:`background:${C.bg};border:1px solid ${C.border};color:${C.muted}`}">${v}s</div>`).join('')}
+</div>
+</div>
+
+<!-- Icon row -->
+<div style="margin-bottom:14px">
+<div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:6px">ICON</div>
+<div style="display:flex;gap:6px">
+${['\u{1F440}','\u{1F453}','\u{1F4BB}','\u{2728}','\u{1F31F}'].map((ic,i)=>`<div style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;${i===0?`background:${R[1].color}20;border:1px solid ${R[1].color}`:`background:${C.bg};border:1px solid ${C.border}`}">${ic}</div>`).join('')}
+</div></div>
+
+<!-- Actions -->
+<div style="display:flex;gap:8px">
+<div style="flex:1;padding:12px;border-radius:12px;background:${R[1].color};text-align:center;font-weight:700;font-size:14px;cursor:pointer">Done</div>
+<div style="width:44px;padding:12px;border-radius:12px;background:${C.exercise}15;text-align:center;font-size:16px;cursor:pointer;color:${C.exercise}">\u{1F5D1}</div>
+</div>
+</div></div>
+</div>`;
+
+B.running=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between">
+<div style="font-size:20px;font-weight:700">Zenu</div>
+<div style="padding:6px 10px;border-radius:8px;background:${C.green}15;font-size:12px;color:${C.green};border:1px solid ${C.green}30">\u25CF Running</div>
+</div>
+
+<!-- Animated bubbles with progress -->
+<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px;padding:16px 20px 10px;min-height:240px">
+${R.map((r,i)=>{const s=[108,96,100,80][i];const pct=[58,75,29,0][i];return`
+<div style="position:relative;width:${s}px;height:${s}px;${!r.enabled?'opacity:.25':''}">
+<svg viewBox="0 0 ${s} ${s}" style="position:absolute;top:0;left:0;transform:rotate(-90deg)">
+<circle cx="${s/2}" cy="${s/2}" r="${s/2-3}" fill="${r.color}08" stroke="${C.border}" stroke-width="2"/>
+${r.enabled?`<circle cx="${s/2}" cy="${s/2}" r="${s/2-3}" fill="none" stroke="${r.color}" stroke-width="3" stroke-dasharray="${2*Math.PI*(s/2-3)}" stroke-dashoffset="${2*Math.PI*(s/2-3)*(1-pct/100)}" stroke-linecap="round"/>`:''}</svg>
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+<span style="font-size:${s/3.5}px">${r.icon}</span>
+<div style="font-size:12px;font-weight:700;color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'Off'}</div>
+<div style="font-size:9px;color:${C.muted}">${r.title}</div>
+</div></div>`}).join('')}
+</div>
+
+<div style="padding:4px 20px 120px">
+${R.filter(r=>r.enabled).map(r=>`
+<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:${C.surface};border-radius:14px;margin-bottom:6px;border-left:3px solid ${r.color}">
+<span style="font-size:16px">${r.icon}</span>
+<div style="flex:1"><span style="font-size:13px;font-weight:600">${r.title}</span></div>
+<span style="font-size:15px;font-family:monospace;font-weight:700;color:${r.color}">${r.next}</span>
+</div>`).join('')}
+</div>
+
+<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,${C.bg} 35%);padding:20px 20px 34px">
+<div style="padding:16px;border-radius:16px;background:linear-gradient(135deg,${C.exercise},#dc2626);text-align:center;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;box-shadow:0 4px 20px ${C.exercise}30">\u25A0 STOP</div>
+</div>`;
+
+B.triggered=A.triggered;
+
+
+// ============== MOCKUP C: FOCUS SPLIT ==============
+const Cs={};
+
+Cs.normal=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between;background:${C.surface}">
+<div style="font-size:20px;font-weight:700">Zenu</div>
+<div style="display:flex;gap:6px">
+<div style="padding:6px 10px;border-radius:8px;background:${C.bg};font-size:12px;color:${C.muted}">&#9790;</div>
+</div></div>
+
+<!-- Focus card: next reminder -->
+<div style="background:${C.surface};padding:0 20px 20px;border-radius:0 0 24px 24px">
+<div style="text-align:center;padding:16px 0">
+<span style="font-size:11px;color:${C.muted};font-weight:600;letter-spacing:1px">NEXT UP</span>
+<div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px">
+<div style="width:52px;height:52px;border-radius:50%;background:${R[1].color}20;border:2px solid ${R[1].color};display:flex;align-items:center;justify-content:center;font-size:26px">${R[1].icon}</div>
+<div style="text-align:left"><div style="font-size:16px;font-weight:700">${R[1].title}</div>
+<div style="font-size:32px;font-weight:700;font-family:monospace;color:${R[1].color};line-height:1">${R[1].next}</div></div>
+</div>
+</div></div>
+
+<!-- Reminder list -->
+<div style="padding:16px 20px 120px">
+<div style="font-size:11px;font-weight:600;color:${C.muted};letter-spacing:1px;margin-bottom:10px">ALL REMINDERS</div>
+${R.map((r,i)=>`
+<div style="display:flex;align-items:center;gap:12px;padding:14px;background:${C.surface};border-radius:14px;margin-bottom:8px;${!r.enabled?'opacity:.4':''}${i===1?';border:1px solid '+r.color+'30':''}">
+<div style="width:42px;height:42px;border-radius:50%;background:${r.color}15;display:flex;align-items:center;justify-content:center;font-size:18px">${r.icon}</div>
+<div style="flex:1">
+<div style="font-size:14px;font-weight:600">${r.title}</div>
+<div style="font-size:11px;color:${C.muted}">${r.interval}m${r.qty?' \u00b7 '+r.qty:''}</div>
+</div>
+<div style="text-align:right">
+<div style="font-size:14px;font-family:monospace;font-weight:700;color:${r.enabled?r.color:C.muted}">${r.enabled?r.next:'Off'}</div>
+</div>
+<div style="width:28px;height:28px;border-radius:8px;background:${C.border};display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer">\u270E</div>
+</div>`).join('')}
+
+<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:1px dashed ${C.border};border-radius:14px;margin-top:4px;cursor:pointer;color:${C.primary}">
+<span style="font-size:18px">+</span><span style="font-size:13px;font-weight:600">Add Reminder</span>
+</div>
+</div>
+
+<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,${C.bg} 35%);padding:20px 20px 34px">
+<div style="padding:16px;border-radius:16px;background:linear-gradient(135deg,${C.amber},#f97316);text-align:center;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;color:#000;box-shadow:0 4px 20px ${C.amber}30">\u25B6 START REMINDERS</div>
+</div>`;
+
+Cs.editing=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between;background:${C.surface}">
+<div style="font-size:20px;font-weight:700">Zenu</div>
+<div style="padding:6px 12px;border-radius:8px;background:${C.bg};font-size:12px;color:${C.muted};cursor:pointer">Cancel</div>
+</div>
+
+<!-- Edit view replaces focus card -->
+<div style="background:${C.surface};padding:0 20px 20px;border-radius:0 0 24px 24px">
+<div style="padding:14px 0 0">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+<div style="width:48px;height:48px;border-radius:50%;background:${R[0].color}20;display:flex;align-items:center;justify-content:center;font-size:24px">${R[0].icon}</div>
+<div style="flex:1"><input type="text" value="Drink Water" style="background:none;border:none;color:${C.text};font-size:18px;font-weight:700;width:100%;outline:none;border-bottom:2px solid ${R[0].color}"></div>
+<div style="width:44px;height:24px;border-radius:12px;background:${C.green};position:relative"><div style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;right:2px;top:2px"></div></div>
+</div>
+</div></div>
+
+<!-- Edit fields -->
+<div style="padding:16px 20px 34px">
+<div style="background:${C.surface};border-radius:16px;padding:16px;margin-bottom:10px">
+<div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:10px">REMIND EVERY</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+${[15,20,30,45,60,90,120].map(v=>`<div style="padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;${v===30?`background:${R[0].color}25;border:1px solid ${R[0].color};color:${R[0].color}`:`background:${C.bg};border:1px solid ${C.border};color:${C.muted}`}">${v} min</div>`).join('')}
+</div>
+</div>
+
+<div style="background:${C.surface};border-radius:16px;padding:16px;margin-bottom:10px">
+<div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:10px">AMOUNT</div>
+<div style="display:flex;align-items:center;justify-content:center;gap:20px;padding:8px 0">
+<div style="width:40px;height:40px;border-radius:50%;background:${C.bg};border:1px solid ${C.border};display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer">&minus;</div>
+<span style="font-size:28px;font-weight:700;color:${R[0].color};font-family:monospace">250ml</span>
+<div style="width:40px;height:40px;border-radius:50%;background:${C.bg};border:1px solid ${C.border};display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer">+</div>
+</div></div>
+
+<div style="display:flex;gap:8px;margin-bottom:10px">
+<div style="flex:1;background:${C.surface};border-radius:16px;padding:16px">
+<div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:8px">ICON</div>
+<div style="display:flex;gap:5px;flex-wrap:wrap">
+${['\u{1F4A7}','\u{1F6B0}','\u{1FAD7}','\u{2615}','\u{1F964}','\u{1F37A}'].map((ic,i)=>`<div style="width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;${i===0?`background:${R[0].color}20;border:1px solid ${R[0].color}`:`background:${C.bg};border:1px solid ${C.border}`}">${ic}</div>`).join('')}
+</div></div>
+<div style="flex:1;background:${C.surface};border-radius:16px;padding:16px">
+<div style="font-size:11px;color:${C.muted};font-weight:600;margin-bottom:8px">COLOR</div>
+<div style="display:flex;gap:5px;flex-wrap:wrap">
+${[C.water,C.eye,C.green,C.primary,C.exercise,C.amber].map((c,i)=>`<div style="width:34px;height:34px;border-radius:8px;background:${c};cursor:pointer;${i===0?'border:2px solid #fff':'border:2px solid transparent'};opacity:${i===0?1:.6}"></div>`).join('')}
+</div></div>
+</div>
+
+<div style="display:flex;gap:8px">
+<div style="flex:1;padding:14px;border-radius:14px;background:${R[0].color};text-align:center;font-weight:700;font-size:15px;cursor:pointer">Save Changes</div>
+<div style="width:50px;padding:14px;border-radius:14px;background:${C.exercise}15;text-align:center;font-size:18px;cursor:pointer;color:${C.exercise}">\u{1F5D1}</div>
+</div>
+</div>`;
+
+Cs.running=()=>`
+<div style="padding:54px 20px 12px;display:flex;align-items:center;justify-content:space-between;background:${C.surface}">
+<div style="font-size:20px;font-weight:700">Zenu</div>
+<div style="padding:6px 10px;border-radius:8px;background:${C.green}15;font-size:12px;color:${C.green};border:1px solid ${C.green}30">\u25CF Running</div>
+</div>
+
+<div style="background:${C.surface};padding:0 20px 20px;border-radius:0 0 24px 24px">
+<div style="text-align:center;padding:16px 0">
+<span style="font-size:11px;color:${C.green};font-weight:600;letter-spacing:1px">NEXT UP IN</span>
+<div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px">
+<div style="position:relative;width:60px;height:60px">
+<svg viewBox="0 0 60 60" style="position:absolute;top:0;left:0;transform:rotate(-90deg)">
+<circle cx="30" cy="30" r="27" fill="${R[1].color}12" stroke="${C.border}" stroke-width="2"/>
+<circle cx="30" cy="30" r="27" fill="none" stroke="${R[1].color}" stroke-width="3" stroke-dasharray="${2*Math.PI*27}" stroke-dashoffset="${2*Math.PI*27*0.25}" stroke-linecap="round"/></svg>
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:26px">${R[1].icon}</div></div>
+<div style="text-align:left"><div style="font-size:16px;font-weight:700">${R[1].title}</div>
+<div style="font-size:36px;font-weight:700;font-family:monospace;color:${R[1].color};line-height:1">${R[1].next}</div></div>
+</div></div></div>
+
+<div style="padding:16px 20px 120px">
+${R.filter(r=>r.enabled).map(r=>`
+<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:${C.surface};border-radius:14px;margin-bottom:6px">
+<div style="position:relative;width:38px;height:38px">
+<svg viewBox="0 0 38 38" style="transform:rotate(-90deg)">
+<circle cx="19" cy="19" r="16" fill="${r.color}10" stroke="${C.border}" stroke-width="1.5"/>
+<circle cx="19" cy="19" r="16" fill="none" stroke="${r.color}" stroke-width="2" stroke-dasharray="${2*Math.PI*16}" stroke-dashoffset="${2*Math.PI*16*0.4}" stroke-linecap="round"/></svg>
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px">${r.icon}</div></div>
+<div style="flex:1"><span style="font-size:13px;font-weight:600">${r.title}</span></div>
+<span style="font-size:15px;font-family:monospace;font-weight:700;color:${r.color}">${r.next}</span>
+</div>`).join('')}
+</div>
+
+<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,${C.bg} 35%);padding:20px 20px 34px">
+<div style="padding:16px;border-radius:16px;background:linear-gradient(135deg,${C.exercise},#dc2626);text-align:center;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;box-shadow:0 4px 20px ${C.exercise}30">\u25A0 STOP</div>
+</div>`;
+
+Cs.triggered=A.triggered;
+
+
+// ============== WIRE UP ==============
+const mockups=[A,B,Cs];
+const names=['A. Orbital','B. Bubbles','C. Focus Split'];
+
+function render(){
+  const m=mockups[currentMockup];
+  const fn=m[currentState]||m.normal;
+  document.getElementById('screen').innerHTML=fn();
+}
+function show(i){
+  currentMockup=i;
+  document.querySelectorAll('.pill').forEach((p,j)=>p.classList.toggle('active',j===i));
+  render();
+}
+function setState(s){
+  currentState=s;
+  document.querySelectorAll('.st-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===s));
+  render();
+}
+render();
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'&&currentMockup<2)show(currentMockup+1);
+  if(e.key==='ArrowLeft'&&currentMockup>0)show(currentMockup-1);
+});
+</script>
+<style>@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}</style>
+</body>
+</html>

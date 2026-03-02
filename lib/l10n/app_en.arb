@@ -689,5 +689,151 @@
     "placeholders": {
       "reminderTitle": {"type": "String"}
     }
+  },
+  "categoryHealth": "Health",
+  "@categoryHealth": {
+    "description": "Health category header in template picker"
+  },
+  "categoryExercise": "Exercise",
+  "@categoryExercise": {
+    "description": "Exercise category header in template picker"
+  },
+  "categoryMindBody": "Mind & Body",
+  "@categoryMindBody": {
+    "description": "Mind & Body category header in template picker"
+  },
+  "pushUps": "Push-ups",
+  "@pushUps": {
+    "description": "Push-ups exercise name"
+  },
+  "pullUps": "Pull-ups",
+  "@pullUps": {
+    "description": "Pull-ups exercise name"
+  },
+  "squats": "Squats",
+  "@squats": {
+    "description": "Squats exercise name"
+  },
+  "stretching": "Stretching",
+  "@stretching": {
+    "description": "Stretching exercise name"
+  },
+  "jumpingJacks": "Jumping Jacks",
+  "@jumpingJacks": {
+    "description": "Jumping jacks exercise name"
+  },
+  "planks": "Planks",
+  "@planks": {
+    "description": "Planks exercise name"
+  },
+  "burpees": "Burpees",
+  "@burpees": {
+    "description": "Burpees exercise name"
+  },
+  "deepBreathing": "Deep Breathing",
+  "@deepBreathing": {
+    "description": "Deep breathing activity name"
+  },
+  "meditationTitle": "Meditation",
+  "@meditationTitle": {
+    "description": "Meditation activity name"
+  },
+  "deepBreathingDescription": "Calm your mind with breathing exercises",
+  "@deepBreathingDescription": {
+    "description": "Deep breathing description"
+  },
+  "meditationDescription": "Clear your mind and find focus",
+  "@meditationDescription": {
+    "description": "Meditation description"
+  },
+  "notificationTimeForDeepBreathing": "Take a deep breath and relax.",
+  "@notificationTimeForDeepBreathing": {
+    "description": "Notification message for deep breathing reminder"
+  },
+  "notificationTimeForMeditation": "Take a moment to clear your mind.",
+  "@notificationTimeForMeditation": {
+    "description": "Notification message for meditation reminder"
+  },
+  "stillRunning": "Still running",
+  "@stillRunning": {
+    "description": "Label for reminders still running in triggered overlay"
+  },
+  "interval": "Interval",
+  "@interval": {
+    "description": "Interval label in edit drawer"
+  },
+  "enabledLabel": "Enabled",
+  "@enabledLabel": {
+    "description": "Enabled switch label in edit drawer"
+  },
+  "inactive": "Inactive",
+  "@inactive": {
+    "description": "Inactive section label"
+  },
+  "tapToEnable": "{title} — tap to enable",
+  "@tapToEnable": {
+    "description": "Tooltip for inactive reminder",
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "doneButton": "Done",
+  "@doneButton": {
+    "description": "Done button label without exclamation"
+  },
+  "doubleTapToToggle": "Double tap to toggle",
+  "@doubleTapToToggle": {
+    "description": "Accessibility hint for toggle button"
+  },
+  "doubleTapToCycleTheme": "Double tap to cycle theme",
+  "@doubleTapToCycleTheme": {
+    "description": "Accessibility hint for theme cycle button"
+  },
+  "doubleTapToAddReminder": "Double tap to add your first health reminder",
+  "@doubleTapToAddReminder": {
+    "description": "Accessibility hint for add reminder button"
+  },
+  "themeSystem": "Theme: System",
+  "@themeSystem": {
+    "description": "System theme accessibility label"
+  },
+  "themeLight": "Theme: Light",
+  "@themeLight": {
+    "description": "Light theme accessibility label"
+  },
+  "themeDark": "Theme: Dark",
+  "@themeDark": {
+    "description": "Dark theme accessibility label"
+  },
+  "due": "due",
+  "@due": {
+    "description": "Due label for overdue reminders"
+  },
+  "last30Days": "Last 30 Days",
+  "@last30Days": {
+    "description": "Last 30 days section title"
+  },
+  "times": "{count} times",
+  "@times": {
+    "description": "Number of times completed",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "dailyAverage": "Daily avg",
+  "@dailyAverage": {
+    "description": "Daily average label"
+  },
+  "noCompletionsYet": "No completions yet",
+  "@noCompletionsYet": {
+    "description": "Empty state for statistics"
+  },
+  "total": "Total",
+  "@total": {
+    "description": "Total label"
+  },
+  "timersReset": "Timers reset",
+  "@timersReset": {
+    "description": "Feedback message after clearing all timers"
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../../mocks/mock_adapters.dart';
 import '../../../fixtures/test_data.dart';
 import '../../../test_config.dart';
 
@@ -395,10 +394,10 @@ void main() {
     group('Notification Interaction', () {
       test('should handle notification tap', () async {
         // Arrange
-        Map<String, dynamic>? receivedResponse;
+        Map? receivedResponse;
         MockPlatformChannel.setMockMethodCallHandler((MethodCall call) async {
           if (call.method == 'onNotificationResponse') {
-            receivedResponse = call.arguments;
+            receivedResponse = Map<String, dynamic>.from(call.arguments as Map);
             return null;
           }
           return null;
@@ -414,15 +413,15 @@ void main() {
         // Assert
         expect(receivedResponse, isNotNull);
         expect(receivedResponse!['actionIdentifier'], equals('com.apple.UNNotificationDefaultActionIdentifier'));
-        expect(receivedResponse!['userInfo']['reminderId'], equals('water_1'));
+        expect((receivedResponse!['userInfo'] as Map)['reminderId'], equals('water_1'));
       });
 
       test('should handle custom action response', () async {
         // Arrange
-        Map<String, dynamic>? receivedResponse;
+        Map? receivedResponse;
         MockPlatformChannel.setMockMethodCallHandler((MethodCall call) async {
           if (call.method == 'onNotificationResponse') {
-            receivedResponse = call.arguments;
+            receivedResponse = Map<String, dynamic>.from(call.arguments as Map);
             return null;
           }
           return null;
@@ -441,10 +440,10 @@ void main() {
 
       test('should handle text input action response', () async {
         // Arrange
-        Map<String, dynamic>? receivedResponse;
+        Map? receivedResponse;
         MockPlatformChannel.setMockMethodCallHandler((MethodCall call) async {
           if (call.method == 'onNotificationResponse') {
-            receivedResponse = call.arguments;
+            receivedResponse = Map<String, dynamic>.from(call.arguments as Map);
             return null;
           }
           return null;

@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../../mocks/mock_adapters.dart';
 import '../../../fixtures/test_data.dart';
 import '../../../test_config.dart';
 
@@ -138,7 +137,7 @@ void main() {
         // Arrange
         MockPlatformChannel.setMockMethodCallHandler((MethodCall call) async {
           if (call.method == 'showNotification') {
-            final actions = call.arguments['actions'] as List<Map>;
+            final actions = (call.arguments['actions'] as List).cast<Map>();
             expect(actions.length, equals(2));
             expect(actions[0]['title'], equals('Complete'));
             expect(actions[0]['action'], equals('complete'));
