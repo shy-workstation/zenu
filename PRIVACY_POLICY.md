@@ -1,8 +1,8 @@
 # Privacy Policy for Zenu - Personal Wellness Reminder Assistant
 
-**Effective Date:** August 21, 2025  
-**Last Updated:** August 21, 2025  
-**Version:** 1.0
+**Effective Date:** August 21, 2025
+**Last Updated:** March 9, 2026
+**Version:** 1.1
 
 ---
 
@@ -104,11 +104,11 @@ To delete all your data:
 
 ## **Third-Party Services**
 
-### **Microsoft Store Platform**
+### **App Distribution Platforms**
 
-- **Distribution Only**: Microsoft Store is used solely for app distribution
-- **No Data Sharing**: No user data is shared with Microsoft beyond standard app telemetry
-- **Store Policies**: We comply with Microsoft Store privacy requirements
+- **Distribution Only**: Microsoft Store and Google Play Store are used solely for app distribution
+- **No Data Sharing**: No user data is shared with platform providers beyond standard app telemetry
+- **Store Policies**: We comply with Microsoft Store and Google Play Store privacy requirements
 
 ### **No External Dependencies**
 
@@ -193,8 +193,8 @@ Our privacy approach includes:
 
 - **Developer**: Yousof Shehada
 - **App**: Zenu - Personal Wellness Reminder Assistant
-- **Store ID**: 9PHV0W6NVW2S
-- **Contact**: Through Microsoft Store support system
+- **Microsoft Store ID**: 9PHV0W6NVW2S
+- **Contact**: Through Microsoft Store or Google Play Store support
 
 ### **Questions or Concerns**
 
@@ -221,4 +221,4 @@ For privacy-related questions:
 
 ---
 
-*This Privacy Policy is effective as of August 21, 2025, and applies to all users of the Zenu application distributed through the Microsoft Store.*
+*This Privacy Policy is effective as of August 21, 2025 (last updated March 9, 2026), and applies to all users of the Zenu application distributed through the Microsoft Store and Google Play Store.*

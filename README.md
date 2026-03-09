@@ -1,18 +1,29 @@
-# Zenu 🏥
+# Zenu - Personal Wellness Reminder Assistant
 
-A comprehensive Flutter app that helps you maintain healthy habits throughout your workday with customizable reminders for eye rest, exercise, hydration, and more.
+Your personal wellness companion that helps you maintain healthy habits throughout your workday with customizable reminders for eye rest, exercise, hydration, and more.
 
-## ✨ Features
+[![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-blue?logo=microsoft)](https://apps.microsoft.com/detail/9PHV0W6NVW2S)
+[![Version](https://img.shields.io/badge/version-1.1.0-green)](CHANGELOG.md)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://flutter.dev)
 
-- **🏋️ Exercise Reminders**: Pull-ups (4 reps) and push-ups (5 reps) every 10 minutes
-- **👁️ Eye Rest**: 20-second eye breaks every 20 minutes  
-- **🚶 Movement**: Stand and move reminders every 40 minutes
-- **💧 Hydration**: Water intake reminders every 30 minutes
-- **🤸 Stretching**: Body stretch reminders every 45 minutes
-- **📊 Statistics**: Daily, weekly, and all-time progress tracking
-- **⚙️ Customizable**: Adjust intervals (1-120 min) and exercise counts (1-50 reps)
-- **🔔 Smart Notifications**: System notifications with sound and vibration
-- **💾 Data Persistence**: All settings and stats saved locally
+## Download
+
+**Windows**: [Get it from the Microsoft Store](https://apps.microsoft.com/detail/9PHV0W6NVW2S)
+
+## Features
+
+- **Exercise Reminders**: Customizable pull-ups, push-ups, and workout reminders
+- **Eye Rest**: 20-20-20 rule reminders for eye health
+- **Movement Breaks**: Stand and move reminders to combat sedentary behavior
+- **Hydration Tracking**: Water intake reminders throughout the day
+- **Stretching**: Body stretch reminders to improve flexibility
+- **Statistics Dashboard**: Daily, weekly, and all-time progress tracking
+- **Fully Customizable**: Adjust intervals (1-120 min) and exercise counts (1-50 reps)
+- **Smart Notifications**: Native system notifications with FloatingPill UI
+- **Swipeable Cards**: Intuitive gesture-based reminder management
+- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **Privacy-First**: All data stored locally, no cloud required
+- **Dark/Light Theme**: Automatic theme support
 
 ## 🚀 Getting Started
 
@@ -52,14 +63,20 @@ A comprehensive Flutter app that helps you maintain healthy habits throughout yo
 ### Build for Release
 
 ```bash
+# Windows (MSIX for Microsoft Store)
+flutter pub run msix:create
+
+# Windows (standalone)
+flutter build windows --release
+
 # Android APK
 flutter build apk --release
 
 # Android App Bundle
 flutter build appbundle --release
 
-# iOS
-flutter build ios --release
+# macOS
+flutter build macos --release
 ```
 
 ## 📱 How to Use
@@ -103,13 +120,15 @@ lib/
 | Water | 30 minutes | - | Cyan |
 | Stretch | 45 minutes | - | Purple |
 
-## 🛠️ Technologies Used
+## Technologies Used
 
-- **Flutter** - Cross-platform mobile framework
-- **Dart** - Programming language
+- **Flutter 3.35+** - Cross-platform framework
+- **Dart 3.9+** - Programming language
 - **SharedPreferences** - Local data persistence
-- **Flutter Local Notifications** - System notifications
-- **Material 3** - Modern UI design system
+- **Flutter Local Notifications** - Native system notifications
+- **Material Design 3** - Modern UI design system
+- **MSIX** - Windows Store packaging
+- **Window Manager** - Desktop window control
 
 ## 📊 Statistics Features
 
@@ -142,10 +161,22 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📞 Support
+## Privacy
 
-If you have any questions or need help, please [open an issue](../../issues) on GitHub.
+Zenu is designed with privacy-first principles. All data is stored locally on your device - no cloud sync, no tracking, no ads. See our [Privacy Policy](PRIVACY_POLICY.md) for details.
+
+## Support
+
+- **Windows Store**: [Microsoft Store Listing](https://apps.microsoft.com/detail/9PHV0W6NVW2S)
+- **Issues**: [GitHub Issues](../../issues)
+- **Changelog**: [View Changes](CHANGELOG.md)
+
+## System Requirements
+
+- Windows 10 (1903) or later / macOS 10.14+ / Linux
+- 4 GB RAM minimum
+- 200 MB free disk space
 
 ---
 
-**Stay healthy and productive! 💪**
+**Stay healthy and productive with Zenu!**

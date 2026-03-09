@@ -1,19 +1,32 @@
 # Zenu Release Information
 
-**Version:** 1.0.2
-**Build:** 4  
-**Release Date:** August 21, 2025
+**Version:** 1.1.0
+**Build:** 0
+**Release Date:** March 9, 2026
 **Platform:** Windows x64
 **Flutter Version:** 3.35.1+
 **Dart Version:** 3.9.0+
 
-## Major Changes in v1.0.2
+## Major Changes in v1.1.0
 
-### App Rebranding
+### New Features
 
-- **App Name:** Changed from "Zenyu" to "Zenu"
-- **App Icon:** Updated to use new `app_icon_zenu.png` design
-- **Executable:** Renamed to `Zenu.exe`
+- **FloatingPill Notifications**: Elegant inline card-based notification system
+- **Swipeable Reminder Cards**: Enhanced gesture support with improved state management
+- **Cross-Platform Optimizations**: Platform-specific performance improvements
+- **Batched Data Service**: Reliable data persistence with retry logic
+
+### Windows Improvements
+
+- Fixed notification action handling for proper body click parsing
+- Improved notification deduplication
+- Better Windows integration
+
+### Performance
+
+- Memory leak fixes across multiple components
+- Optimized data service with exponential backoff
+- Improved code quality and analyzer compliance
 
 ## Build Information
 
@@ -21,66 +34,28 @@
 - **Optimization:** Enabled
 - **Debug Info:** Stripped
 - **Size Optimization:** Enabled
-
-## File Checksums (SHA256)
-
-- Zenyu.exe: [Generated on first run]
-- flutter_windows.dll: [Runtime dependency]
-- flutter_local_notifications_windows.dll: [Notifications support]
+- **Store:** Microsoft Store certified
 
 ## Dependencies
 
-- Flutter Framework
+- Flutter Framework 3.35+
 - Windows Local Notifications
 - Material Design 3
-- Provider State Management
-
-## Release Notes - v1.0.0
-
-### ✨ New Features
-
-- Complete dynamic reminder system
-- 40+ customizable icons
-- 19+ color themes  
-- Smart statistics tracking
-- Modern Material Design 3 interface
-- System and in-app notifications
-- Performance optimizations
-- Error handling and logging
-- Memory caching system
-- App lifecycle management
-
-### 🎯 Core Functionality
-
-- Create, edit, and delete reminders
-- Customizable timing (1 minute to 7 days)
-- Completion tracking and statistics
-- Dark and light theme support
-- Snooze and notification management
-
-### 🔧 Technical Improvements
-
-- Production-ready error handling
-- Memory optimization and caching
-- Performance monitoring
-- Input validation
-- Comprehensive logging system
-- App state management
-
-### 🧘 Zenyu Experience
-
-- Clean, zen-inspired design
-- Intuitive user interface
-- Smooth animations
-- Responsive layout
-- Accessibility features
+- MSIX Packaging
 
 ## Installation
 
+### Microsoft Store (Recommended)
+
+1. Visit [Microsoft Store](https://apps.microsoft.com/detail/9PHV0W6NVW2S)
+2. Click "Get" to install
+3. Launch Zenu from Start Menu
+
+### Manual Installation
+
 1. Extract all files to a folder
-2. Double-click Zenyu.exe to launch
-3. Windows may show a security warning (click "More info" → "Run anyway")
-4. Create your first reminder and start your wellness journey!
+2. Double-click Zenu.exe to launch
+3. Windows may show a security warning (click "More info" then "Run anyway")
 
 ## System Requirements
 
@@ -88,7 +63,7 @@
 - x64 processor architecture
 - 4 GB RAM minimum
 - 200 MB free disk space
-- Visual C++ Redistributable (usually pre-installed)
 
 ---
-Built with ❤️ for your wellness journey
+
+Built with care for your wellness journey
