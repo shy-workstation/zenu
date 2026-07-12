@@ -243,7 +243,7 @@ class MockSetupHelpers {
     when(mock.textPrimary).thenReturn(isDarkMode ? Colors.white : Colors.black);
     when(mock.textSecondary).thenReturn(isDarkMode ? Colors.grey[400]! : Colors.grey[600]!);
     when(mock.shadowColor).thenReturn(Colors.grey.withValues(alpha: 0.1));
-    when(mock.toggleTheme()).thenAnswer((_) async {});
+    when(mock.cycleTheme()).thenAnswer((_) async {});
   }
 }
 

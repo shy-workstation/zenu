@@ -57,6 +57,36 @@ class MockNotificationService extends _i1.Mock
       ) as _i4.Future<void>);
 
   @override
+  _i4.Future<void> scheduleReminder(
+    _i5.Reminder? reminder, {
+    int? horizon = 5,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #scheduleReminder,
+          [reminder],
+          {#horizon: horizon},
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> cancelReminder(
+    String? reminderId, {
+    int? horizon = 5,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #cancelReminder,
+          [reminderId],
+          {#horizon: horizon},
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
   _i4.Future<void> cancelNotification(int? id) => (super.noSuchMethod(
         Invocation.method(
           #cancelNotification,

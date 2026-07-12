@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:mockito/mockito.dart';
 
 /// Mock notification adapter for testing platform-specific notifications
