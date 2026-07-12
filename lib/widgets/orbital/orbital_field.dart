@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart' show Ticker;
 import '../../models/reminder.dart';
 import 'orbital_rings_painter.dart';
 import 'center_button.dart';
@@ -14,8 +15,6 @@ class OrbitalField extends StatefulWidget {
   final void Function(Reminder) onLongPressBubble;
   final VoidCallback onAddReminder;
   final VoidCallback? onClearTimers;
-
-  static const double _bubbleSize = 64;
 
   const OrbitalField({
     super.key,
@@ -34,8 +33,34 @@ class OrbitalField extends StatefulWidget {
 }
 
 class _OrbitalFieldState extends State<OrbitalField>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _wispCtrl;
+
+  // Orbital drift. The angle is *accumulated* from elapsed frame time and only
+  // advances while actively drifting, so it is monotonic: pausing simply stops
+  // adding to it (bubbles hold their exact positions) and resuming continues
+  // from the identical value — no jump, ever.
+  late Ticker _driftTicker;
+  Duration _lastElapsed = Duration.zero;
+  double _rotation = 0; // accumulated drift angle in radians
+  bool _touching = false;
+
+  // Seconds for one full turn of the base ring.
+  static const double _driftPeriodSeconds = 300;
+
+  bool get _drifting => widget.isRunning && !_touching;
+
+  void _onDriftTick(Duration elapsed) {
+    final dt = elapsed - _lastElapsed;
+    _lastElapsed = elapsed;
+    if (!_drifting) return;
+    // Skip abnormally large gaps (e.g. after the app was backgrounded and the
+    // ticker was muted) so the drift never lurches forward on resume.
+    if (dt.inMilliseconds > 100) return;
+    setState(() {
+      _rotation += (dt.inMicroseconds / (_driftPeriodSeconds * 1e6)) * 2 * pi;
+    });
+  }
 
   @override
   void initState() {
@@ -44,7 +69,11 @@ class _OrbitalFieldState extends State<OrbitalField>
       duration: const Duration(milliseconds: 12000),
       vsync: this,
     );
-    if (widget.isRunning) _wispCtrl.repeat();
+    _driftTicker = createTicker(_onDriftTick);
+    if (widget.isRunning) {
+      _wispCtrl.repeat();
+      _driftTicker.start();
+    }
   }
 
   @override
@@ -52,16 +81,25 @@ class _OrbitalFieldState extends State<OrbitalField>
     super.didUpdateWidget(oldWidget);
     if (widget.isRunning && !oldWidget.isRunning) {
       _wispCtrl.repeat();
+      _startDrift();
     } else if (!widget.isRunning && oldWidget.isRunning) {
       _wispCtrl
         ..stop()
         ..reset();
+      _driftTicker.stop(); // freezes _rotation at its current value
     }
+  }
+
+  void _startDrift() {
+    if (_driftTicker.isActive) return;
+    _lastElapsed = Duration.zero;
+    _driftTicker.start();
   }
 
   @override
   void dispose() {
     _wispCtrl.dispose();
+    _driftTicker.dispose();
     super.dispose();
   }
 
@@ -72,90 +110,154 @@ class _OrbitalFieldState extends State<OrbitalField>
         final fieldWidth = constraints.maxWidth;
         final fieldHeight = constraints.maxHeight;
         final orbitalSize = min(fieldWidth, fieldHeight);
-        final radius = orbitalSize * 0.45;
+
+        // Scale bubble size to the available space.
+        final bubbleSize = (orbitalSize * 0.13).clamp(40.0, 64.0);
         final center = Offset(fieldWidth / 2, fieldHeight / 2);
 
         final count = min(widget.activeReminders.length, 15);
-        final visibleRings = (count / 3).ceil();
-
-        // Collect bubble colors for wisps
-        final bubblePositions = <Offset>[];
-        final bubbleColors = <Color>[];
-        for (int i = 0; i < count; i++) {
-          bubblePositions.add(center + slotPosition(i, radius));
-          bubbleColors.add(widget.activeReminders[i].color);
-        }
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
           width: fieldWidth,
           height: fieldHeight,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // Orbit rings
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: OrbitalRingsPainter(
-                    radius: radius,
-                    opacity: 1.0,
-                    visibleRings: visibleRings,
-                  ),
-                ),
-              ),
-              // Energy wisps layer
-              if (widget.isRunning && bubblePositions.isNotEmpty)
-                Positioned.fill(
-                  child: AnimatedBuilder(
-                    animation: _wispCtrl,
-                    builder: (context, _) => CustomPaint(
-                      painter: _EnergyWispsPainter(
-                        progress: _wispCtrl.value,
-                        center: center,
-                        bubblePositions: bubblePositions,
-                        bubbleColors: bubbleColors,
+          // Freeze the drift while a finger/cursor is down so moving bubbles are
+          // easy to tap; resume when it lifts.
+          child: Listener(
+            behavior: HitTestBehavior.deferToChild,
+            onPointerDown: (_) {
+              if (widget.isRunning && !_touching) {
+                setState(() => _touching = true);
+              }
+            },
+            onPointerUp: (_) {
+              if (_touching) setState(() => _touching = false);
+            },
+            onPointerCancel: (_) {
+              if (_touching) setState(() => _touching = false);
+            },
+            child: Builder(
+              builder: (context) {
+                // The drift angle is frozen while paused/touched, so bubbles
+                // keep their exact positions instead of snapping.
+                final rotation = _rotation;
+
+                // Recompute the concentric, collision-free layout for the
+                // current drift angle. Cheap (trig for ≤15 points).
+                final layout = computeOrbitalLayout(
+                  count: count,
+                  fieldWidth: fieldWidth,
+                  fieldHeight: fieldHeight,
+                  bubbleSize: bubbleSize,
+                  rotation: rotation,
+                );
+
+                final bubblePositions = <Offset>[];
+                final bubbleColors = <Color>[];
+                for (int i = 0; i < count && i < layout.positions.length; i++) {
+                  bubblePositions.add(center + layout.positions[i]);
+                  bubbleColors.add(widget.activeReminders[i].color);
+                }
+
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Orbit rings — decorative dashed ellipses matching the
+                    // active rings.
+                    Positioned.fill(
+                      child: RepaintBoundary(
+                        child: CustomPaint(
+                          painter: OrbitalRingsPainter(
+                            ringRadii: layout.ringRadii,
+                            stretchX: layout.stretchX,
+                            stretchY: layout.stretchY,
+                            opacity: 1.0,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              // Center button with add badge
-              Positioned(
-                left: center.dx - 54,
-                top: center.dy - 54,
-                child: CenterButton(
-                  isRunning: widget.isRunning,
-                  activeCount:
-                      widget.activeReminders.where((r) => r.isEnabled).length,
-                  onToggle: widget.onToggleRunning,
-                  onAdd: count < 15 ? widget.onAddReminder : null,
-                  onClear: widget.isRunning ? widget.onClearTimers : null,
-                ),
-              ),
-              // Reminder bubbles at fixed slots
-              for (int i = 0; i < count; i++)
-                Positioned(
-                  left: center.dx +
-                      slotPosition(i, radius).dx -
-                      (OrbitalField._bubbleSize + 24) / 2,
-                  top: center.dy +
-                      slotPosition(i, radius).dy -
-                      (OrbitalField._bubbleSize + 30) / 2,
-                  child: OrbitalBubble(
-                    reminder: widget.activeReminders[i],
-                    currentTime: widget.currentTime,
-                    isRunning: widget.isRunning,
-                    size: OrbitalField._bubbleSize,
-                    onTap: () =>
-                        widget.onTapBubble(widget.activeReminders[i]),
-                    onLongPress: () =>
-                        widget.onLongPressBubble(widget.activeReminders[i]),
-                  ),
-                ),
-            ],
+                    // Energy wisps layer — kept in its own repaint boundary.
+                    if (widget.isRunning && bubblePositions.isNotEmpty)
+                      Positioned.fill(
+                        child: RepaintBoundary(
+                          child: AnimatedBuilder(
+                            animation: _wispCtrl,
+                            builder: (context, _) => CustomPaint(
+                              painter: _EnergyWispsPainter(
+                                progress: _wispCtrl.value,
+                                center: center,
+                                bubblePositions: bubblePositions,
+                                bubbleColors: bubbleColors,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    // Center start/pause button with add + clear badges.
+                    Positioned(
+                      left: center.dx - 54,
+                      top: center.dy - 54,
+                      child: CenterButton(
+                        isRunning: widget.isRunning,
+                        activeCount: widget.activeReminders
+                            .where((r) => r.isEnabled)
+                            .length,
+                        onToggle: widget.onToggleRunning,
+                        onAdd: count < 15 ? widget.onAddReminder : null,
+                        onClear: widget.isRunning ? widget.onClearTimers : null,
+                      ),
+                    ),
+                    // Reminder bubbles. While running they follow the drift each
+                    // frame (plain Positioned); while stopped they glide between
+                    // layouts on add/remove (AnimatedPositioned).
+                    for (int i = 0;
+                        i < count && i < layout.positions.length;
+                        i++)
+                      if (widget.isRunning)
+                        Positioned(
+                          key: ValueKey('slot-${widget.activeReminders[i].id}'),
+                          left: center.dx +
+                              layout.positions[i].dx -
+                              (bubbleSize + 24) / 2,
+                          top: center.dy +
+                              layout.positions[i].dy -
+                              (bubbleSize + 30) / 2,
+                          child: _bubble(i, bubbleSize),
+                        )
+                      else
+                        AnimatedPositioned(
+                          key: ValueKey('slot-${widget.activeReminders[i].id}'),
+                          duration: const Duration(milliseconds: 350),
+                          curve: Curves.easeOutCubic,
+                          left: center.dx +
+                              layout.positions[i].dx -
+                              (bubbleSize + 24) / 2,
+                          top: center.dy +
+                              layout.positions[i].dy -
+                              (bubbleSize + 30) / 2,
+                          child: _bubble(i, bubbleSize),
+                        ),
+                  ],
+                );
+              },
+            ),
           ),
         );
       },
+    );
+  }
+
+  Widget _bubble(int i, double bubbleSize) {
+    final reminder = widget.activeReminders[i];
+    return OrbitalBubble(
+      key: ValueKey(reminder.id),
+      reminder: reminder,
+      currentTime: widget.currentTime,
+      isRunning: widget.isRunning,
+      size: bubbleSize,
+      onTap: () => widget.onTapBubble(reminder),
+      onLongPress: () => widget.onLongPressBubble(reminder),
     );
   }
 }
@@ -174,7 +276,14 @@ class _EnergyWispsPainter extends CustomPainter {
   // Deterministic "random" angles per wisp slot so paths don't jitter
   static const List<double> _edgeAngles = [0.4, 2.7, 4.9, 1.2, 3.8, 5.5];
   static const List<double> _curveSigns = [1, -1, 1, -1, 1, -1];
-  static const List<double> _curveStrengths = [0.38, 0.25, 0.45, 0.32, 0.40, 0.28];
+  static const List<double> _curveStrengths = [
+    0.38,
+    0.25,
+    0.45,
+    0.32,
+    0.40,
+    0.28
+  ];
 
   _EnergyWispsPainter({
     required this.progress,
@@ -207,8 +316,7 @@ class _EnergyWispsPainter extends CustomPainter {
         final dist = sqrt(dx * dx + dy * dy);
         final perpX = -dy / dist;
         final perpY = dx / dist;
-        final curveOffset =
-            dist * _curveStrengths[slot] * _curveSigns[slot];
+        final curveOffset = dist * _curveStrengths[slot] * _curveSigns[slot];
         final ctrl = Offset(
           mid.dx + perpX * curveOffset,
           mid.dy + perpY * curveOffset,
