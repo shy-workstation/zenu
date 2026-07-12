@@ -112,6 +112,7 @@ class ReminderService extends ChangeNotifier {
       }
     }
     _pausedRemaining.clear();
+    _triggeredNotifications.clear();
 
     _timerSubscriptionId = GlobalTimerService.instance.subscribe(
       const Duration(seconds: 1),
@@ -119,6 +120,8 @@ class ReminderService extends ChangeNotifier {
       id: 'reminder_service',
     );
 
+    saveData();
+    _syncScheduledNotifications();
     notifyListeners();
   }
 
@@ -132,6 +135,7 @@ class ReminderService extends ChangeNotifier {
 
     final now = DateTime.now();
     _pausedRemaining.clear();
+    _triggeredNotifications.clear();
     for (var reminder in _reminders) {
       if (reminder.isEnabled && reminder.nextReminder != null) {
         final remaining = reminder.nextReminder!.difference(now);
@@ -142,6 +146,8 @@ class ReminderService extends ChangeNotifier {
       reminder.nextReminder = null;
     }
 
+    saveData();
+    _syncScheduledNotifications();
     notifyListeners();
   }
 
@@ -156,39 +162,63 @@ class ReminderService extends ChangeNotifier {
         }
       }
     }
+    saveData();
+    _syncScheduledNotifications();
     notifyListeners();
+  }
+
+  /// Cancels every OS-scheduled reminder and re-queues the upcoming ones so a
+  /// backgrounded/killed app still delivers reminders. No-op on desktop, which
+  /// stays alive and notifies directly from the foreground timer.
+  Future<void> _syncScheduledNotifications() async {
+    if (!NotificationService.supportsScheduling) return;
+    await _notificationService.cancelAllNotifications();
+    if (!_isRunning) return;
+    for (final reminder in _reminders) {
+      if (reminder.isEnabled && reminder.nextReminder != null) {
+        await _notificationService.scheduleReminder(reminder);
+      }
+    }
   }
 
   void _checkReminders() {
     final now = DateTime.now();
-    bool hasChanges = false;
+    bool newlyTriggered = false;
 
     for (var reminder in _reminders) {
       if (reminder.isEnabled &&
           reminder.nextReminder != null &&
           now.isAfter(reminder.nextReminder!)) {
-        _triggerReminder(reminder);
-        hasChanges = true;
+        if (_triggerReminder(reminder)) newlyTriggered = true;
       }
     }
 
-    if (hasChanges) {
+    // Only rebuild listeners when a reminder actually becomes due — not every
+    // tick while one stays overdue.
+    if (newlyTriggered) {
       notifyListeners();
     }
   }
 
-  void _triggerReminder(Reminder reminder) {
-    if (_triggeredNotifications.contains(reminder.id)) return;
+  /// Marks a reminder as triggered. Returns true only the first time.
+  /// On desktop the notification is shown here (process stays alive); on mobile
+  /// the OS-scheduled alarm delivers it instead, so we only track state.
+  bool _triggerReminder(Reminder reminder) {
+    if (_triggeredNotifications.contains(reminder.id)) return false;
 
     _triggeredNotifications.add(reminder.id);
-    _notificationService.showReminderNotification(reminder);
-    notifyListeners();
+    if (!NotificationService.supportsScheduling) {
+      _notificationService.showReminderNotification(reminder);
+    }
+    return true;
   }
 
   void completeReminder(Reminder reminder, {int? customCount}) {
     reminder.completeReminder(customCount: customCount);
     _triggeredNotifications.remove(reminder.id);
+    _notificationService.cancelReminder(reminder.id);
     saveData();
+    _syncScheduledNotifications();
     notifyListeners();
   }
 
@@ -204,11 +234,14 @@ class ReminderService extends ChangeNotifier {
 
       if (!_reminders[index].isEnabled) {
         _reminders[index].nextReminder = null;
+        _triggeredNotifications.remove(reminderId);
+        _notificationService.cancelReminder(reminderId);
       } else if (_isRunning) {
         _reminders[index].resetNextReminder();
       }
 
       saveData();
+      _syncScheduledNotifications();
       notifyListeners();
     }
   }
@@ -221,12 +254,16 @@ class ReminderService extends ChangeNotifier {
     }
 
     saveData();
+    _syncScheduledNotifications();
     notifyListeners();
   }
 
   void removeReminder(String reminderId) {
     _reminders.removeWhere((r) => r.id == reminderId);
+    _triggeredNotifications.remove(reminderId);
+    _notificationService.cancelReminder(reminderId);
     saveData();
+    _syncScheduledNotifications();
     notifyListeners();
   }
 
@@ -245,7 +282,9 @@ class ReminderService extends ChangeNotifier {
 
       if (_isRunning) {
         if (updatedReminder.isEnabled &&
-            (!wasEnabled || intervalChanged || updatedReminder.nextReminder == null)) {
+            (!wasEnabled ||
+                intervalChanged ||
+                updatedReminder.nextReminder == null)) {
           _reminders[index].resetNextReminder();
         } else if (!updatedReminder.isEnabled) {
           _reminders[index].nextReminder = null;
@@ -253,6 +292,7 @@ class ReminderService extends ChangeNotifier {
       }
 
       saveData();
+      _syncScheduledNotifications();
       notifyListeners();
     }
   }

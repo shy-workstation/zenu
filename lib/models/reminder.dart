@@ -56,25 +56,47 @@ class Reminder {
     this.unit = 'reps',
   }) : completionLog = completionLog ?? [];
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'type': type.name,
-    'title': title,
-    'description': description,
-    'interval': interval.inSeconds,
-    'isEnabled': isEnabled,
-    'nextReminder': nextReminder?.millisecondsSinceEpoch,
-    'exerciseCount': exerciseCount,
-    'totalCompleted': totalCompleted,
-    'minQuantity': minQuantity,
-    'maxQuantity': maxQuantity,
-    'stepSize': stepSize,
-    'unit': unit,
-    'iconCodePoint': icon.codePoint,
-    'iconFontFamily': icon.fontFamily,
-    'colorValue': color.toARGB32().toRadixString(16).padLeft(8, '0'),
-    'completionLog': completionLog,
+  // Icons a reminder can carry (quick-add templates + fallback). fromJson
+  // must resolve to these const instances instead of constructing IconData
+  // at runtime, which would defeat release-build icon tree-shaking.
+  static const List<IconData> _assignableIcons = [
+    Icons.water_drop,
+    Icons.remove_red_eye,
+    Icons.directions_walk,
+    Icons.fitness_center,
+    Icons.sports_gymnastics,
+    Icons.accessibility_new,
+    Icons.directions_run,
+    Icons.bolt,
+    Icons.self_improvement,
+    Icons.horizontal_rule,
+    Icons.air,
+    Icons.spa,
+  ];
+
+  static final Map<int, IconData> _iconByCodePoint = {
+    for (final icon in _assignableIcons) icon.codePoint: icon,
   };
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'type': type.name,
+        'title': title,
+        'description': description,
+        'interval': interval.inSeconds,
+        'isEnabled': isEnabled,
+        'nextReminder': nextReminder?.millisecondsSinceEpoch,
+        'exerciseCount': exerciseCount,
+        'totalCompleted': totalCompleted,
+        'minQuantity': minQuantity,
+        'maxQuantity': maxQuantity,
+        'stepSize': stepSize,
+        'unit': unit,
+        'iconCodePoint': icon.codePoint,
+        'iconFontFamily': icon.fontFamily,
+        'colorValue': color.toARGB32().toRadixString(16).padLeft(8, '0'),
+        'completionLog': completionLog,
+      };
 
   factory Reminder.fromJson(Map<String, dynamic> json) {
     // Support both old index-based and new name-based type serialization
@@ -94,16 +116,13 @@ class Reminder {
       title: json['title'],
       description: json['description'],
       interval: Duration(seconds: json['interval']),
-      icon: IconData(
-        json['iconCodePoint'] ?? Icons.fitness_center.codePoint,
-        fontFamily: json['iconFontFamily'] ?? Icons.fitness_center.fontFamily,
-      ),
+      icon: _iconByCodePoint[json['iconCodePoint'] as int?] ??
+          Icons.fitness_center,
       color: Color(int.parse(json['colorValue'] ?? 'ff2196f3', radix: 16)),
       isEnabled: json['isEnabled'] ?? true,
-      nextReminder:
-          json['nextReminder'] != null
-              ? DateTime.fromMillisecondsSinceEpoch(json['nextReminder'])
-              : null,
+      nextReminder: json['nextReminder'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['nextReminder'])
+          : null,
       exerciseCount: json['exerciseCount'] ?? 0,
       totalCompleted: json['totalCompleted'] ?? 0,
       minQuantity: json['minQuantity'] ?? 1,

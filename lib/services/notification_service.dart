@@ -1,6 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:window_manager/window_manager.dart';
 import '../models/reminder.dart';
 import '../l10n/app_localizations.dart';
@@ -10,15 +12,22 @@ class NotificationService {
   static NotificationService? _instance;
   AppLocalizations? _localizations;
 
+  /// Mobile platforms freeze the app process when backgrounded, so reminders
+  /// must be handed to the OS alarm scheduler. Desktop keeps the process alive,
+  /// so it delivers notifications directly from the foreground timer.
+  static bool get supportsScheduling => Platform.isAndroid || Platform.isIOS;
+
   NotificationService._(this._flutterLocalNotificationsPlugin);
 
   static Future<NotificationService> getInstance() async {
     if (_instance == null) {
+      tz_data.initializeTimeZones();
+
       final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
           FlutterLocalNotificationsPlugin();
 
       final initializationSettings = InitializationSettings(
-        android: const AndroidInitializationSettings('@mipmap/ic_launcher'),
+        android: const AndroidInitializationSettings('@drawable/ic_stat_zenu'),
         iOS: const DarwinInitializationSettings(
           requestAlertPermission: true,
           requestBadgePermission: true,
@@ -79,10 +88,10 @@ class NotificationService {
 
     final reminderId = payload.substring(9);
 
-    // Dismiss the system notification
+    // Dismiss the system notification (the occurrence that was tapped).
     if (_instance != null) {
-      final notificationId = reminderId.hashCode.abs();
-      await _instance!._flutterLocalNotificationsPlugin.cancel(id: notificationId);
+      await _instance!._flutterLocalNotificationsPlugin
+          .cancel(id: _instance!._baseId(reminderId));
     }
 
     // Bring app to foreground
@@ -113,8 +122,8 @@ class NotificationService {
     } catch (_) {}
   }
 
-  Future<void> showReminderNotification(Reminder reminder) async {
-    final notificationDetails = NotificationDetails(
+  NotificationDetails _buildDetails() {
+    return NotificationDetails(
       android: AndroidNotificationDetails(
         'health_reminder_channel',
         _localizations?.healthReminders ?? 'Health Reminders',
@@ -124,6 +133,7 @@ class NotificationService {
         priority: Priority.high,
         playSound: true,
         enableVibration: true,
+        icon: '@drawable/ic_stat_zenu',
       ),
       iOS: const DarwinNotificationDetails(
         presentAlert: true,
@@ -138,8 +148,17 @@ class NotificationService {
       linux: const LinuxNotificationDetails(),
       windows: const WindowsNotificationDetails(),
     );
+  }
 
-    final notificationId = reminder.id.hashCode.abs();
+  /// Base notification id for a reminder. The nth upcoming occurrence uses
+  /// [_occurrenceId] so several future alarms can be queued at once.
+  int _baseId(String reminderId) => reminderId.hashCode.abs() % 0x3fffffff;
+  int _occurrenceId(String reminderId, int occurrence) =>
+      _baseId(reminderId) + occurrence;
+
+  /// Immediately shows a notification (desktop foreground delivery path).
+  Future<void> showReminderNotification(Reminder reminder) async {
+    final notificationId = _baseId(reminder.id);
 
     if (kDebugMode) {
       debugPrint(
@@ -151,7 +170,7 @@ class NotificationService {
         id: notificationId,
         title: reminder.title,
         body: _getNotificationBody(reminder),
-        notificationDetails: notificationDetails,
+        notificationDetails: _buildDetails(),
         payload: 'reminder_${reminder.id}',
       );
       // Flash taskbar icon to get user attention
@@ -160,6 +179,45 @@ class NotificationService {
       if (kDebugMode) {
         debugPrint('❌ Error showing notification: $e');
       }
+    }
+  }
+
+  /// Schedules the next [horizon] occurrences of a reminder with the OS so it
+  /// keeps firing while the app is backgrounded or killed. Mobile only —
+  /// desktop relies on [showReminderNotification] from the foreground timer.
+  ///
+  /// Inexact alarms are used to stay clear of Google Play's exact-alarm policy.
+  Future<void> scheduleReminder(Reminder reminder, {int horizon = 5}) async {
+    if (!supportsScheduling || reminder.nextReminder == null) return;
+
+    final details = _buildDetails();
+    final body = _getNotificationBody(reminder);
+    for (int n = 0; n < horizon; n++) {
+      final fireTime = reminder.nextReminder!.add(reminder.interval * n);
+      if (fireTime.isBefore(DateTime.now())) continue;
+      try {
+        await _flutterLocalNotificationsPlugin.zonedSchedule(
+          id: _occurrenceId(reminder.id, n),
+          title: reminder.title,
+          body: body,
+          scheduledDate: tz.TZDateTime.from(fireTime.toUtc(), tz.UTC),
+          notificationDetails: details,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          payload: 'reminder_${reminder.id}',
+        );
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('❌ Error scheduling notification: $e');
+        }
+      }
+    }
+  }
+
+  /// Cancels every queued occurrence for a single reminder.
+  Future<void> cancelReminder(String reminderId, {int horizon = 5}) async {
+    for (int n = 0; n < horizon; n++) {
+      await _flutterLocalNotificationsPlugin.cancel(
+          id: _occurrenceId(reminderId, n));
     }
   }
 
@@ -176,19 +234,25 @@ class NotificationService {
       case ReminderType.standUp:
         return _localizations!.notificationTimeToStandUp;
       case ReminderType.pushUps:
-        return _localizations!.notificationTimeForPushUps(reminder.exerciseCount);
+        return _localizations!
+            .notificationTimeForPushUps(reminder.exerciseCount);
       case ReminderType.pullUps:
-        return _localizations!.notificationTimeForPullUps(reminder.exerciseCount);
+        return _localizations!
+            .notificationTimeForPullUps(reminder.exerciseCount);
       case ReminderType.squats:
-        return _localizations!.notificationTimeForSquats(reminder.exerciseCount);
+        return _localizations!
+            .notificationTimeForSquats(reminder.exerciseCount);
       case ReminderType.jumpingJacks:
-        return _localizations!.notificationTimeForJumpingJacks(reminder.exerciseCount);
+        return _localizations!
+            .notificationTimeForJumpingJacks(reminder.exerciseCount);
       case ReminderType.burpees:
-        return _localizations!.notificationTimeForBurpees(reminder.exerciseCount);
+        return _localizations!
+            .notificationTimeForBurpees(reminder.exerciseCount);
       case ReminderType.stretch:
         return _localizations!.notificationTimeToStretch;
       case ReminderType.planks:
-        return _localizations!.notificationTimeForPlanks(reminder.exerciseCount);
+        return _localizations!
+            .notificationTimeForPlanks(reminder.exerciseCount);
       case ReminderType.deepBreathing:
         return _localizations!.notificationTimeForDeepBreathing;
       case ReminderType.meditation:
