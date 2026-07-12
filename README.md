@@ -4,9 +4,11 @@ Your personal wellness companion that helps you maintain healthy habits througho
 
 [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-blue?logo=microsoft)](https://apps.microsoft.com/detail/9PHV0W6NVW2S)
 [![Version](https://img.shields.io/badge/version-1.1.0-green)](CHANGELOG.md)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://flutter.dev)
+[![Platform](https://img.shields.io/badge/platform-Android%20%7C%20Windows-lightgrey)](https://flutter.dev)
 
 ## Download
+
+**Android**: Google Play (coming with the 1.1.0 launch)
 
 **Windows**: [Get it from the Microsoft Store](https://apps.microsoft.com/detail/9PHV0W6NVW2S)
 
@@ -18,10 +20,10 @@ Your personal wellness companion that helps you maintain healthy habits througho
 - **Hydration Tracking**: Water intake reminders throughout the day
 - **Stretching**: Body stretch reminders to improve flexibility
 - **Statistics Dashboard**: Daily, weekly, and all-time progress tracking
-- **Fully Customizable**: Adjust intervals (1-120 min) and exercise counts (1-50 reps)
-- **Smart Notifications**: Native system notifications with FloatingPill UI
-- **Swipeable Cards**: Intuitive gesture-based reminder management
-- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **Fully Customizable**: Adjust intervals (slider up to 240 min, or type any value) and quantities per reminder
+- **Orbital Interface**: Reminders orbit a central start/pause control with live countdown rings
+- **Smart Notifications**: Native system notifications; on Android they fire even when the app is closed
+- **Cross-Platform**: Android and Windows from a single Flutter codebase
 - **Privacy-First**: All data stored locally, no cloud required
 - **Dark/Light Theme**: Automatic theme support
 

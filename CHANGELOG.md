@@ -2,40 +2,44 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.0] - 2026-03-09
+## [1.1.0] - 2026-07-12
 
-### New Features
+First **Android** release, alongside the Windows / Microsoft Store build.
 
-- **FloatingPill Notifications**: Redesigned notification system with elegant inline card-based notifications
-- **Swipeable Reminder Cards**: Enhanced reminder cards with improved swipe gestures and state management
-- **Cross-Platform Optimizations**: Added platform-specific optimizations for web, mobile, and desktop
-- **Batched Data Service**: New data service with retry logic and exponential backoff for reliable data persistence
-- **Platform Adapter Pattern**: Implemented clean architecture with platform-specific adapters
+### New
+
+- **Android support**: signed App Bundle for Google Play, adaptive launcher icon,
+  and a proper monochrome status-bar notification icon.
+- **Orbital interface**: reminders live as bubbles orbiting a central start/pause
+  control, with per-reminder countdown rings and an inactive shelf.
+- **Background reminders on Android**: reminders are handed to the OS scheduler so
+  they still fire when the app is backgrounded or closed (inexact alarms — no
+  exact-alarm permission required).
 
 ### Improvements
 
-- **Windows Notifications**: Fixed notification action handling for Windows - proper parsing of notification body clicks
-- **Notification Deduplication**: Prevents duplicate notifications and improves action handling
-- **Better Localization**: Added missing translations and replaced hardcoded strings with localization
-- **Performance**: Major performance optimization and feature enhancements
-- **Memory Management**: Fixed critical bugs and memory leaks across multiple components
-- **Code Quality**: Resolved all analyzer issues with improved code structure
+- **Battery**: the 1-second UI timer now pauses while the app is backgrounded or
+  minimised and catches up instantly on resume.
+- **Rendering**: the animated orbital field is isolated in repaint boundaries so it
+  no longer forces the whole screen to redraw every frame.
+- **Bubble layout**: reminders are now placed on evenly-spaced concentric rings that
+  scale with the reminder count and fill the screen's height, so they no longer
+  overlap or crowd into a narrow band — especially in portrait. Adding or removing a
+  reminder animates the others into their new positions.
+- **Localization**: added German for the remaining reminder confirmations, unit
+  labels, and accessibility descriptions.
+- **Accessibility**: semantic labels and tooltips on the start/pause, add, reset,
+  statistics, and reminder controls.
 
-### Technical Improvements
+### Fixes
 
-- Added comprehensive test infrastructure and test suites
-- Improved logging with debugPrint for better debugging
-- Refactored UI feedback mechanism for cleaner notifications
-- Enhanced build and test documentation
-- Unified stats and controls with consistent SpeedDial pattern
-- Bottom controls redesigned with aligned buttons and stats drawer
-
-### Bug Fixes
-
-- Fixed merge conflict issues in swipeable_reminder_card.dart
-- Resolved notification method references
-- Fixed triggered notification flag clearing on action click
-- Code formatting improvements for better readability
+- Reminder notifications now show the Zenu icon instead of the default Flutter logo.
+- Notifications are cancelled when a reminder is completed, disabled, or deleted.
+- Closing the reminder overlay now sticks instead of reopening a second later.
+- Typed intervals above the slider maximum are no longer silently reduced on save.
+- Fixed a crash in split-screen / very small windows (orbital radius clamp).
+- The triggered overlay scrolls so the Done button stays reachable in landscape
+  and at large text sizes.
 
 ---
 
