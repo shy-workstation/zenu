@@ -2,9 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.0] - 2026-07-12
+## [1.1.1] - 2026-07-12
 
-First **Android** release, alongside the Windows / Microsoft Store build.
+First **Android** release, alongside a Windows / Microsoft Store update. Builds on
+the 1.1.0 store release with background reminders, a reworked bubble layout, and
+numerous fixes.
 
 ### New
 
@@ -40,6 +42,25 @@ First **Android** release, alongside the Windows / Microsoft Store build.
 - Fixed a crash in split-screen / very small windows (orbital radius clamp).
 - The triggered overlay scrolls so the Done button stays reachable in landscape
   and at large text sizes.
+
+---
+
+## [1.1.0] - 2026-03-09
+
+Initial 1.1.0 store release (Microsoft Store).
+
+### New Features
+
+- **FloatingPill Notifications**: inline card-based notification system
+- **Batched Data Service**: persistence with retry and exponential backoff
+- **Platform Adapter Pattern**: platform-specific adapters
+- Cross-platform optimizations for desktop, mobile, and web
+
+### Improvements
+
+- Windows notification action handling (notification body clicks)
+- Notification deduplication and better localization
+- Performance optimizations and memory-leak fixes
 
 ---
 
