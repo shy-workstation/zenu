@@ -30,7 +30,6 @@ class _HoverScaleState extends State<_HoverScale> {
 }
 
 class QuickAddDialogs {
-
   /// Shows a template picker with all available reminder types grouped by category.
   static Future<void> showTemplatePicker(
     BuildContext context,
@@ -40,9 +39,7 @@ class QuickAddDialogs {
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.6),
       builder: (context) => _TemplatePickerDialog(
-        existingTypes: reminderService.reminders
-            .map((r) => r.type)
-            .toSet(),
+        existingTypes: reminderService.reminders.map((r) => r.type).toSet(),
       ),
     );
 
@@ -67,8 +64,12 @@ class QuickAddDialogs {
     reminderService.addReminder(reminder);
 
     if (context.mounted) {
-      FloatingPill.success(context, '${reminder.title} added',
-          color: reminder.color);
+      FloatingPill.success(
+        context,
+        AppLocalizations.of(context)?.reminderAddedNamed(reminder.title) ??
+            '${reminder.title} added',
+        color: reminder.color,
+      );
     }
   }
 }
@@ -187,8 +188,7 @@ class _TemplatePickerDialog extends StatelessWidget {
         {
           'type': ReminderType.water,
           'title': '\u{1F4A7} ${l?.stayHydrated ?? 'Stay Hydrated'}',
-          'description':
-              l?.drinkWaterRegularly ?? 'Drink water regularly',
+          'description': l?.drinkWaterRegularly ?? 'Drink water regularly',
           'icon': Icons.water_drop,
           'color': const Color(0xFF06B6D4),
           'interval': const Duration(minutes: 30),
@@ -302,8 +302,8 @@ class _TemplatePickerDialog extends StatelessWidget {
         {
           'type': ReminderType.planks,
           'title': '\u{1F4AA} ${l?.planks ?? 'Planks'}',
-          'description': l?.coreStrengtheningExercise ??
-              'Core strengthening exercise',
+          'description':
+              l?.coreStrengtheningExercise ?? 'Core strengthening exercise',
           'icon': Icons.horizontal_rule,
           'color': const Color(0xFFEC4899),
           'interval': const Duration(minutes: 15),
@@ -326,8 +326,8 @@ class _TemplatePickerDialog extends StatelessWidget {
         {
           'type': ReminderType.meditation,
           'title': '\u{1F9D8} ${l?.meditationTitle ?? 'Meditation'}',
-          'description': l?.meditationDescription ??
-              'Clear your mind and find focus',
+          'description':
+              l?.meditationDescription ?? 'Clear your mind and find focus',
           'icon': Icons.spa,
           'color': const Color(0xFF7C3AED),
           'interval': const Duration(minutes: 60),

@@ -1,7 +1,78 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/reminder.dart';
 import '../../services/reminder_service.dart';
+
+/// Max interval the slider covers. Values beyond this can still be entered
+/// via the tap-to-type dialog.
+const int _kMaxIntervalMinutes = 240;
+
+Future<int?> _promptNumber(
+  BuildContext context, {
+  required String title,
+  required int initial,
+  required int min,
+  int? max,
+  String? unit,
+  Color? accentColor,
+}) {
+  final ctrl = TextEditingController(text: initial.toString());
+  ctrl.selection = TextSelection(baseOffset: 0, extentOffset: ctrl.text.length);
+
+  int? parse() {
+    final v = int.tryParse(ctrl.text.trim());
+    if (v == null) return null;
+    if (v < min) return null;
+    if (max != null && v > max) return null;
+    return v;
+  }
+
+  return showDialog<int>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(title),
+        content: TextField(
+          controller: ctrl,
+          keyboardType: const TextInputType.numberWithOptions(
+            decimal: false,
+            signed: false,
+          ),
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          autofocus: true,
+          decoration: InputDecoration(
+            suffixText: unit,
+            border: const OutlineInputBorder(),
+            helperText: max != null ? '$min – $max' : '≥ $min',
+          ),
+          onSubmitted: (_) {
+            final v = parse();
+            if (v != null) Navigator.of(context).pop(v);
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+          ),
+          FilledButton(
+            style: accentColor != null
+                ? FilledButton.styleFrom(backgroundColor: accentColor)
+                : null,
+            onPressed: () {
+              final v = parse();
+              if (v != null) Navigator.of(context).pop(v);
+            },
+            child: Text(AppLocalizations.of(context)?.doneButton ?? 'Done'),
+          ),
+        ],
+      );
+    },
+  ).whenComplete(ctrl.dispose);
+}
 
 class _HoverScale extends StatefulWidget {
   final Widget child;
@@ -60,7 +131,9 @@ class _EditDialogState extends State<_EditDialog> {
   void initState() {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.reminder.title);
-    _intervalMin = widget.reminder.interval.inMinutes.clamp(1, 60).toDouble();
+    // Don't clamp to the slider max here — a value typed via the tap-to-type
+    // dialog can legitimately exceed it and must survive a re-save untouched.
+    _intervalMin = max(1, widget.reminder.interval.inMinutes).toDouble();
     _enabled = widget.reminder.isEnabled;
   }
 
@@ -170,12 +243,32 @@ class _EditDialogState extends State<_EditDialog> {
                   ),
                 ),
                 const Spacer(),
-                Text(
-                  '${_intervalMin.round()} min',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: r.color,
+                InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () async {
+                    final entered = await _promptNumber(
+                      context,
+                      title: l?.interval ?? 'Interval',
+                      initial: _intervalMin.round(),
+                      min: 1,
+                      unit: 'min',
+                      accentColor: r.color,
+                    );
+                    if (entered != null) {
+                      setState(() => _intervalMin = entered.toDouble());
+                    }
+                  },
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    child: Text(
+                      '${_intervalMin.round()} min',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: r.color,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -188,10 +281,11 @@ class _EditDialogState extends State<_EditDialog> {
                 overlayColor: r.color.withValues(alpha: 0.15),
               ),
               child: Slider(
-                value: _intervalMin,
+                // Clamp so a typed value > slider max still renders a valid thumb.
+                value: _intervalMin.clamp(1.0, _kMaxIntervalMinutes.toDouble()),
                 min: 1,
-                max: 60,
-                divisions: 59,
+                max: _kMaxIntervalMinutes.toDouble(),
+                divisions: _kMaxIntervalMinutes - 1,
                 onChanged: (v) => setState(() => _intervalMin = v),
               ),
             ),
@@ -213,7 +307,8 @@ class _EditDialogState extends State<_EditDialog> {
             onPressed: _delete,
             icon: const Icon(Icons.delete_outline, size: 18),
             label: Text(l?.delete ?? 'Delete'),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style:
+                TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
           ),
         ),
         _HoverScale(

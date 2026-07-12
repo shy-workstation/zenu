@@ -68,9 +68,12 @@ void main() async {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Please restart the application.',
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                Text(
+                  kDebugMode
+                      ? 'Please restart the application.\n$e'
+                      : 'Please restart the application.',
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),

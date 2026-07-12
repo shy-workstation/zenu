@@ -32,8 +32,8 @@ class StatisticsScreen extends StatelessWidget {
                       child: Text(
                         l?.noCompletionsYet ?? 'No completions yet',
                         style: TextStyle(
-                          color: themeService.textPrimary
-                              .withValues(alpha: 0.5),
+                          color:
+                              themeService.textPrimary.withValues(alpha: 0.5),
                           fontSize: 16,
                         ),
                       ),
@@ -104,8 +104,7 @@ class _TodaySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final withCompletions =
-        reminders.where((r) => r.todayCount > 0).toList();
+    final withCompletions = reminders.where((r) => r.todayCount > 0).toList();
 
     if (withCompletions.isEmpty) {
       return Container(
@@ -129,7 +128,7 @@ class _TodaySection extends StatelessWidget {
     return Column(
       children: withCompletions.map((r) {
         final stripped = r.title.replaceAll(
-          RegExp(r'^[\p{So}\p{Sk}\s]+', unicode: true),
+          RegExp(r'^[\p{So}\p{Sk}\p{Cf}\p{M}\s]+', unicode: true),
           '',
         );
         return Container(
@@ -164,8 +163,7 @@ class _TodaySection extends StatelessWidget {
                       l?.times(r.todayCount) ?? '${r.todayCount} times',
                       style: TextStyle(
                         fontSize: 12,
-                        color: themeService.textPrimary
-                            .withValues(alpha: 0.6),
+                        color: themeService.textPrimary.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -225,7 +223,7 @@ class _Last30DaysSection extends StatelessWidget {
     return Column(
       children: withHistory.map((r) {
         final stripped = r.title.replaceAll(
-          RegExp(r'^[\p{So}\p{Sk}\s]+', unicode: true),
+          RegExp(r'^[\p{So}\p{Sk}\p{Cf}\p{M}\s]+', unicode: true),
           '',
         );
         final dailyTotals = r.dailyTotals;
@@ -272,34 +270,41 @@ class _Last30DaysSection extends StatelessWidget {
               // Stats row
               Row(
                 children: [
-                  _StatChip(
-                    label: l?.total ?? 'Total',
-                    value: '$totalQty ${r.unit}',
-                    themeService: themeService,
+                  Expanded(
+                    child: _StatChip(
+                      label: l?.total ?? 'Total',
+                      value: '$totalQty ${r.unit}',
+                      themeService: themeService,
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  _StatChip(
-                    label: l?.times(totalCount) ?? '$totalCount times',
-                    value: '',
-                    themeService: themeService,
+                  Expanded(
+                    child: _StatChip(
+                      label: l?.times(totalCount) ?? '$totalCount times',
+                      value: '',
+                      themeService: themeService,
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  _StatChip(
-                    label: l?.dailyAverage ?? 'Daily avg',
-                    value: '$dailyAvg ${r.unit}',
-                    themeService: themeService,
+                  Expanded(
+                    child: _StatChip(
+                      label: l?.dailyAverage ?? 'Daily avg',
+                      value: '$dailyAvg ${r.unit}',
+                      themeService: themeService,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
               // Simple bar chart for last 30 days
-              if (maxDaily > 0) _DailyBars(
-                dailyTotals: dailyTotals,
-                maxDaily: maxDaily,
-                color: r.color,
-                themeService: themeService,
-                unit: r.unit,
-              ),
+              if (maxDaily > 0)
+                _DailyBars(
+                  dailyTotals: dailyTotals,
+                  maxDaily: maxDaily,
+                  color: r.color,
+                  themeService: themeService,
+                  unit: r.unit,
+                ),
             ],
           ),
         );
@@ -393,7 +398,7 @@ class _DailyBars extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 10,
-                    color: themeService.textPrimary.withValues(alpha: 0.45),
+                    color: themeService.textPrimary.withValues(alpha: 0.6),
                   ),
                 ),
               ),

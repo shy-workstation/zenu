@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../l10n/app_localizations.dart';
 
 class CenterButton extends StatefulWidget {
   final bool isRunning;
@@ -73,6 +74,10 @@ class _CenterButtonState extends State<CenterButton>
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final toggleLabel = widget.isRunning
+        ? (l?.pauseReminders ?? 'Pause reminders')
+        : (l?.startReminders ?? 'Start reminders');
     final button = GestureDetector(
       onTapDown: (_) => _scaleCtrl.forward(),
       onTapUp: (_) {
@@ -115,10 +120,16 @@ class _CenterButtonState extends State<CenterButton>
       ),
     );
 
+    final wrappedButton = Semantics(
+      button: true,
+      label: toggleLabel,
+      child: Tooltip(message: toggleLabel, child: button),
+    );
+
     final hasAdd = widget.onAdd != null;
     final hasClear = widget.onClear != null;
 
-    if (!hasAdd && !hasClear) return button;
+    if (!hasAdd && !hasClear) return wrappedButton;
 
     return SizedBox(
       width: widget.size + 18,
@@ -130,39 +141,46 @@ class _CenterButtonState extends State<CenterButton>
           Positioned(
             left: 9,
             top: 9,
-            child: button,
+            child: wrappedButton,
           ),
           // "+" badge at top-right
           if (hasAdd)
             Positioned(
               right: 0,
               top: 0,
-              child: GestureDetector(
-                onTap: widget.onAdd,
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Theme.of(context).colorScheme.primary,
-                    border: Border.all(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      width: 2.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withValues(alpha: 0.4),
-                        blurRadius: 8,
+              child: Semantics(
+                button: true,
+                label: l?.addReminderTooltip ?? 'Add reminder',
+                child: Tooltip(
+                  message: l?.addReminderTooltip ?? 'Add reminder',
+                  child: GestureDetector(
+                    onTap: widget.onAdd,
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Theme.of(context).colorScheme.primary,
+                        border: Border.all(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          width: 2.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.4),
+                            blurRadius: 8,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.add_rounded,
-                    size: 22,
-                    color: Colors.white,
+                      child: const Icon(
+                        Icons.add_rounded,
+                        size: 22,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -172,38 +190,45 @@ class _CenterButtonState extends State<CenterButton>
             Positioned(
               left: 0,
               bottom: 0,
-              child: GestureDetector(
-                onTap: () {
-                  HapticFeedback.mediumImpact();
-                  widget.onClear!();
-                },
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .error
-                        .withValues(alpha: 0.9),
-                    border: Border.all(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      width: 2.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
+              child: Semantics(
+                button: true,
+                label: l?.resetTimersTooltip ?? 'Reset timers',
+                child: Tooltip(
+                  message: l?.resetTimersTooltip ?? 'Reset timers',
+                  child: GestureDetector(
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      widget.onClear!();
+                    },
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
                         color: Theme.of(context)
                             .colorScheme
                             .error
-                            .withValues(alpha: 0.4),
-                        blurRadius: 8,
+                            .withValues(alpha: 0.9),
+                        border: Border.all(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          width: 2.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .error
+                                .withValues(alpha: 0.4),
+                            blurRadius: 8,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.refresh_rounded,
-                    size: 18,
-                    color: Colors.white,
+                      child: const Icon(
+                        Icons.refresh_rounded,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ),

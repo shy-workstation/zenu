@@ -34,6 +34,11 @@ class _OrbitalHomeScreenState extends State<OrbitalHomeScreen> {
   DateTime _currentTime = DateTime.now();
   String? _triggeredId;
 
+  // Reminders the user closed from the overlay, keyed to the exact due instant
+  // that was dismissed. A reminder re-triggers only once its nextReminder
+  // advances (i.e. it was completed or reset), so the X button actually sticks.
+  final Map<String, DateTime?> _dismissedUntil = {};
+
   @override
   void initState() {
     super.initState();
@@ -68,6 +73,14 @@ class _OrbitalHomeScreenState extends State<OrbitalHomeScreen> {
     final service = widget.reminderService ??
         Provider.of<ReminderService>(context, listen: false);
 
+    // Drop dismissals whose due instant has passed (reminder completed/reset).
+    _dismissedUntil.removeWhere((id, when) {
+      final r = service.reminders
+          .cast<Reminder?>()
+          .firstWhere((r) => r?.id == id, orElse: () => null);
+      return r == null || r.nextReminder != when;
+    });
+
     // Auto-dismiss if current triggered reminder is no longer past due
     if (_triggeredId != null) {
       final r = service.reminders
@@ -90,6 +103,8 @@ class _OrbitalHomeScreenState extends State<OrbitalHomeScreen> {
       if (r.isEnabled &&
           r.nextReminder != null &&
           _currentTime.isAfter(r.nextReminder!)) {
+        // Respect an explicit dismissal of this exact due instance.
+        if (_dismissedUntil[r.id] == r.nextReminder) continue;
         setState(() => _triggeredId = r.id);
         return;
       }
@@ -107,9 +122,9 @@ class _OrbitalHomeScreenState extends State<OrbitalHomeScreen> {
             final inactiveReminders =
                 service.reminders.where((r) => !r.isEnabled).toList();
             final triggeredReminder = _triggeredId != null
-                ? service.reminders
-                    .cast<Reminder?>()
-                    .firstWhere((r) => r?.id == _triggeredId, orElse: () => null)
+                ? service.reminders.cast<Reminder?>().firstWhere(
+                    (r) => r?.id == _triggeredId,
+                    orElse: () => null)
                 : null;
 
             if (_triggeredId != null && triggeredReminder == null) {
@@ -151,23 +166,32 @@ class _OrbitalHomeScreenState extends State<OrbitalHomeScreen> {
                   // Statistics button
                   Container(
                     margin: const EdgeInsets.only(right: 4),
-                    child: Material(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(12),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const StatisticsScreen(),
-                          ),
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          child: Icon(
-                            Icons.bar_chart,
-                            color: themeService.textPrimary,
-                            size: 20,
+                    child: Semantics(
+                      button: true,
+                      label: AppLocalizations.of(context)?.openStatistics ??
+                          'Open statistics',
+                      child: Tooltip(
+                        message: AppLocalizations.of(context)?.openStatistics ??
+                            'Open statistics',
+                        child: Material(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const StatisticsScreen(),
+                              ),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              child: Icon(
+                                Icons.bar_chart,
+                                color: themeService.textPrimary,
+                                size: 20,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -178,7 +202,9 @@ class _OrbitalHomeScreenState extends State<OrbitalHomeScreen> {
                     margin: const EdgeInsets.only(right: 16),
                     child: Semantics(
                       label: _themeLabel(themeService),
-                      hint: AppLocalizations.of(context)?.doubleTapToCycleTheme ?? 'Double tap to cycle theme',
+                      hint:
+                          AppLocalizations.of(context)?.doubleTapToCycleTheme ??
+                              'Double tap to cycle theme',
                       child: Material(
                         color: Colors.transparent,
                         borderRadius: BorderRadius.circular(12),
@@ -201,8 +227,7 @@ class _OrbitalHomeScreenState extends State<OrbitalHomeScreen> {
               ),
               body: service.reminders.isEmpty
                   ? EmptyState(
-                      onAddReminder: () =>
-                          QuickAddDialogs.showTemplatePicker(
+                      onAddReminder: () => QuickAddDialogs.showTemplatePicker(
                         context,
                         service,
                       ),
@@ -246,7 +271,8 @@ class _OrbitalHomeScreenState extends State<OrbitalHomeScreen> {
                             // Inactive shelf
                             InactiveShelf(
                               inactiveReminders: inactiveReminders,
-                              onActivate: (id) => service.toggleReminder(id),
+                              onActivate: (id) =>
+                                  _onActivateFromShelf(id, service),
                             ),
                             const SizedBox(height: 8),
                           ],
@@ -264,8 +290,11 @@ class _OrbitalHomeScreenState extends State<OrbitalHomeScreen> {
                                       r.nextReminder != null &&
                                       !_currentTime.isAfter(r.nextReminder!))
                                   .toList(),
-                              onDismiss: () =>
-                                  setState(() => _triggeredId = null),
+                              onDismiss: () => setState(() {
+                                _dismissedUntil[triggeredReminder.id] =
+                                    triggeredReminder.nextReminder;
+                                _triggeredId = null;
+                              }),
                             ),
                           ),
                       ],
@@ -275,6 +304,21 @@ class _OrbitalHomeScreenState extends State<OrbitalHomeScreen> {
         );
       },
     );
+  }
+
+  void _onActivateFromShelf(String id, ReminderService service) {
+    final activeCount = service.reminders.where((r) => r.isEnabled).length;
+    // The orbital field only renders 15 slots; refuse a 16th so it can't be
+    // enabled-but-invisible.
+    if (activeCount >= 15) {
+      FloatingPill.warning(
+        context,
+        AppLocalizations.of(context)?.maxActiveReminders ??
+            'Maximum of 15 active reminders reached',
+      );
+      return;
+    }
+    service.toggleReminder(id);
   }
 
   void _onTapBubble(Reminder r, ReminderService service) {
