@@ -192,5 +192,18 @@
   "dailyAverage": "Tagesschnitt",
   "noCompletionsYet": "Noch keine Abschlüsse",
   "total": "Gesamt",
-  "timersReset": "Timer zurückgesetzt"
+  "timersReset": "Timer zurückgesetzt",
+  "reminderAddedNamed": "{title} hinzugefügt",
+  "maxActiveReminders": "Maximal 15 aktive Erinnerungen erreicht",
+  "unitReps": "Wdh.",
+  "unitSec": "Sek.",
+  "unitMin": "Min.",
+  "unitMl": "ml",
+  "unitGlasses": "Gläser",
+  "startReminders": "Erinnerungen starten",
+  "pauseReminders": "Erinnerungen pausieren",
+  "addReminderTooltip": "Erinnerung hinzufügen",
+  "resetTimersTooltip": "Timer zurücksetzen",
+  "openStatistics": "Statistiken öffnen",
+  "editReminderNamed": "{title} bearbeiten"
 }

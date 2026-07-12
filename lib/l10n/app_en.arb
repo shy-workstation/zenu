@@ -835,5 +835,63 @@
   "timersReset": "Timers reset",
   "@timersReset": {
     "description": "Feedback message after clearing all timers"
+  },
+  "reminderAddedNamed": "{title} added",
+  "@reminderAddedNamed": {
+    "description": "Confirmation shown after adding a reminder",
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "maxActiveReminders": "Maximum of 15 active reminders reached",
+  "@maxActiveReminders": {
+    "description": "Warning when trying to activate a 16th reminder"
+  },
+  "unitReps": "reps",
+  "@unitReps": {
+    "description": "Unit: repetitions"
+  },
+  "unitSec": "sec",
+  "@unitSec": {
+    "description": "Unit: seconds"
+  },
+  "unitMin": "min",
+  "@unitMin": {
+    "description": "Unit: minutes"
+  },
+  "unitMl": "ml",
+  "@unitMl": {
+    "description": "Unit: millilitres"
+  },
+  "unitGlasses": "glasses",
+  "@unitGlasses": {
+    "description": "Unit: glasses"
+  },
+  "startReminders": "Start reminders",
+  "@startReminders": {
+    "description": "Accessibility label for the start button"
+  },
+  "pauseReminders": "Pause reminders",
+  "@pauseReminders": {
+    "description": "Accessibility label for the pause button"
+  },
+  "addReminderTooltip": "Add reminder",
+  "@addReminderTooltip": {
+    "description": "Accessibility label for the add-reminder badge"
+  },
+  "resetTimersTooltip": "Reset timers",
+  "@resetTimersTooltip": {
+    "description": "Accessibility label for the reset-timers badge"
+  },
+  "openStatistics": "Open statistics",
+  "@openStatistics": {
+    "description": "Accessibility label for the statistics button"
+  },
+  "editReminderNamed": "Edit {title}",
+  "@editReminderNamed": {
+    "description": "Accessibility label for a reminder bubble",
+    "placeholders": {
+      "title": {"type": "String"}
+    }
   }
 }

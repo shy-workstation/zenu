@@ -607,4 +607,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get timersReset => 'Timers reset';
+
+  @override
+  String reminderAddedNamed(String title) {
+    return '$title added';
+  }
+
+  @override
+  String get maxActiveReminders => 'Maximum of 15 active reminders reached';
+
+  @override
+  String get unitReps => 'reps';
+
+  @override
+  String get unitSec => 'sec';
+
+  @override
+  String get unitMin => 'min';
+
+  @override
+  String get unitMl => 'ml';
+
+  @override
+  String get unitGlasses => 'glasses';
+
+  @override
+  String get startReminders => 'Start reminders';
+
+  @override
+  String get pauseReminders => 'Pause reminders';
+
+  @override
+  String get addReminderTooltip => 'Add reminder';
+
+  @override
+  String get resetTimersTooltip => 'Reset timers';
+
+  @override
+  String get openStatistics => 'Open statistics';
+
+  @override
+  String editReminderNamed(String title) {
+    return 'Edit $title';
+  }
 }

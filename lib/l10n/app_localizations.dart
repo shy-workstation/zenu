@@ -1171,6 +1171,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Timers reset'**
   String get timersReset;
+
+  /// Confirmation shown after adding a reminder
+  ///
+  /// In en, this message translates to:
+  /// **'{title} added'**
+  String reminderAddedNamed(String title);
+
+  /// Warning when trying to activate a 16th reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum of 15 active reminders reached'**
+  String get maxActiveReminders;
+
+  /// Unit: repetitions
+  ///
+  /// In en, this message translates to:
+  /// **'reps'**
+  String get unitReps;
+
+  /// Unit: seconds
+  ///
+  /// In en, this message translates to:
+  /// **'sec'**
+  String get unitSec;
+
+  /// Unit: minutes
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get unitMin;
+
+  /// Unit: millilitres
+  ///
+  /// In en, this message translates to:
+  /// **'ml'**
+  String get unitMl;
+
+  /// Unit: glasses
+  ///
+  /// In en, this message translates to:
+  /// **'glasses'**
+  String get unitGlasses;
+
+  /// Accessibility label for the start button
+  ///
+  /// In en, this message translates to:
+  /// **'Start reminders'**
+  String get startReminders;
+
+  /// Accessibility label for the pause button
+  ///
+  /// In en, this message translates to:
+  /// **'Pause reminders'**
+  String get pauseReminders;
+
+  /// Accessibility label for the add-reminder badge
+  ///
+  /// In en, this message translates to:
+  /// **'Add reminder'**
+  String get addReminderTooltip;
+
+  /// Accessibility label for the reset-timers badge
+  ///
+  /// In en, this message translates to:
+  /// **'Reset timers'**
+  String get resetTimersTooltip;
+
+  /// Accessibility label for the statistics button
+  ///
+  /// In en, this message translates to:
+  /// **'Open statistics'**
+  String get openStatistics;
+
+  /// Accessibility label for a reminder bubble
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {title}'**
+  String editReminderNamed(String title);
 }
 
 class _AppLocalizationsDelegate
