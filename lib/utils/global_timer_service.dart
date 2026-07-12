@@ -1,17 +1,66 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 /// Global timer service to consolidate multiple periodic timers
 /// This reduces CPU usage by ~30% by having a single timer instead of multiple ones
-class GlobalTimerService {
+class GlobalTimerService with WidgetsBindingObserver {
   static GlobalTimerService? _instance;
   static GlobalTimerService get instance =>
       _instance ??= GlobalTimerService._();
 
-  GlobalTimerService._();
+  GlobalTimerService._() {
+    // Guarded: pure-Dart unit tests have no WidgetsBinding. Lifecycle pausing
+    // is a runtime battery optimization that can be safely skipped there.
+    try {
+      WidgetsBinding.instance.addObserver(this);
+    } catch (_) {}
+  }
 
   Timer? _globalTimer;
+  bool _paused = false;
   final Map<String, TimerSubscription> _subscribers = {};
+
+  /// Pauses the ticking loop while the app is backgrounded/minimized so it
+  /// stops waking the CPU every second (battery). On Android reminders still
+  /// fire via OS-scheduled notifications; on resume the UI catches up instantly.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _paused = false;
+        if (_subscribers.isNotEmpty) {
+          _catchUp();
+          _startGlobalTimer();
+        }
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        _paused = true;
+        _stopGlobalTimer();
+        break;
+    }
+  }
+
+  /// Runs every due subscription once immediately (used on resume so countdown
+  /// labels and reminder checks reflect the elapsed background time at once).
+  void _catchUp() {
+    final now = DateTime.now();
+    for (final subscription in _subscribers.values) {
+      if (subscription.shouldAutoRemove || subscription.isInErrorCooldown) {
+        continue;
+      }
+      try {
+        subscription.callback();
+        subscription.lastExecuted = now;
+        subscription.recordSuccess();
+      } catch (_) {
+        subscription.recordError();
+      }
+    }
+  }
 
   /// Subscribe to timer events
   String subscribe(Duration interval, VoidCallback callback, {String? id}) {
@@ -51,7 +100,7 @@ class GlobalTimerService {
 
   /// Start the global timer if not already running
   void _startGlobalTimer() {
-    if (_globalTimer != null) return;
+    if (_globalTimer != null || _paused) return;
 
     // Use 1-second interval as the base unit
     _globalTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -74,7 +123,10 @@ class GlobalTimerService {
         final timeSinceLastExecution =
             now.difference(subscription.lastExecuted);
 
-        if (timeSinceLastExecution >= subscription.interval) {
+        // Allow a small tolerance so sub-second timer jitter doesn't push a
+        // 1s subscription onto the next tick, making countdowns skip a second.
+        if (timeSinceLastExecution >=
+            subscription.interval - const Duration(milliseconds: 100)) {
           try {
             subscription.callback();
             subscription.lastExecuted = now;
@@ -82,13 +134,13 @@ class GlobalTimerService {
           } catch (e) {
             subscription.recordError();
             if (kDebugMode) {
-              debugPrint(
-                  '⚠️ Error in timer subscription ${subscription.id} '
+              debugPrint('⚠️ Error in timer subscription ${subscription.id} '
                   '(${subscription.consecutiveErrors}/${TimerSubscription.maxConsecutiveErrors} errors): $e');
             }
 
             // Log warning if approaching auto-removal threshold
-            if (subscription.consecutiveErrors == TimerSubscription.maxConsecutiveErrors - 1) {
+            if (subscription.consecutiveErrors ==
+                TimerSubscription.maxConsecutiveErrors - 1) {
               if (kDebugMode) {
                 debugPrint(
                     '🚨 Timer subscription ${subscription.id} will be auto-removed after next error');
@@ -158,6 +210,7 @@ class GlobalTimerService {
 
   /// Dispose all resources
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _stopGlobalTimer();
     _subscribers.clear();
 
