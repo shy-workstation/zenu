@@ -35,13 +35,13 @@
   "@exerciseReminder": {
     "description": "Exercise reminder type"
   },
-  "pushUpsReminder": "Push-ups Reminder", 
+  "pushUpsReminder": "Push-ups Reminder",
   "@pushUpsReminder": {
     "description": "Push-ups reminder type"
   },
   "pullUpsReminder": "Pull-ups Reminder",
   "@pullUpsReminder": {
-    "description": "Pull-ups reminder type" 
+    "description": "Pull-ups reminder type"
   },
   "squatsReminder": "Squats Reminder",
   "@squatsReminder": {
@@ -55,7 +55,7 @@
   "@jumpingJacksReminder": {
     "description": "Jumping jacks reminder type"
   },
-  "planksReminder": "Planks Reminder", 
+  "planksReminder": "Planks Reminder",
   "@planksReminder": {
     "description": "Planks reminder type"
   },
@@ -85,7 +85,7 @@
   },
   "skip": "Skip",
   "@skip": {
-    "description": "Skip button"
+    "description": "Skip button text"
   },
   "noRemindersYet": "No reminders yet",
   "@noRemindersYet": {
@@ -111,16 +111,16 @@
   "@getStarted": {
     "description": "Get started button text"
   },
-  "exerciseCount": "{count, plural, =0{No exercises} =1{1 exercise} other{{count} exercises}}",
+  "exerciseCount": "Exercise Count",
   "@exerciseCount": {
-    "placeholders": {
-      "count": {"type": "num"}
-    }
+    "description": "Exercise count label"
   },
   "reminderDue": "Time for {reminderType}!",
   "@reminderDue": {
     "placeholders": {
-      "reminderType": {"type": "String"}
+      "reminderType": {
+        "type": "String"
+      }
     }
   },
   "statistics": "Statistics",
@@ -146,7 +146,7 @@
   },
   "edit": "Edit",
   "@edit": {
-    "description": "Edit button"
+    "description": "Edit button text"
   },
   "save": "Save",
   "@save": {
@@ -154,7 +154,7 @@
   },
   "complete": "Complete",
   "@complete": {
-    "description": "Complete button"
+    "description": "Complete button text"
   },
   "manageReminders": "Manage Reminders",
   "@manageReminders": {
@@ -164,41 +164,45 @@
   "@yourReminders": {
     "description": "Your reminders count",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "markComplete": "Mark Complete",
   "@markComplete": {
-    "description": "Mark complete button"
+    "description": "Button to mark reminder as complete"
   },
   "reminderCompleted": "{reminderTitle} completed!",
   "@reminderCompleted": {
     "description": "Reminder completed message",
     "placeholders": {
-      "reminderTitle": {"type": "String"}
+      "reminderTitle": {
+        "type": "String"
+      }
     }
   },
   "completeReminderTitle": "Complete {reminderTitle}",
   "@completeReminderTitle": {
     "description": "Complete reminder dialog title",
     "placeholders": {
-      "reminderTitle": {"type": "String"}
+      "reminderTitle": {
+        "type": "String"
+      }
     }
   },
   "reminderSettings": "{reminderTitle} Settings",
   "@reminderSettings": {
     "description": "Reminder settings dialog title",
     "placeholders": {
-      "reminderTitle": {"type": "String"}
+      "reminderTitle": {
+        "type": "String"
+      }
     }
   },
   "intervalMinutes": "Interval (minutes)",
   "@intervalMinutes": {
     "description": "Interval in minutes label"
-  },
-  "exerciseCount": "Exercise Count",
-  "@exerciseCount": {
-    "description": "Exercise count label"
   },
   "waterReminderAdded": "Water reminder added! 💧",
   "@waterReminderAdded": {
@@ -208,7 +212,9 @@
   "@exerciseReminderAdded": {
     "description": "Exercise reminder added message",
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "eyeRestReminderAdded": "Eye rest reminder added! 👁️",
@@ -219,7 +225,9 @@
   "@customReminderAdded": {
     "description": "Custom reminder added message",
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "chooseExerciseType": "Choose Exercise Type",
@@ -238,7 +246,7 @@
   "@lowerBodyStrengtheningExercise": {
     "description": "Squats exercise description"
   },
-  "bodyFlexibilityAndMobility": "Body flexibility and mobility", 
+  "bodyFlexibilityAndMobility": "Body flexibility and mobility",
   "@bodyFlexibilityAndMobility": {
     "description": "Stretching exercise description"
   },
@@ -256,31 +264,31 @@
   },
   "icon": "Icon:",
   "@icon": {
-    "description": "Icon label"
+    "description": "Icon selection label"
   },
   "color": "Color:",
   "@color": {
-    "description": "Color label"
+    "description": "Color selection label"
   },
   "unit": "Unit:",
   "@unit": {
-    "description": "Unit label"
+    "description": "Unit selection label"
   },
   "min": "Min:",
   "@min": {
-    "description": "Minimum label"
+    "description": "Minimum value label"
   },
   "max": "Max:",
   "@max": {
-    "description": "Maximum label"
+    "description": "Maximum value label"
   },
   "step": "Step:",
   "@step": {
-    "description": "Step label"
+    "description": "Step value label"
   },
   "pleaseEnterTitle": "Please enter a title",
   "@pleaseEnterTitle": {
-    "description": "Please enter title validation message"
+    "description": "Validation message for empty title"
   },
   "statisticsResetSuccess": "Statistics reset successfully",
   "@statisticsResetSuccess": {
@@ -288,7 +296,7 @@
   },
   "zenuHealthReminder": "Zenu - Health Reminder",
   "@zenuHealthReminder": {
-    "description": "App title for debug screen"
+    "description": "App title in simple home screen"
   },
   "zenuHealthReminderApp": "Zenu Health Reminder App",
   "@zenuHealthReminderApp": {
@@ -318,7 +326,9 @@
   "@reminderServiceStatus": {
     "description": "Reminder service status",
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
   "running": "Running",
@@ -333,12 +343,14 @@
   "@remindersLoaded": {
     "description": "Reminders loaded count",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "testAppFunctionality": "Test App Functionality",
   "@testAppFunctionality": {
-    "description": "Test app functionality button"
+    "description": "Button to test app functionality"
   },
   "manualTestConfirmed": "Manual testing confirmed - App is working!",
   "@manualTestConfirmed": {
@@ -378,7 +390,7 @@
   },
   "useDefaultIntervals": "Use default intervals",
   "@useDefaultIntervals": {
-    "description": "Quick tip 2"  
+    "description": "Quick tip 2"
   },
   "enableNotifications": "Enable notifications",
   "@enableNotifications": {
@@ -404,7 +416,9 @@
   "@error": {
     "description": "Error message",
     "placeholders": {
-      "message": {"type": "String"}
+      "message": {
+        "type": "String"
+      }
     }
   },
   "activeReminders": "Active Reminders",
@@ -413,7 +427,7 @@
   },
   "today": "Today",
   "@today": {
-    "description": "Today's completions label on statistics screen"
+    "description": "Today stats label"
   },
   "allTime": "All Time",
   "@allTime": {
@@ -439,38 +453,6 @@
   "@failedToStartApp": {
     "description": "Error message when app fails to start"
   },
-  "markComplete": "Mark Complete",
-  "@markComplete": {
-    "description": "Button to mark reminder as complete"
-  },
-  "icon": "Icon:",
-  "@icon": {
-    "description": "Icon selection label"
-  },
-  "color": "Color:",
-  "@color": {
-    "description": "Color selection label"
-  },
-  "unit": "Unit:",
-  "@unit": {
-    "description": "Unit selection label"
-  },
-  "min": "Min:",
-  "@min": {
-    "description": "Minimum value label"
-  },
-  "max": "Max:",
-  "@max": {
-    "description": "Maximum value label"
-  },
-  "step": "Step:",
-  "@step": {
-    "description": "Step value label"
-  },
-  "pleaseEnterTitle": "Please enter a title",
-  "@pleaseEnterTitle": {
-    "description": "Validation message for empty title"
-  },
   "notificationTimeToRestEyes": "Time to rest your eyes! Look away from your screen.",
   "@notificationTimeToRestEyes": {
     "description": "Notification message for eye rest reminder"
@@ -491,42 +473,54 @@
   "@notificationTimeForPullUps": {
     "description": "Notification message for pull-ups reminder",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTimeForPushUps": "Time for {count} push-ups!",
   "@notificationTimeForPushUps": {
     "description": "Notification message for push-ups reminder",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTimeForSquats": "Time for {count} squats!",
   "@notificationTimeForSquats": {
     "description": "Notification message for squats reminder",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTimeForJumpingJacks": "Time for {count} jumping jacks!",
   "@notificationTimeForJumpingJacks": {
     "description": "Notification message for jumping jacks reminder",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTimeForPlanks": "Time for a {count} second plank!",
   "@notificationTimeForPlanks": {
     "description": "Notification message for planks reminder",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notificationTimeForBurpees": "Time for {count} burpees!",
   "@notificationTimeForBurpees": {
     "description": "Notification message for burpees reminder",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "healthReminderApp": "Health Reminder App",
@@ -561,33 +555,13 @@
   "@manualTestingConfirmedAppWorking": {
     "description": "Development message - testing confirmation"
   },
-  "testAppFunctionality": "Test App Functionality",
-  "@testAppFunctionality": {
-    "description": "Button to test app functionality"
-  },
-  "edit": "Edit",
-  "@edit": {
-    "description": "Edit button text"
-  },
   "searchExercisesStretches": "Search exercises, stretches, wellness...",
   "@searchExercisesStretches": {
     "description": "Search hint text"
   },
-  "skip": "Skip",
-  "@skip": {
-    "description": "Skip button text"
-  },
   "done": "Done!",
   "@done": {
     "description": "Done button text"
-  },
-  "zenuHealthReminder": "Zenu - Health Reminder",
-  "@zenuHealthReminder": {
-    "description": "App title in simple home screen"
-  },
-  "complete": "Complete",
-  "@complete": {
-    "description": "Complete button text"
   },
   "snooze10m": "Snooze 10m",
   "@snooze10m": {
@@ -613,10 +587,6 @@
   "@testReminder": {
     "description": "Test reminder button tooltip"
   },
-  "today": "Today",
-  "@today": {
-    "description": "Today stats label"
-  },
   "streak": "Streak",
   "@streak": {
     "description": "Streak stats label"
@@ -633,7 +603,9 @@
   "@reminderListAccessibility": {
     "description": "Accessibility label for reminder list",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "settings": "Settings",
@@ -680,14 +652,18 @@
   "@reminderEnabled": {
     "description": "Message shown when reminder is enabled",
     "placeholders": {
-      "reminderTitle": {"type": "String"}
+      "reminderTitle": {
+        "type": "String"
+      }
     }
   },
   "reminderDisabled": "{reminderTitle} disabled",
   "@reminderDisabled": {
     "description": "Message shown when reminder is disabled",
     "placeholders": {
-      "reminderTitle": {"type": "String"}
+      "reminderTitle": {
+        "type": "String"
+      }
     }
   },
   "categoryHealth": "Health",
@@ -774,7 +750,9 @@
   "@tapToEnable": {
     "description": "Tooltip for inactive reminder",
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "doneButton": "Done",
@@ -817,7 +795,9 @@
   "@times": {
     "description": "Number of times completed",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "dailyAverage": "Daily avg",
@@ -840,7 +820,9 @@
   "@reminderAddedNamed": {
     "description": "Confirmation shown after adding a reminder",
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
   },
   "maxActiveReminders": "Maximum of 15 active reminders reached",
@@ -891,7 +873,411 @@
   "@editReminderNamed": {
     "description": "Accessibility label for a reminder bubble",
     "placeholders": {
-      "title": {"type": "String"}
+      "title": {
+        "type": "String"
+      }
     }
+  },
+  "v2NotifChannelName": "Care reminders",
+  "@v2NotifChannelName": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotifChannelDescription": "Your pet asks for water, eye breaks, and movement",
+  "@v2NotifChannelDescription": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ActionDone": "Done",
+  "@v2ActionDone": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ActionSnooze": "Snooze 10 min",
+  "@v2ActionSnooze": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotifTitleWater": "Your pet is thirsty",
+  "@v2NotifTitleWater": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotifTitleEyeRest": "Your pet's eyes are tired",
+  "@v2NotifTitleEyeRest": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotifTitleMove": "Your pet is fidgety",
+  "@v2NotifTitleMove": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotifTitleStretch": "Your pet wants to stretch",
+  "@v2NotifTitleStretch": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotifTitleStrength": "Your pet is feeling mighty",
+  "@v2NotifTitleStrength": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotifBodyWater": "Time for a sip of water.",
+  "@v2NotifBodyWater": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotifBodyEyeRest": "Look 20 feet away for 20 seconds — together.",
+  "@v2NotifBodyEyeRest": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotifBodyMove": "Stand up and move for a minute.",
+  "@v2NotifBodyMove": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotifBodyStretch": "A little stretch goes a long way.",
+  "@v2NotifBodyStretch": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotifBodyStrength": "A few reps together?",
+  "@v2NotifBodyStrength": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ActivityWater": "Water",
+  "@v2ActivityWater": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ActivityEyeRest": "Eyes",
+  "@v2ActivityEyeRest": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ActivityMove": "Move",
+  "@v2ActivityMove": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ActivityStretch": "Stretch",
+  "@v2ActivityStretch": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ActivityStrength": "Strength",
+  "@v2ActivityStrength": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2SpeechContent": "All good. I'm happy when you're well.",
+  "@v2SpeechContent": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2SpeechThirsty": "I could use a sip of water…",
+  "@v2SpeechThirsty": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2SpeechTiredEyes": "My eyes are getting heavy…",
+  "@v2SpeechTiredEyes": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2SpeechFidgety": "I need to wiggle. Walk with me?",
+  "@v2SpeechFidgety": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2SpeechStretchy": "Stretch time! Arms up — do it with me!",
+  "@v2SpeechStretchy": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2SpeechMighty": "Game face on. A few reps together!",
+  "@v2SpeechMighty": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2SpeechResting": "{petName} is resting. Tap Start when you're ready.",
+  "@v2SpeechResting": {
+    "description": "Zenu v2 pet UI",
+    "placeholders": {
+      "petName": {
+        "type": "String"
+      }
+    }
+  },
+  "v2GoodMorning": "Good morning",
+  "@v2GoodMorning": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2GoodAfternoon": "Good afternoon",
+  "@v2GoodAfternoon": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2GoodEvening": "Good evening",
+  "@v2GoodEvening": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2PetWithYou": "{petName} is with you today",
+  "@v2PetWithYou": {
+    "description": "Zenu v2 pet UI",
+    "placeholders": {
+      "petName": {
+        "type": "String"
+      }
+    }
+  },
+  "v2ChooseCompanionTitle": "Choose your companion",
+  "@v2ChooseCompanionTitle": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ChooseCompanionSubtitle": "Your pet feels what your body needs — thirsty when you should drink, tired-eyed when you need a screen break. Caring for it is caring for you.",
+  "@v2ChooseCompanionSubtitle": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2StartTogether": "Start together with {name}",
+  "@v2StartTogether": {
+    "description": "Zenu v2 pet UI",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "v2PetNeverSuffers": "Your pet never gets sick, sad, or lost. It just needs what you need.",
+  "@v2PetNeverSuffers": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2BlurbMiro": "A calm sprout-spirit. Gentle, patient, hums when watered.",
+  "@v2BlurbMiro": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2BlurbPip": "A bouncy cloud-pup. Cheers loudest when you stand and move.",
+  "@v2BlurbPip": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2BlurbLuma": "A dreamy star-cat. Guards your eyes and your evenings.",
+  "@v2BlurbLuma": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CareButtonWater": "Give water · I just drank",
+  "@v2CareButtonWater": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CareButtonEyeRest": "Rest eyes · Just did",
+  "@v2CareButtonEyeRest": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CareButtonMove": "We moved!",
+  "@v2CareButtonMove": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CareButtonStretch": "We stretched!",
+  "@v2CareButtonStretch": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CareButtonStrength": "Log workout",
+  "@v2CareButtonStrength": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Snooze10": "Snooze 10 min",
+  "@v2Snooze10": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Start": "Start",
+  "@v2Start": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Pause": "Pause",
+  "@v2Pause": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Wardrobe": "Wardrobe",
+  "@v2Wardrobe": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Owned": "Owned",
+  "@v2Owned": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Wearing": "Wearing",
+  "@v2Wearing": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2WardrobeHint": "Sparks come from care moments — a drink logged, a stretch done. Nothing to buy, nothing to lose.",
+  "@v2WardrobeHint": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticCozyScarf": "Cozy Scarf",
+  "@v2CosmeticCozyScarf": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticRoundGlasses": "Round Glasses",
+  "@v2CosmeticRoundGlasses": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticLeafCrown": "Leaf Crown",
+  "@v2CosmeticLeafCrown": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticNightCap": "Night Cap",
+  "@v2CosmeticNightCap": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticTinyMug": "Tiny Mug",
+  "@v2CosmeticTinyMug": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticStarCharm": "Star Charm",
+  "@v2CosmeticStarCharm": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Journey": "Journey",
+  "@v2Journey": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Today": "Today",
+  "@v2Today": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Last14Days": "Last 14 days",
+  "@v2Last14Days": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CareMoments": "{count} care moments",
+  "@v2CareMoments": {
+    "description": "Zenu v2 pet UI",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "v2Settings": "Settings",
+  "@v2Settings": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Intervals": "Reminders",
+  "@v2Intervals": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Every": "Every {minutes} min",
+  "@v2Every": {
+    "description": "Zenu v2 pet UI",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "v2MinutesShort": "{minutes} min",
+  "@v2MinutesShort": {
+    "description": "Zenu v2 pet UI",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "v2Theme": "Theme",
+  "@v2Theme": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ThemeSystem": "System",
+  "@v2ThemeSystem": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ThemeLight": "Light",
+  "@v2ThemeLight": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ThemeDark": "Dark",
+  "@v2ThemeDark": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Desktop": "Desktop",
+  "@v2Desktop": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CloseToTray": "Close to tray",
+  "@v2CloseToTray": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2AlwaysOnTop": "Always on top",
+  "@v2AlwaysOnTop": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2LaunchAtStartup": "Launch at startup",
+  "@v2LaunchAtStartup": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotificationsOff": "Notifications are off",
+  "@v2NotificationsOff": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2NotificationsOffHint": "Zenu can't remind you until notifications are allowed.",
+  "@v2NotificationsOffHint": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2EnableNotifications": "Allow",
+  "@v2EnableNotifications": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2DataSection": "Your data",
+  "@v2DataSection": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ExportData": "Export data (copy JSON)",
+  "@v2ExportData": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ExportCopied": "Copied to clipboard",
+  "@v2ExportCopied": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ClearAllData": "Clear all data",
+  "@v2ClearAllData": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ClearAllConfirmTitle": "Delete everything?",
+  "@v2ClearAllConfirmTitle": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ClearAllConfirmBody": "Your reminders, history, sparks, and pet will be gone. This can't be undone.",
+  "@v2ClearAllConfirmBody": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Cancel": "Cancel",
+  "@v2Cancel": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Delete": "Delete",
+  "@v2Delete": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2HowMuch": "How much?",
+  "@v2HowMuch": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Log": "Log",
+  "@v2Log": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2TabPet": "Pet",
+  "@v2TabPet": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2TabWardrobe": "Wardrobe",
+  "@v2TabWardrobe": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2TabJourney": "Journey",
+  "@v2TabJourney": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2TabSettings": "Settings",
+  "@v2TabSettings": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2TrayShow": "Show Zenu",
+  "@v2TrayShow": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2TrayPause": "Pause reminders",
+  "@v2TrayPause": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2TrayResume": "Resume reminders",
+  "@v2TrayResume": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2TrayQuit": "Quit",
+  "@v2TrayQuit": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2MigratedNotice": "Welcome back — your old reminders and history came along.",
+  "@v2MigratedNotice": {
+    "description": "Zenu v2 pet UI"
   }
 }

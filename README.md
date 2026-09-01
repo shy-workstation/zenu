@@ -2,6 +2,12 @@
 
 Your personal wellness companion that helps you maintain healthy habits throughout your workday with customizable reminders for eye rest, exercise, hydration, and more.
 
+> **This branch (`v2-pet-companion`)** is the ground-up v2 rework: a virtual-pet
+> companion whose needs mirror your reminders, with OS-scheduled notifications on
+> Android/iOS/Windows, tray support, and a rebuilt data layer. See
+> [docs/V2.md](docs/V2.md) for the v2 architecture. Sections below describing the
+> v1 UI do not apply to this branch.
+
 [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-blue?logo=microsoft)](https://apps.microsoft.com/detail/9PHV0W6NVW2S)
 [![Version](https://img.shields.io/badge/version-1.1.0-green)](CHANGELOG.md)
 [![Platform](https://img.shields.io/badge/platform-Android%20%7C%20Windows-lightgrey)](https://flutter.dev)
@@ -94,22 +100,10 @@ flutter build macos --release
 
 ## 🏗️ Project Structure
 
-```
-lib/
-├── models/
-│   ├── reminder.dart          # Reminder data model
-│   └── statistics.dart        # Statistics tracking model
-├── services/
-│   ├── data_service.dart      # Local data storage
-│   ├── notification_service.dart  # Push notifications
-│   └── reminder_service.dart  # Core reminder logic
-├── screens/
-│   ├── home_screen.dart       # Main app interface
-│   └── statistics_screen.dart # Progress dashboard
-├── widgets/
-│   └── reminder_card.dart     # Individual reminder cards
-└── main.dart                  # App entry point
-```
+See [docs/V2.md](docs/V2.md) for the current architecture: a pure-Dart
+`domain/` layer, a versioned `data/` store with legacy migration,
+`services/` (care state authority, OS notification scheduler, tray), and
+the pet `ui/`.
 
 ## 📋 Default Reminder Settings
 

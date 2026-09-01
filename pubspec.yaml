@@ -41,6 +41,9 @@ dependencies:
   msix: ^3.16.12
   window_manager: ^0.5.1
   flutter_svg: ^2.0.10
+  provider: ^6.1.5+1
+  tray_manager: ^0.5.3
+  launch_at_startup: ^0.5.1
 
 dev_dependencies:
   flutter_test:
@@ -84,6 +87,8 @@ flutter:
 
   assets:
     - assets/icon/app_icon_zenu_300.svg
+    - assets/icon/tray_icon.ico
+    - assets/icon/app_icon_512.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -142,3 +147,10 @@ msix_config:
   icons_background_color: transparent
   languages: en-us, de-de
   store: true
+  # COM toast activator so Windows toast taps and action buttons reach the
+  # app under MSIX. The CLSID must match the guid passed to
+  # WindowsInitializationSettings in notification_scheduler.dart.
+  toast_activator:
+    clsid: "BE46DC6D-FD4E-4ABB-A08C-68EABDEC1169"
+    arguments: ""
+    display_name: Zenu

@@ -1,33 +1,40 @@
-import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:launch_at_startup/launch_at_startup.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
+
+import 'data/app_store.dart';
 import 'l10n/app_localizations.dart';
-import 'services/notification_service.dart';
-import 'services/reminder_service.dart';
-import 'services/data_service.dart';
-import 'services/theme_service.dart';
-import 'screens/orbital_home_screen.dart';
-import 'utils/state_management.dart';
-import 'utils/platform_helper.dart';
+import 'services/care_service.dart';
+import 'services/notification_scheduler.dart';
+import 'services/notification_texts.dart';
+import 'services/theme_controller.dart';
+import 'services/ticker_service.dart';
+import 'services/tray_service.dart';
+import 'ui/shell.dart';
+import 'ui/zenu_theme.dart';
+
+bool get _isDesktop =>
+    !kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize window manager only on desktop platforms
-  if (PlatformHelper.supportsWindowManagement) {
+  if (_isDesktop) {
     await windowManager.ensureInitialized();
-
-    WindowOptions windowOptions = const WindowOptions(
-      size: Size(1280, 960),
-      minimumSize: Size(900, 760),
+    // A companion, not a dashboard: small by default, comfortable minimum.
+    const windowOptions = WindowOptions(
+      size: Size(430, 700),
+      minimumSize: Size(360, 560),
       center: true,
-      backgroundColor: Colors.transparent,
-      skipTaskbar: false,
+      title: 'Zenu',
       titleBarStyle: TitleBarStyle.normal,
-      windowButtonVisibility: true,
     );
-
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
       await windowManager.focus();
@@ -35,99 +42,137 @@ void main() async {
   }
 
   try {
-    final notificationService = await NotificationService.getInstance();
-    final dataService = await DataService.getInstance();
-    final themeService = await ThemeService.getInstance();
-    final reminderService = ReminderService(notificationService, dataService);
+    final prefs = await SharedPreferences.getInstance();
+    final scheduler = await NotificationScheduler.create();
+    final store = AppStore(prefs);
+    final care = await CareService.create(store: store, scheduler: scheduler);
+    final themeController = ThemeController(prefs);
+    final ticker = TickerService(care);
 
-    await reminderService.loadData();
+    await care.refreshPermissionStatus();
 
-    runApp(
-      HealthReminderApp(
-        reminderService: reminderService,
-        themeService: themeService,
-      ),
-    );
-  } catch (e) {
-    if (kDebugMode) {
-      debugPrint('Failed to start app: $e');
+    if (_isDesktop && care.state.alwaysOnTop) {
+      try {
+        await windowManager.setAlwaysOnTop(true);
+      } catch (_) {}
+    }
+    if (Platform.isWindows || Platform.isMacOS) {
+      try {
+        launchAtStartup.setup(
+          appName: 'Zenu',
+          appPath: Platform.resolvedExecutable,
+        );
+      } catch (_) {}
     }
 
-    runApp(
-      MaterialApp(
-        title: 'Zenu',
-        home: Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                const SizedBox(height: 16),
-                const Text(
-                  'Unable to start Zenu',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  kDebugMode
-                      ? 'Please restart the application.\n$e'
-                      : 'Please restart the application.',
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
+    runApp(ZenuApp(
+      care: care,
+      themeController: themeController,
+      ticker: ticker,
+    ));
+  } catch (e, stack) {
+    debugPrint('Failed to start Zenu: $e\n$stack');
+    runApp(const _StartupErrorApp());
+  }
+}
+
+class ZenuApp extends StatefulWidget {
+  final CareService care;
+  final ThemeController themeController;
+  final TickerService ticker;
+
+  const ZenuApp({
+    super.key,
+    required this.care,
+    required this.themeController,
+    required this.ticker,
+  });
+
+  @override
+  State<ZenuApp> createState() => _ZenuAppState();
+}
+
+class _ZenuAppState extends State<ZenuApp> {
+  TrayService? _tray;
+
+  @override
+  void dispose() {
+    _tray?.dispose();
+    widget.ticker.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: widget.care),
+        ChangeNotifierProvider.value(value: widget.themeController),
+        Provider.value(value: widget.ticker),
+      ],
+      child: Consumer<ThemeController>(
+        builder: (context, themeController, _) => MaterialApp(
+          title: 'Zenu',
+          theme: ZenuTheme.light(),
+          darkTheme: ZenuTheme.dark(),
+          themeMode: themeController.mode,
+          supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          builder: (context, child) {
+            final l10n = AppLocalizations.of(context);
+            if (l10n != null) {
+              widget.care.setTexts(NotificationTexts.of(l10n));
+              _initTrayOnce(l10n);
+            }
+            return child!;
+          },
+          home: const ZenuShell(),
         ),
       ),
     );
   }
+
+  void _initTrayOnce(AppLocalizations l10n) {
+    if (_tray != null || !TrayService.supported) return;
+    _tray = TrayService(
+      widget.care,
+      showLabel: l10n.v2TrayShow,
+      pauseLabel: l10n.v2TrayPause,
+      resumeLabel: l10n.v2TrayResume,
+      quitLabel: l10n.v2TrayQuit,
+    );
+    _tray!.init();
+  }
 }
 
-class HealthReminderApp extends StatelessWidget {
-  final ReminderService reminderService;
-  final ThemeService themeService;
-
-  const HealthReminderApp({
-    super.key,
-    required this.reminderService,
-    required this.themeService,
-  });
+class _StartupErrorApp extends StatelessWidget {
+  const _StartupErrorApp();
 
   @override
   Widget build(BuildContext context) {
-    return Provider<ThemeService>(
-      value: themeService,
-      child: Consumer<ThemeService>(
-        builder: (context, themeService, child) {
-          return Provider<ReminderService>(
-            value: reminderService,
-            child: MaterialApp(
-              title: 'Zenu',
-              theme: themeService.lightTheme,
-              darkTheme: themeService.darkTheme,
-              themeMode: themeService.themeMode,
-              supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              builder: (context, widget) {
-                final localizations = AppLocalizations.of(context);
-                if (localizations != null) {
-                  reminderService.setLocalizations(localizations);
-                }
-                return widget!;
-              },
-              home: OrbitalHomeScreen(
-                reminderService: reminderService,
-                themeService: themeService,
+    return MaterialApp(
+      title: 'Zenu',
+      home: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.error_outline, size: 64, color: Colors.red),
+              SizedBox(height: 16),
+              Text(
+                'Unable to start Zenu',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-            ),
-          );
-        },
+              SizedBox(height: 8),
+              Text('Please restart the application.'),
+            ],
+          ),
+        ),
       ),
     );
   }

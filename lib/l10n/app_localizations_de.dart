@@ -654,4 +654,308 @@ class AppLocalizationsDe extends AppLocalizations {
   String editReminderNamed(String title) {
     return '$title bearbeiten';
   }
+
+  @override
+  String get v2NotifChannelName => 'Pflege-Erinnerungen';
+
+  @override
+  String get v2NotifChannelDescription =>
+      'Dein Begleiter bittet um Wasser, Augenpausen und Bewegung';
+
+  @override
+  String get v2ActionDone => 'Erledigt';
+
+  @override
+  String get v2ActionSnooze => '10 Min. später';
+
+  @override
+  String get v2NotifTitleWater => 'Dein Begleiter hat Durst';
+
+  @override
+  String get v2NotifTitleEyeRest => 'Die Augen deines Begleiters sind müde';
+
+  @override
+  String get v2NotifTitleMove => 'Dein Begleiter ist zappelig';
+
+  @override
+  String get v2NotifTitleStretch => 'Dein Begleiter möchte sich strecken';
+
+  @override
+  String get v2NotifTitleStrength => 'Dein Begleiter fühlt sich stark';
+
+  @override
+  String get v2NotifBodyWater => 'Zeit für einen Schluck Wasser.';
+
+  @override
+  String get v2NotifBodyEyeRest =>
+      'Schau 20 Sekunden in die Ferne – gemeinsam.';
+
+  @override
+  String get v2NotifBodyMove => 'Steh auf und beweg dich eine Minute.';
+
+  @override
+  String get v2NotifBodyStretch => 'Eine kleine Dehnung wirkt Wunder.';
+
+  @override
+  String get v2NotifBodyStrength => 'Ein paar Wiederholungen zusammen?';
+
+  @override
+  String get v2ActivityWater => 'Wasser';
+
+  @override
+  String get v2ActivityEyeRest => 'Augen';
+
+  @override
+  String get v2ActivityMove => 'Bewegung';
+
+  @override
+  String get v2ActivityStretch => 'Dehnen';
+
+  @override
+  String get v2ActivityStrength => 'Kraft';
+
+  @override
+  String get v2SpeechContent =>
+      'Alles gut. Mir geht\'s gut, wenn\'s dir gut geht.';
+
+  @override
+  String get v2SpeechThirsty => 'Ich könnte einen Schluck Wasser gebrauchen …';
+
+  @override
+  String get v2SpeechTiredEyes => 'Meine Augen werden schwer …';
+
+  @override
+  String get v2SpeechFidgety => 'Ich muss mich bewegen. Gehst du mit?';
+
+  @override
+  String get v2SpeechStretchy => 'Zeit zum Strecken! Arme hoch – mach mit!';
+
+  @override
+  String get v2SpeechMighty =>
+      'Jetzt wird\'s ernst. Ein paar Wiederholungen zusammen!';
+
+  @override
+  String v2SpeechResting(String petName) {
+    return '$petName ruht sich aus. Tippe auf Start, wenn du bereit bist.';
+  }
+
+  @override
+  String get v2GoodMorning => 'Guten Morgen';
+
+  @override
+  String get v2GoodAfternoon => 'Guten Tag';
+
+  @override
+  String get v2GoodEvening => 'Guten Abend';
+
+  @override
+  String v2PetWithYou(String petName) {
+    return '$petName ist heute bei dir';
+  }
+
+  @override
+  String get v2ChooseCompanionTitle => 'Wähle deinen Begleiter';
+
+  @override
+  String get v2ChooseCompanionSubtitle =>
+      'Dein Begleiter fühlt, was dein Körper braucht – durstig, wenn du trinken solltest, müde Augen, wenn du eine Pause brauchst. Für ihn zu sorgen heißt, für dich zu sorgen.';
+
+  @override
+  String v2StartTogether(String name) {
+    return 'Gemeinsam mit $name starten';
+  }
+
+  @override
+  String get v2PetNeverSuffers =>
+      'Dein Begleiter wird nie krank, traurig oder geht verloren. Er braucht nur, was du brauchst.';
+
+  @override
+  String get v2BlurbMiro =>
+      'Ein ruhiger Sprossengeist. Sanft, geduldig, summt beim Gießen.';
+
+  @override
+  String get v2BlurbPip =>
+      'Ein munterer Wolkenwelpe. Jubelt am lautesten, wenn du dich bewegst.';
+
+  @override
+  String get v2BlurbLuma =>
+      'Eine verträumte Sternenkatze. Wacht über deine Augen und Abende.';
+
+  @override
+  String get v2CareButtonWater => 'Wasser geben · Ich habe getrunken';
+
+  @override
+  String get v2CareButtonEyeRest => 'Augen ausruhen · Gerade gemacht';
+
+  @override
+  String get v2CareButtonMove => 'Wir haben uns bewegt!';
+
+  @override
+  String get v2CareButtonStretch => 'Wir haben uns gedehnt!';
+
+  @override
+  String get v2CareButtonStrength => 'Training eintragen';
+
+  @override
+  String get v2Snooze10 => '10 Minuten später';
+
+  @override
+  String get v2Start => 'Start';
+
+  @override
+  String get v2Pause => 'Pause';
+
+  @override
+  String get v2Wardrobe => 'Garderobe';
+
+  @override
+  String get v2Owned => 'Im Besitz';
+
+  @override
+  String get v2Wearing => 'Angezogen';
+
+  @override
+  String get v2WardrobeHint =>
+      'Funken gibt es für Pflegemomente – ein Schluck, eine Dehnung. Nichts zu kaufen, nichts zu verlieren.';
+
+  @override
+  String get v2CosmeticCozyScarf => 'Kuscheliger Schal';
+
+  @override
+  String get v2CosmeticRoundGlasses => 'Runde Brille';
+
+  @override
+  String get v2CosmeticLeafCrown => 'Blätterkrone';
+
+  @override
+  String get v2CosmeticNightCap => 'Schlafmütze';
+
+  @override
+  String get v2CosmeticTinyMug => 'Kleine Tasse';
+
+  @override
+  String get v2CosmeticStarCharm => 'Sternanhänger';
+
+  @override
+  String get v2Journey => 'Verlauf';
+
+  @override
+  String get v2Today => 'Heute';
+
+  @override
+  String get v2Last14Days => 'Letzte 14 Tage';
+
+  @override
+  String v2CareMoments(int count) {
+    return '$count Pflegemomente';
+  }
+
+  @override
+  String get v2Settings => 'Einstellungen';
+
+  @override
+  String get v2Intervals => 'Erinnerungen';
+
+  @override
+  String v2Every(int minutes) {
+    return 'Alle $minutes Min.';
+  }
+
+  @override
+  String v2MinutesShort(int minutes) {
+    return '$minutes Min.';
+  }
+
+  @override
+  String get v2Theme => 'Design';
+
+  @override
+  String get v2ThemeSystem => 'System';
+
+  @override
+  String get v2ThemeLight => 'Hell';
+
+  @override
+  String get v2ThemeDark => 'Dunkel';
+
+  @override
+  String get v2Desktop => 'Desktop';
+
+  @override
+  String get v2CloseToTray => 'Beim Schließen in den Infobereich';
+
+  @override
+  String get v2AlwaysOnTop => 'Immer im Vordergrund';
+
+  @override
+  String get v2LaunchAtStartup => 'Beim Systemstart starten';
+
+  @override
+  String get v2NotificationsOff => 'Benachrichtigungen sind aus';
+
+  @override
+  String get v2NotificationsOffHint =>
+      'Zenu kann dich nicht erinnern, solange Benachrichtigungen nicht erlaubt sind.';
+
+  @override
+  String get v2EnableNotifications => 'Erlauben';
+
+  @override
+  String get v2DataSection => 'Deine Daten';
+
+  @override
+  String get v2ExportData => 'Daten exportieren (JSON kopieren)';
+
+  @override
+  String get v2ExportCopied => 'In die Zwischenablage kopiert';
+
+  @override
+  String get v2ClearAllData => 'Alle Daten löschen';
+
+  @override
+  String get v2ClearAllConfirmTitle => 'Alles löschen?';
+
+  @override
+  String get v2ClearAllConfirmBody =>
+      'Deine Erinnerungen, dein Verlauf, deine Funken und dein Begleiter werden gelöscht. Das lässt sich nicht rückgängig machen.';
+
+  @override
+  String get v2Cancel => 'Abbrechen';
+
+  @override
+  String get v2Delete => 'Löschen';
+
+  @override
+  String get v2HowMuch => 'Wie viel?';
+
+  @override
+  String get v2Log => 'Eintragen';
+
+  @override
+  String get v2TabPet => 'Begleiter';
+
+  @override
+  String get v2TabWardrobe => 'Garderobe';
+
+  @override
+  String get v2TabJourney => 'Verlauf';
+
+  @override
+  String get v2TabSettings => 'Einstellungen';
+
+  @override
+  String get v2TrayShow => 'Zenu anzeigen';
+
+  @override
+  String get v2TrayPause => 'Erinnerungen pausieren';
+
+  @override
+  String get v2TrayResume => 'Erinnerungen fortsetzen';
+
+  @override
+  String get v2TrayQuit => 'Beenden';
+
+  @override
+  String get v2MigratedNotice =>
+      'Willkommen zurück – deine alten Erinnerungen und dein Verlauf sind mitgekommen.';
 }

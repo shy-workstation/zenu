@@ -1249,6 +1249,564 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit {title}'**
   String editReminderNamed(String title);
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Care reminders'**
+  String get v2NotifChannelName;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Your pet asks for water, eye breaks, and movement'**
+  String get v2NotifChannelDescription;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get v2ActionDone;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze 10 min'**
+  String get v2ActionSnooze;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Your pet is thirsty'**
+  String get v2NotifTitleWater;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Your pet\'s eyes are tired'**
+  String get v2NotifTitleEyeRest;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Your pet is fidgety'**
+  String get v2NotifTitleMove;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Your pet wants to stretch'**
+  String get v2NotifTitleStretch;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Your pet is feeling mighty'**
+  String get v2NotifTitleStrength;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Time for a sip of water.'**
+  String get v2NotifBodyWater;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Look 20 feet away for 20 seconds — together.'**
+  String get v2NotifBodyEyeRest;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Stand up and move for a minute.'**
+  String get v2NotifBodyMove;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'A little stretch goes a long way.'**
+  String get v2NotifBodyStretch;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'A few reps together?'**
+  String get v2NotifBodyStrength;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Water'**
+  String get v2ActivityWater;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Eyes'**
+  String get v2ActivityEyeRest;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Move'**
+  String get v2ActivityMove;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Stretch'**
+  String get v2ActivityStretch;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Strength'**
+  String get v2ActivityStrength;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'All good. I\'m happy when you\'re well.'**
+  String get v2SpeechContent;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'I could use a sip of water…'**
+  String get v2SpeechThirsty;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'My eyes are getting heavy…'**
+  String get v2SpeechTiredEyes;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'I need to wiggle. Walk with me?'**
+  String get v2SpeechFidgety;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Stretch time! Arms up — do it with me!'**
+  String get v2SpeechStretchy;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Game face on. A few reps together!'**
+  String get v2SpeechMighty;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'{petName} is resting. Tap Start when you\'re ready.'**
+  String v2SpeechResting(String petName);
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get v2GoodMorning;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
+  String get v2GoodAfternoon;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening'**
+  String get v2GoodEvening;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'{petName} is with you today'**
+  String v2PetWithYou(String petName);
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your companion'**
+  String get v2ChooseCompanionTitle;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Your pet feels what your body needs — thirsty when you should drink, tired-eyed when you need a screen break. Caring for it is caring for you.'**
+  String get v2ChooseCompanionSubtitle;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Start together with {name}'**
+  String v2StartTogether(String name);
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Your pet never gets sick, sad, or lost. It just needs what you need.'**
+  String get v2PetNeverSuffers;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'A calm sprout-spirit. Gentle, patient, hums when watered.'**
+  String get v2BlurbMiro;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'A bouncy cloud-pup. Cheers loudest when you stand and move.'**
+  String get v2BlurbPip;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'A dreamy star-cat. Guards your eyes and your evenings.'**
+  String get v2BlurbLuma;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Give water · I just drank'**
+  String get v2CareButtonWater;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Rest eyes · Just did'**
+  String get v2CareButtonEyeRest;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'We moved!'**
+  String get v2CareButtonMove;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'We stretched!'**
+  String get v2CareButtonStretch;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Log workout'**
+  String get v2CareButtonStrength;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze 10 min'**
+  String get v2Snooze10;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get v2Start;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get v2Pause;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Wardrobe'**
+  String get v2Wardrobe;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Owned'**
+  String get v2Owned;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Wearing'**
+  String get v2Wearing;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Sparks come from care moments — a drink logged, a stretch done. Nothing to buy, nothing to lose.'**
+  String get v2WardrobeHint;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Cozy Scarf'**
+  String get v2CosmeticCozyScarf;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Round Glasses'**
+  String get v2CosmeticRoundGlasses;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Leaf Crown'**
+  String get v2CosmeticLeafCrown;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Night Cap'**
+  String get v2CosmeticNightCap;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny Mug'**
+  String get v2CosmeticTinyMug;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Star Charm'**
+  String get v2CosmeticStarCharm;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Journey'**
+  String get v2Journey;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get v2Today;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Last 14 days'**
+  String get v2Last14Days;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'{count} care moments'**
+  String v2CareMoments(int count);
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get v2Settings;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get v2Intervals;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Every {minutes} min'**
+  String v2Every(int minutes);
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String v2MinutesShort(int minutes);
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get v2Theme;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get v2ThemeSystem;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get v2ThemeLight;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get v2ThemeDark;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Desktop'**
+  String get v2Desktop;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Close to tray'**
+  String get v2CloseToTray;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Always on top'**
+  String get v2AlwaysOnTop;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Launch at startup'**
+  String get v2LaunchAtStartup;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are off'**
+  String get v2NotificationsOff;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Zenu can\'t remind you until notifications are allowed.'**
+  String get v2NotificationsOffHint;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get v2EnableNotifications;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Your data'**
+  String get v2DataSection;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Export data (copy JSON)'**
+  String get v2ExportData;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get v2ExportCopied;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all data'**
+  String get v2ClearAllData;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Delete everything?'**
+  String get v2ClearAllConfirmTitle;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Your reminders, history, sparks, and pet will be gone. This can\'t be undone.'**
+  String get v2ClearAllConfirmBody;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get v2Cancel;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get v2Delete;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'How much?'**
+  String get v2HowMuch;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Log'**
+  String get v2Log;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Pet'**
+  String get v2TabPet;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Wardrobe'**
+  String get v2TabWardrobe;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Journey'**
+  String get v2TabJourney;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get v2TabSettings;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Show Zenu'**
+  String get v2TrayShow;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Pause reminders'**
+  String get v2TrayPause;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Resume reminders'**
+  String get v2TrayResume;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Quit'**
+  String get v2TrayQuit;
+
+  /// Zenu v2 pet UI
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back — your old reminders and history came along.'**
+  String get v2MigratedNotice;
 }
 
 class _AppLocalizationsDelegate

@@ -650,4 +650,306 @@ class AppLocalizationsEn extends AppLocalizations {
   String editReminderNamed(String title) {
     return 'Edit $title';
   }
+
+  @override
+  String get v2NotifChannelName => 'Care reminders';
+
+  @override
+  String get v2NotifChannelDescription =>
+      'Your pet asks for water, eye breaks, and movement';
+
+  @override
+  String get v2ActionDone => 'Done';
+
+  @override
+  String get v2ActionSnooze => 'Snooze 10 min';
+
+  @override
+  String get v2NotifTitleWater => 'Your pet is thirsty';
+
+  @override
+  String get v2NotifTitleEyeRest => 'Your pet\'s eyes are tired';
+
+  @override
+  String get v2NotifTitleMove => 'Your pet is fidgety';
+
+  @override
+  String get v2NotifTitleStretch => 'Your pet wants to stretch';
+
+  @override
+  String get v2NotifTitleStrength => 'Your pet is feeling mighty';
+
+  @override
+  String get v2NotifBodyWater => 'Time for a sip of water.';
+
+  @override
+  String get v2NotifBodyEyeRest =>
+      'Look 20 feet away for 20 seconds — together.';
+
+  @override
+  String get v2NotifBodyMove => 'Stand up and move for a minute.';
+
+  @override
+  String get v2NotifBodyStretch => 'A little stretch goes a long way.';
+
+  @override
+  String get v2NotifBodyStrength => 'A few reps together?';
+
+  @override
+  String get v2ActivityWater => 'Water';
+
+  @override
+  String get v2ActivityEyeRest => 'Eyes';
+
+  @override
+  String get v2ActivityMove => 'Move';
+
+  @override
+  String get v2ActivityStretch => 'Stretch';
+
+  @override
+  String get v2ActivityStrength => 'Strength';
+
+  @override
+  String get v2SpeechContent => 'All good. I\'m happy when you\'re well.';
+
+  @override
+  String get v2SpeechThirsty => 'I could use a sip of water…';
+
+  @override
+  String get v2SpeechTiredEyes => 'My eyes are getting heavy…';
+
+  @override
+  String get v2SpeechFidgety => 'I need to wiggle. Walk with me?';
+
+  @override
+  String get v2SpeechStretchy => 'Stretch time! Arms up — do it with me!';
+
+  @override
+  String get v2SpeechMighty => 'Game face on. A few reps together!';
+
+  @override
+  String v2SpeechResting(String petName) {
+    return '$petName is resting. Tap Start when you\'re ready.';
+  }
+
+  @override
+  String get v2GoodMorning => 'Good morning';
+
+  @override
+  String get v2GoodAfternoon => 'Good afternoon';
+
+  @override
+  String get v2GoodEvening => 'Good evening';
+
+  @override
+  String v2PetWithYou(String petName) {
+    return '$petName is with you today';
+  }
+
+  @override
+  String get v2ChooseCompanionTitle => 'Choose your companion';
+
+  @override
+  String get v2ChooseCompanionSubtitle =>
+      'Your pet feels what your body needs — thirsty when you should drink, tired-eyed when you need a screen break. Caring for it is caring for you.';
+
+  @override
+  String v2StartTogether(String name) {
+    return 'Start together with $name';
+  }
+
+  @override
+  String get v2PetNeverSuffers =>
+      'Your pet never gets sick, sad, or lost. It just needs what you need.';
+
+  @override
+  String get v2BlurbMiro =>
+      'A calm sprout-spirit. Gentle, patient, hums when watered.';
+
+  @override
+  String get v2BlurbPip =>
+      'A bouncy cloud-pup. Cheers loudest when you stand and move.';
+
+  @override
+  String get v2BlurbLuma =>
+      'A dreamy star-cat. Guards your eyes and your evenings.';
+
+  @override
+  String get v2CareButtonWater => 'Give water · I just drank';
+
+  @override
+  String get v2CareButtonEyeRest => 'Rest eyes · Just did';
+
+  @override
+  String get v2CareButtonMove => 'We moved!';
+
+  @override
+  String get v2CareButtonStretch => 'We stretched!';
+
+  @override
+  String get v2CareButtonStrength => 'Log workout';
+
+  @override
+  String get v2Snooze10 => 'Snooze 10 min';
+
+  @override
+  String get v2Start => 'Start';
+
+  @override
+  String get v2Pause => 'Pause';
+
+  @override
+  String get v2Wardrobe => 'Wardrobe';
+
+  @override
+  String get v2Owned => 'Owned';
+
+  @override
+  String get v2Wearing => 'Wearing';
+
+  @override
+  String get v2WardrobeHint =>
+      'Sparks come from care moments — a drink logged, a stretch done. Nothing to buy, nothing to lose.';
+
+  @override
+  String get v2CosmeticCozyScarf => 'Cozy Scarf';
+
+  @override
+  String get v2CosmeticRoundGlasses => 'Round Glasses';
+
+  @override
+  String get v2CosmeticLeafCrown => 'Leaf Crown';
+
+  @override
+  String get v2CosmeticNightCap => 'Night Cap';
+
+  @override
+  String get v2CosmeticTinyMug => 'Tiny Mug';
+
+  @override
+  String get v2CosmeticStarCharm => 'Star Charm';
+
+  @override
+  String get v2Journey => 'Journey';
+
+  @override
+  String get v2Today => 'Today';
+
+  @override
+  String get v2Last14Days => 'Last 14 days';
+
+  @override
+  String v2CareMoments(int count) {
+    return '$count care moments';
+  }
+
+  @override
+  String get v2Settings => 'Settings';
+
+  @override
+  String get v2Intervals => 'Reminders';
+
+  @override
+  String v2Every(int minutes) {
+    return 'Every $minutes min';
+  }
+
+  @override
+  String v2MinutesShort(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get v2Theme => 'Theme';
+
+  @override
+  String get v2ThemeSystem => 'System';
+
+  @override
+  String get v2ThemeLight => 'Light';
+
+  @override
+  String get v2ThemeDark => 'Dark';
+
+  @override
+  String get v2Desktop => 'Desktop';
+
+  @override
+  String get v2CloseToTray => 'Close to tray';
+
+  @override
+  String get v2AlwaysOnTop => 'Always on top';
+
+  @override
+  String get v2LaunchAtStartup => 'Launch at startup';
+
+  @override
+  String get v2NotificationsOff => 'Notifications are off';
+
+  @override
+  String get v2NotificationsOffHint =>
+      'Zenu can\'t remind you until notifications are allowed.';
+
+  @override
+  String get v2EnableNotifications => 'Allow';
+
+  @override
+  String get v2DataSection => 'Your data';
+
+  @override
+  String get v2ExportData => 'Export data (copy JSON)';
+
+  @override
+  String get v2ExportCopied => 'Copied to clipboard';
+
+  @override
+  String get v2ClearAllData => 'Clear all data';
+
+  @override
+  String get v2ClearAllConfirmTitle => 'Delete everything?';
+
+  @override
+  String get v2ClearAllConfirmBody =>
+      'Your reminders, history, sparks, and pet will be gone. This can\'t be undone.';
+
+  @override
+  String get v2Cancel => 'Cancel';
+
+  @override
+  String get v2Delete => 'Delete';
+
+  @override
+  String get v2HowMuch => 'How much?';
+
+  @override
+  String get v2Log => 'Log';
+
+  @override
+  String get v2TabPet => 'Pet';
+
+  @override
+  String get v2TabWardrobe => 'Wardrobe';
+
+  @override
+  String get v2TabJourney => 'Journey';
+
+  @override
+  String get v2TabSettings => 'Settings';
+
+  @override
+  String get v2TrayShow => 'Show Zenu';
+
+  @override
+  String get v2TrayPause => 'Pause reminders';
+
+  @override
+  String get v2TrayResume => 'Resume reminders';
+
+  @override
+  String get v2TrayQuit => 'Quit';
+
+  @override
+  String get v2MigratedNotice =>
+      'Welcome back — your old reminders and history came along.';
 }
