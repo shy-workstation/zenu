@@ -36,10 +36,16 @@ class PetHomeScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        _greeting(l10n),
-                        style: const TextStyle(
-                            fontSize: 21, fontWeight: FontWeight.w800),
+                      // Ticker-driven so the greeting rolls over with the
+                      // clock instead of freezing on whatever hour the
+                      // screen last rebuilt in.
+                      ValueListenableBuilder<int>(
+                        valueListenable: ticker.nowMs,
+                        builder: (context, _, __) => Text(
+                          _greeting(l10n),
+                          style: const TextStyle(
+                              fontSize: 21, fontWeight: FontWeight.w800),
+                        ),
                       ),
                       Text(
                         l10n.v2PetWithYou(petName),
@@ -106,7 +112,12 @@ class _PetStage extends StatelessWidget {
     final focus = care.focusActivity();
     final species = care.state.game.species ?? PetSpecies.miro;
 
-    return Column(
+    return LayoutBuilder(builder: (context, constraints) {
+      // ~300px of chrome (bubble, rings, buttons, gaps) surrounds the pet;
+      // shrink the pet instead of overflowing on small windows/phones.
+      final petSize =
+          (constraints.maxHeight - 300).clamp(120.0, 250.0).toDouble();
+      return Column(
       children: [
         const Spacer(),
         Container(
@@ -139,7 +150,7 @@ class _PetStage extends StatelessWidget {
           species: species,
           mood: mood,
           worn: care.state.game.worn,
-          size: 250,
+          size: petSize,
         ),
         const Spacer(),
         Padding(
@@ -179,7 +190,8 @@ class _PetStage extends StatelessWidget {
           ),
         const SizedBox(height: 8),
       ],
-    );
+      );
+    });
   }
 
   Widget _primaryAction(BuildContext context, CareActivity? focus) {

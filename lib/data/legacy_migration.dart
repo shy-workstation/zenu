@@ -87,10 +87,12 @@ class LegacyMigration {
         }
       }
 
+      // An activity the v1 user never configured stays off — migration
+      // must not add reminder streams they didn't ask for.
       state.activities = [
         for (final builtin in Activities.defaults)
           builtin.copyWith(
-            enabled: enabled[builtin.id] ?? builtin.enabled,
+            enabled: enabled[builtin.id] ?? false,
             interval: intervalSec[builtin.id] != null
                 ? Duration(seconds: intervalSec[builtin.id]!)
                 : builtin.interval,

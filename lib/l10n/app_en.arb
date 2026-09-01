@@ -1125,7 +1125,7 @@
   "@v2Last14Days": {
     "description": "Zenu v2 pet UI"
   },
-  "v2CareMoments": "{count} care moments",
+  "v2CareMoments": "{count, plural, =1{1 care moment} other{{count} care moments}}",
   "@v2CareMoments": {
     "description": "Zenu v2 pet UI",
     "placeholders": {

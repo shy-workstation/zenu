@@ -249,7 +249,7 @@
   "v2Journey": "Verlauf",
   "v2Today": "Heute",
   "v2Last14Days": "Letzte 14 Tage",
-  "v2CareMoments": "{count} Pflegemomente",
+  "v2CareMoments": "{count, plural, =1{1 Pflegemoment} other{{count} Pflegemomente}}",
   "v2Settings": "Einstellungen",
   "v2Intervals": "Erinnerungen",
   "v2Every": "Alle {minutes} Min.",

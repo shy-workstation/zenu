@@ -30,11 +30,16 @@ class _ZenuShellState extends State<ZenuShell> {
     return Scaffold(
       body: IndexedStack(
         index: _index,
-        children: const [
-          PetHomeScreen(),
-          WardrobeScreen(),
-          JourneyScreen(),
-          SettingsScreen(),
+        children: [
+          // TickerMode stops the offstage tabs' animations (IndexedStack
+          // alone keeps hidden pets breathing at frame rate forever).
+          for (final (i, screen) in const [
+            PetHomeScreen(),
+            WardrobeScreen(),
+            JourneyScreen(),
+            SettingsScreen(),
+          ].indexed)
+            TickerMode(enabled: i == _index, child: screen),
         ],
       ),
       bottomNavigationBar: NavigationBar(

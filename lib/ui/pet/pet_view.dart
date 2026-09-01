@@ -40,6 +40,18 @@ class _PetViewState extends State<PetView> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void didUpdateWidget(PetView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.animated != oldWidget.animated) {
+      if (widget.animated) {
+        _controller.repeat();
+      } else {
+        _controller.stop();
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();

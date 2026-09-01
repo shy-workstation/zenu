@@ -111,11 +111,28 @@ void main() {
     expect(care.state.snoozeUntilMs.containsKey('eyeRest'), isFalse);
   });
 
+  test('rapid-fire logging cannot farm sparks (quarter-interval gate)',
+      () async {
+    final care = await makeService();
+    await care.startSession();
+    clock.advance(const Duration(minutes: 30));
+    await care.logCare('water');
+    expect(care.state.game.sparks, 5);
+
+    // Ten instant re-taps: events log fine, sparks don't accumulate.
+    for (var i = 0; i < 10; i++) {
+      await care.logCare('water');
+    }
+    expect(care.state.events.length, 11);
+    expect(care.state.game.sparks, 5);
+  });
+
   test('wardrobe: buying deducts sparks, wearing toggles, no debt possible',
       () async {
     final care = await makeService();
     await care.startSession();
     for (var i = 0; i < 10; i++) {
+      clock.advance(const Duration(minutes: 30));
       await care.logCare('water');
     }
     expect(care.state.game.sparks, 50);

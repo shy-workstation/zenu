@@ -847,7 +847,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String v2CareMoments(int count) {
-    return '$count Pflegemomente';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Pflegemomente',
+      one: '1 Pflegemoment',
+    );
+    return '$_temp0';
   }
 
   @override

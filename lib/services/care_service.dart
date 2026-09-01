@@ -82,6 +82,12 @@ class CareService extends ChangeNotifier {
     final activity = _activity(activityId);
     if (activity == null) return;
     final at = atMs ?? clock.nowMs();
+    // Sparks only once the need has meaningfully grown (a quarter of the
+    // interval) — logging always works, but rapid-fire taps can't farm
+    // the wardrobe economy.
+    final anchor = state.lastDoneMs[activityId];
+    final earnsSparks = anchor == null ||
+        (at - anchor) >= activity.interval.inMilliseconds ~/ 4;
     state.events.add(CompletionEvent(
       activityId: activityId,
       atMs: at,
@@ -89,7 +95,10 @@ class CareService extends ChangeNotifier {
     ));
     state.lastDoneMs[activityId] = at;
     state.snoozeUntilMs.remove(activityId);
-    state.game = state.game.copyWith(sparks: state.game.sparks + sparksPerCare);
+    if (earnsSparks) {
+      state.game =
+          state.game.copyWith(sparks: state.game.sparks + sparksPerCare);
+    }
     await _persistAndResync();
   }
 
@@ -243,15 +252,17 @@ class CareService extends ChangeNotifier {
   }
 
   /// Care moments per local day for the last [days] days, newest last.
+  /// Day distance is computed on UTC-constructed calendar dates so a DST
+  /// transition (23/25-hour day) can never shift events into the wrong
+  /// bucket via elapsed-time truncation.
   List<int> dailyCounts({int days = 14}) {
     final now = clock.now();
     final counts = List<int>.filled(days, 0);
-    final startOfToday = DateTime(now.year, now.month, now.day);
+    final todayUtc = DateTime.utc(now.year, now.month, now.day);
     for (final e in state.events) {
       final local = DateTime.fromMillisecondsSinceEpoch(e.atMs);
-      final dayDiff = startOfToday
-          .difference(DateTime(local.year, local.month, local.day))
-          .inDays;
+      final dayUtc = DateTime.utc(local.year, local.month, local.day);
+      final dayDiff = todayUtc.difference(dayUtc).inDays;
       if (dayDiff >= 0 && dayDiff < days) {
         counts[days - 1 - dayDiff]++;
       }
@@ -303,7 +314,16 @@ class CareService extends ChangeNotifier {
   }
 
   void setTexts(NotificationTexts newTexts) {
+    // The OS queue is armed at startup with fallback English; once the
+    // real locale arrives, re-arm so scheduled toasts speak the user's
+    // language. Guarded, because MaterialApp's builder calls this on
+    // every rebuild.
+    final changed = texts.channelName != newTexts.channelName ||
+        texts.titleByKind['water'] != newTexts.titleByKind['water'];
     texts = newTexts;
+    if (changed && state.running) {
+      _persistAndResync(notify: false);
+    }
   }
 
   /// In-process delivery check for platforms without OS scheduling
@@ -348,35 +368,56 @@ class CareService extends ChangeNotifier {
   Future<void> _drainPendingActions() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      // The queue is written by the notification background isolate; the
+      // main isolate's prefs cache is a startup snapshot, so reload or the
+      // actions stay invisible until the process dies.
+      await prefs.reload();
       final queue = prefs.getStringList(pendingActionsKey);
       if (queue == null || queue.isEmpty) return;
-      await prefs.remove(pendingActionsKey);
       for (final raw in queue) {
         try {
           final decoded = jsonDecode(raw) as Map<String, dynamic>;
           final activityId = decoded['activityId'] as String;
           final action = decoded['action'] as String? ?? 'tap';
-          final atMs = (decoded['atMs'] as num?)?.toInt();
+          final atMs = (decoded['atMs'] as num?)?.toInt() ?? clock.nowMs();
           if (action == actionDoneId) {
             final activity = _activity(activityId);
             if (activity == null) continue;
+            final anchor = state.lastDoneMs[activityId] ?? 0;
+            // A queued Done at or before the current anchor is already
+            // reflected (or a crash-replay) — applying it again would
+            // duplicate the event and the spark award.
+            if (atMs <= anchor) continue;
             state.events.add(CompletionEvent(
               activityId: activityId,
-              atMs: atMs ?? clock.nowMs(),
+              atMs: atMs,
               qty: activity.goalQty,
             ));
-            final anchor = state.lastDoneMs[activityId] ?? 0;
-            if ((atMs ?? clock.nowMs()) > anchor) {
-              state.lastDoneMs[activityId] = atMs ?? clock.nowMs();
-            }
+            state.lastDoneMs[activityId] = atMs;
             state.snoozeUntilMs.remove(activityId);
             state.game =
                 state.game.copyWith(sparks: state.game.sparks + sparksPerCare);
-          } else if (action == actionSnoozeId && atMs != null) {
+          } else if (action == actionSnoozeId) {
             state.snoozeUntilMs[activityId] =
                 atMs + const Duration(minutes: 10).inMilliseconds;
           }
         } catch (_) {}
+      }
+      // Persist the applied actions BEFORE removing them from the queue,
+      // so a crash or failed save replays instead of silently discarding
+      // the user's taps (replay is deduped by the anchor check above).
+      final saved = await _store.save(state);
+      if (saved) {
+        await prefs.reload();
+        final current = prefs.getStringList(pendingActionsKey) ?? [];
+        if (current.length <= queue.length) {
+          await prefs.remove(pendingActionsKey);
+        } else {
+          // The background isolate appended more while we worked — keep
+          // only the unprocessed tail.
+          await prefs.setStringList(
+              pendingActionsKey, current.sublist(queue.length));
+        }
       }
     } catch (e) {
       debugPrint('draining pending actions failed: $e');
@@ -396,9 +437,23 @@ class CareService extends ChangeNotifier {
     ];
   }
 
-  Future<void> _persistAndResync({bool notify = true}) async {
-    await _store.save(state);
-    await _scheduler?.resync(state, texts);
+  /// Serialized: saves and resyncs are chained so a later call always runs
+  /// after — and therefore supersedes — an earlier one. Without this, two
+  /// overlapping resyncs can interleave their cancel/schedule batches and
+  /// leave stale notifications armed.
+  Future<void> _resyncChain = Future.value();
+
+  Future<void> _persistAndResync({bool notify = true}) {
+    // State is already mutated synchronously by the caller; tell the UI
+    // immediately, persist in order.
     if (notify) notifyListeners();
+    final task = _resyncChain.then((_) async {
+      await _store.save(state);
+      await _scheduler?.resync(state, texts);
+    });
+    _resyncChain = task.catchError((e) {
+      debugPrint('persist/resync failed: $e');
+    });
+    return task;
   }
 }

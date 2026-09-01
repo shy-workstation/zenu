@@ -1601,7 +1601,7 @@ abstract class AppLocalizations {
   /// Zenu v2 pet UI
   ///
   /// In en, this message translates to:
-  /// **'{count} care moments'**
+  /// **'{count, plural, =1{1 care moment} other{{count} care moments}}'**
   String v2CareMoments(int count);
 
   /// Zenu v2 pet UI

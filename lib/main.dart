@@ -56,11 +56,15 @@ void main() async {
         await windowManager.setAlwaysOnTop(true);
       } catch (_) {}
     }
-    if (Platform.isWindows || Platform.isMacOS) {
+    if (_isDesktop) {
       try {
+        // packageName makes launch_at_startup detect the MSIX (Store)
+        // install and use the package startup task instead of a registry
+        // Run key pointing into WindowsApps (which would silently break).
         launchAtStartup.setup(
           appName: 'Zenu',
           appPath: Platform.resolvedExecutable,
+          packageName: 'YousofShehada.Zenu',
         );
       } catch (_) {}
     }

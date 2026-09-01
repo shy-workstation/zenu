@@ -186,17 +186,30 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-class _ActivityRow extends StatelessWidget {
+class _ActivityRow extends StatefulWidget {
   final CareService care;
   final String activityId;
 
   const _ActivityRow({required this.care, required this.activityId});
 
   @override
+  State<_ActivityRow> createState() => _ActivityRowState();
+}
+
+class _ActivityRowState extends State<_ActivityRow> {
+  CareService get care => widget.care;
+  String get activityId => widget.activityId;
+
+  /// Local value while dragging; persisting + re-arming the OS queue
+  /// happens once, on drag end — not on every division crossed.
+  int? _dragMinutes;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final activity =
         care.state.activities.firstWhere((a) => a.id == activityId);
+    final shownMinutes = _dragMinutes ?? activity.interval.inMinutes;
     final label = switch (activity.kind) {
       'water' => l10n.v2ActivityWater,
       'eyeRest' => l10n.v2ActivityEyeRest,
@@ -214,7 +227,7 @@ class _ActivityRow extends StatelessWidget {
             color: ZenuColors.forKind(activity.kind),
           ),
           title: Text(label),
-          subtitle: Text(l10n.v2Every(activity.interval.inMinutes)),
+          subtitle: Text(l10n.v2Every(shownMinutes)),
           value: activity.enabled,
           onChanged: (value) => care.setActivityEnabled(activity.id, value),
         ),
@@ -225,17 +238,20 @@ class _ActivityRow extends StatelessWidget {
               children: [
                 Expanded(
                   child: Slider(
-                    value: activity.interval.inMinutes
-                        .clamp(5, 240)
-                        .toDouble(),
+                    value: shownMinutes.clamp(5, 240).toDouble(),
                     min: 5,
                     max: 240,
                     divisions: 47,
                     activeColor: ZenuColors.forKind(activity.kind),
-                    onChanged: (value) => care.setActivityInterval(
-                      activity.id,
-                      Duration(minutes: value.round()),
-                    ),
+                    onChanged: (value) =>
+                        setState(() => _dragMinutes = value.round()),
+                    onChangeEnd: (value) {
+                      setState(() => _dragMinutes = null);
+                      care.setActivityInterval(
+                        activity.id,
+                        Duration(minutes: value.round()),
+                      );
+                    },
                   ),
                 ),
                 InkWell(
@@ -244,7 +260,7 @@ class _ActivityRow extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(6),
                     child: Text(
-                      l10n.v2MinutesShort(activity.interval.inMinutes),
+                      l10n.v2MinutesShort(shownMinutes),
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         fontFeatures: [FontFeature.tabularFigures()],

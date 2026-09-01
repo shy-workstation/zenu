@@ -30,19 +30,42 @@ class TrayService with TrayListener, WindowListener {
 
   Future<void> init() async {
     if (!supported) return;
+    // Close interception must not depend on the tray icon succeeding —
+    // register the window listener first, in its own try.
+    try {
+      windowManager.addListener(this);
+      await windowManager.setPreventClose(true);
+    } catch (e) {
+      debugPrint('close-to-tray setup failed: $e');
+    }
     try {
       await trayManager.setIcon(
         Platform.isWindows
             ? 'assets/icon/tray_icon.ico'
             : 'assets/icon/app_icon_512.png',
       );
-      await trayManager.setToolTip('Zenu');
-      await _refreshMenu();
       trayManager.addListener(this);
-      windowManager.addListener(this);
-      await windowManager.setPreventClose(true);
+      // Keep the tray menu's Pause/Resume label in sync with the session,
+      // whichever code path toggles it.
+      _lastRunning = care.running;
+      care.addListener(_onCareChanged);
+      await _refreshMenu();
     } catch (e) {
       debugPrint('tray init failed: $e');
+    }
+    // Tooltips are not implemented on every platform (e.g. Linux) — a
+    // failure here must not take the rest of the tray down.
+    try {
+      await trayManager.setToolTip('Zenu');
+    } catch (_) {}
+  }
+
+  bool _lastRunning = false;
+
+  void _onCareChanged() {
+    if (care.running != _lastRunning) {
+      _lastRunning = care.running;
+      _refreshMenu();
     }
   }
 
@@ -102,6 +125,7 @@ class TrayService with TrayListener, WindowListener {
 
   void dispose() {
     if (!supported) return;
+    care.removeListener(_onCareChanged);
     trayManager.removeListener(this);
     windowManager.removeListener(this);
   }

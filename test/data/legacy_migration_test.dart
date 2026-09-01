@@ -43,9 +43,14 @@ void main() {
       expect(water.interval, const Duration(minutes: 30));
       expect(strength.enabled, isTrue);
       expect(strength.interval, const Duration(hours: 1));
-      // Disabled legacy reminder keeps the activity's default interval and
-      // does not force-enable it.
+      // A legacy reminder that existed but was disabled stays disabled...
+      expect(stretch.enabled, isFalse);
       expect(stretch.interval, const Duration(hours: 1));
+      // ...and activities the v1 user never configured are not force-enabled.
+      final eyeRest = state.activities.firstWhere((a) => a.id == 'eyeRest');
+      final move = state.activities.firstWhere((a) => a.id == 'move');
+      expect(eyeRest.enabled, isFalse);
+      expect(move.enabled, isFalse);
 
       expect(state.events.length, 1);
       expect(state.events.single.activityId, 'water');

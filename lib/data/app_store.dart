@@ -85,8 +85,17 @@ class AppStore {
       final encoded = jsonEncode(state.toJson());
       final previous = _prefs.getString(stateKey);
       final ok = await _prefs.setString(stateKey, encoded);
-      if (ok && previous != null) {
-        await _prefs.setString(backupKey, previous);
+      if (ok) {
+        // The backup slot must always hold a known-GOOD generation: the
+        // previous blob when it parses, else the state just written —
+        // never a corrupt blob that happened to sit in the primary slot.
+        final backupCandidate =
+            (previous != null && _tryParse(previous) != null)
+                ? previous
+                : encoded;
+        if (_prefs.getString(backupKey) != backupCandidate) {
+          await _prefs.setString(backupKey, backupCandidate);
+        }
       }
       return ok;
     } catch (e) {
