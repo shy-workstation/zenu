@@ -715,50 +715,32 @@ class AppLocalizationsDe extends AppLocalizations {
   String get v2ActivityStrength => 'Kraft';
 
   @override
-  String get v2SpeechContent =>
-      'Alles gut. Mir geht\'s gut, wenn\'s dir gut geht.';
+  String get v2SpeechContent => 'Alles gut.';
 
   @override
-  String get v2SpeechThirsty => 'Ich könnte einen Schluck Wasser gebrauchen …';
+  String get v2SpeechThirsty => 'Ein Schluck Wasser?';
 
   @override
-  String get v2SpeechTiredEyes => 'Meine Augen werden schwer …';
+  String get v2SpeechTiredEyes => 'Augen ausruhen, mit mir.';
 
   @override
-  String get v2SpeechFidgety => 'Ich muss mich bewegen. Gehst du mit?';
+  String get v2SpeechFidgety => 'Los, bewegen!';
 
   @override
-  String get v2SpeechStretchy => 'Zeit zum Strecken! Arme hoch – mach mit!';
+  String get v2SpeechStretchy => 'Zeit zum Dehnen!';
 
   @override
-  String get v2SpeechMighty =>
-      'Jetzt wird\'s ernst. Ein paar Wiederholungen zusammen!';
+  String get v2SpeechMighty => 'Ein paar Wiederholungen?';
 
   @override
-  String v2SpeechResting(String petName) {
-    return '$petName ruht sich aus. Tippe auf Start, wenn du bereit bist.';
-  }
-
-  @override
-  String get v2GoodMorning => 'Guten Morgen';
-
-  @override
-  String get v2GoodAfternoon => 'Guten Tag';
-
-  @override
-  String get v2GoodEvening => 'Guten Abend';
-
-  @override
-  String v2PetWithYou(String petName) {
-    return '$petName ist heute bei dir';
-  }
+  String get v2SpeechResting => 'Ruht sich aus. Tippe auf Start.';
 
   @override
   String get v2ChooseCompanionTitle => 'Wähle deinen Begleiter';
 
   @override
   String get v2ChooseCompanionSubtitle =>
-      'Dein Begleiter fühlt, was dein Körper braucht – durstig, wenn du trinken solltest, müde Augen, wenn du eine Pause brauchst. Für ihn zu sorgen heißt, für dich zu sorgen.';
+      'Er fühlt, was dein Körper braucht. Für ihn sorgen heißt für dich sorgen.';
 
   @override
   String v2StartTogether(String name) {
@@ -766,57 +748,37 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get v2PetNeverSuffers =>
-      'Dein Begleiter wird nie krank, traurig oder geht verloren. Er braucht nur, was du brauchst.';
+  String get v2BlurbMiro => 'Ruhig und geduldig.';
 
   @override
-  String get v2BlurbMiro =>
-      'Ein ruhiger Sprossengeist. Sanft, geduldig, summt beim Gießen.';
+  String get v2BlurbPip => 'Munter und fröhlich.';
 
   @override
-  String get v2BlurbPip =>
-      'Ein munterer Wolkenwelpe. Jubelt am lautesten, wenn du dich bewegst.';
+  String get v2BlurbLuma => 'Verträumt und wachsam.';
 
   @override
-  String get v2BlurbLuma =>
-      'Eine verträumte Sternenkatze. Wacht über deine Augen und Abende.';
+  String get v2CareButtonWater => 'Getrunken';
 
   @override
-  String get v2CareButtonWater => 'Wasser geben · Ich habe getrunken';
+  String get v2CareButtonEyeRest => 'Augen ausgeruht';
 
   @override
-  String get v2CareButtonEyeRest => 'Augen ausruhen · Gerade gemacht';
+  String get v2CareButtonMove => 'Bewegt';
 
   @override
-  String get v2CareButtonMove => 'Wir haben uns bewegt!';
+  String get v2CareButtonStretch => 'Gedehnt';
 
   @override
-  String get v2CareButtonStretch => 'Wir haben uns gedehnt!';
+  String get v2CareButtonStrength => 'Wiederholungen eintragen';
 
   @override
-  String get v2CareButtonStrength => 'Training eintragen';
-
-  @override
-  String get v2Snooze10 => '10 Minuten später';
+  String get v2Snooze10 => 'Später (10 Min.)';
 
   @override
   String get v2Start => 'Start';
 
   @override
   String get v2Pause => 'Pause';
-
-  @override
-  String get v2Wardrobe => 'Garderobe';
-
-  @override
-  String get v2Owned => 'Im Besitz';
-
-  @override
-  String get v2Wearing => 'Angezogen';
-
-  @override
-  String get v2WardrobeHint =>
-      'Funken gibt es für Pflegemomente – ein Schluck, eine Dehnung. Nichts zu kaufen, nichts zu verlieren.';
 
   @override
   String get v2CosmeticCozyScarf => 'Kuscheliger Schal';
@@ -863,11 +825,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get v2Intervals => 'Erinnerungen';
 
   @override
-  String v2Every(int minutes) {
-    return 'Alle $minutes Min.';
-  }
-
-  @override
   String v2MinutesShort(int minutes) {
     return '$minutes Min.';
   }
@@ -901,7 +858,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get v2NotificationsOffHint =>
-      'Zenu kann dich nicht erinnern, solange Benachrichtigungen nicht erlaubt sind.';
+      'Erlaube Benachrichtigungen, damit dein Begleiter dich erinnern kann.';
 
   @override
   String get v2EnableNotifications => 'Erlauben';
@@ -923,7 +880,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get v2ClearAllConfirmBody =>
-      'Deine Erinnerungen, dein Verlauf, deine Funken und dein Begleiter werden gelöscht. Das lässt sich nicht rückgängig machen.';
+      'Erinnerungen, Verlauf und dein Begleiter werden gelöscht. Das lässt sich nicht rückgängig machen.';
 
   @override
   String get v2Cancel => 'Abbrechen';
@@ -936,18 +893,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get v2Log => 'Eintragen';
-
-  @override
-  String get v2TabPet => 'Begleiter';
-
-  @override
-  String get v2TabWardrobe => 'Garderobe';
-
-  @override
-  String get v2TabJourney => 'Verlauf';
-
-  @override
-  String get v2TabSettings => 'Einstellungen';
 
   @override
   String get v2TrayShow => 'Zenu anzeigen';
@@ -963,5 +908,110 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get v2MigratedNotice =>
-      'Willkommen zurück – deine alten Erinnerungen und dein Verlauf sind mitgekommen.';
+      'Willkommen zurück. Deine Erinnerungen und dein Verlauf sind mitgekommen.';
+
+  @override
+  String get v2Style => 'Aussehen';
+
+  @override
+  String get v2Colour => 'Farbe';
+
+  @override
+  String get v2Pattern => 'Muster';
+
+  @override
+  String get v2None => 'Nichts';
+
+  @override
+  String get v2SlotHead => 'Kopf';
+
+  @override
+  String get v2SlotFace => 'Gesicht';
+
+  @override
+  String get v2SlotNeck => 'Hals';
+
+  @override
+  String get v2SlotCharm => 'Anhänger';
+
+  @override
+  String get v2ColorMint => 'Mint';
+
+  @override
+  String get v2ColorSky => 'Himmel';
+
+  @override
+  String get v2ColorLilac => 'Flieder';
+
+  @override
+  String get v2ColorPeach => 'Pfirsich';
+
+  @override
+  String get v2ColorRose => 'Rosé';
+
+  @override
+  String get v2ColorLemon => 'Zitrone';
+
+  @override
+  String get v2ColorAqua => 'Aqua';
+
+  @override
+  String get v2ColorSlate => 'Schiefer';
+
+  @override
+  String get v2PatternPlain => 'Einfarbig';
+
+  @override
+  String get v2PatternSpots => 'Punkte';
+
+  @override
+  String get v2PatternFreckles => 'Sommersprossen';
+
+  @override
+  String get v2PatternStripes => 'Streifen';
+
+  @override
+  String get v2PatternHeart => 'Herz';
+
+  @override
+  String get v2CosmeticBowTie => 'Fliege';
+
+  @override
+  String get v2CosmeticBandana => 'Halstuch';
+
+  @override
+  String get v2CosmeticBellCollar => 'Glöckchenhalsband';
+
+  @override
+  String get v2CosmeticSunglasses => 'Sonnenbrille';
+
+  @override
+  String get v2CosmeticMonocle => 'Monokel';
+
+  @override
+  String get v2CosmeticEyePatch => 'Augenklappe';
+
+  @override
+  String get v2CosmeticBeanie => 'Mütze';
+
+  @override
+  String get v2CosmeticTopHat => 'Zylinder';
+
+  @override
+  String get v2CosmeticHairBow => 'Haarschleife';
+
+  @override
+  String get v2CosmeticHalo => 'Heiligenschein';
+
+  @override
+  String get v2CosmeticFlowerClip => 'Blumenspange';
+
+  @override
+  String get v2CosmeticHeartCharm => 'Herzanhänger';
+
+  @override
+  String get v2CosmeticBalloon => 'Luftballon';
+
+  @override
+  String get v2CosmeticButterfly => 'Schmetterling';
 }

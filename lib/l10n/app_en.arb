@@ -954,65 +954,36 @@
   "@v2ActivityStrength": {
     "description": "Zenu v2 pet UI"
   },
-  "v2SpeechContent": "All good. I'm happy when you're well.",
+  "v2SpeechContent": "All good.",
   "@v2SpeechContent": {
     "description": "Zenu v2 pet UI"
   },
-  "v2SpeechThirsty": "I could use a sip of water…",
+  "v2SpeechThirsty": "A sip of water?",
   "@v2SpeechThirsty": {
     "description": "Zenu v2 pet UI"
   },
-  "v2SpeechTiredEyes": "My eyes are getting heavy…",
+  "v2SpeechTiredEyes": "Rest your eyes with me.",
   "@v2SpeechTiredEyes": {
     "description": "Zenu v2 pet UI"
   },
-  "v2SpeechFidgety": "I need to wiggle. Walk with me?",
+  "v2SpeechFidgety": "Let's move!",
   "@v2SpeechFidgety": {
     "description": "Zenu v2 pet UI"
   },
-  "v2SpeechStretchy": "Stretch time! Arms up — do it with me!",
+  "v2SpeechStretchy": "Stretch time!",
   "@v2SpeechStretchy": {
     "description": "Zenu v2 pet UI"
   },
-  "v2SpeechMighty": "Game face on. A few reps together!",
+  "v2SpeechMighty": "A few reps?",
   "@v2SpeechMighty": {
     "description": "Zenu v2 pet UI"
   },
-  "v2SpeechResting": "{petName} is resting. Tap Start when you're ready.",
-  "@v2SpeechResting": {
-    "description": "Zenu v2 pet UI",
-    "placeholders": {
-      "petName": {
-        "type": "String"
-      }
-    }
-  },
-  "v2GoodMorning": "Good morning",
-  "@v2GoodMorning": {
-    "description": "Zenu v2 pet UI"
-  },
-  "v2GoodAfternoon": "Good afternoon",
-  "@v2GoodAfternoon": {
-    "description": "Zenu v2 pet UI"
-  },
-  "v2GoodEvening": "Good evening",
-  "@v2GoodEvening": {
-    "description": "Zenu v2 pet UI"
-  },
-  "v2PetWithYou": "{petName} is with you today",
-  "@v2PetWithYou": {
-    "description": "Zenu v2 pet UI",
-    "placeholders": {
-      "petName": {
-        "type": "String"
-      }
-    }
-  },
+  "v2SpeechResting": "Resting. Tap Start when ready.",
   "v2ChooseCompanionTitle": "Choose your companion",
   "@v2ChooseCompanionTitle": {
     "description": "Zenu v2 pet UI"
   },
-  "v2ChooseCompanionSubtitle": "Your pet feels what your body needs — thirsty when you should drink, tired-eyed when you need a screen break. Caring for it is caring for you.",
+  "v2ChooseCompanionSubtitle": "It feels what your body needs. Caring for it is caring for you.",
   "@v2ChooseCompanionSubtitle": {
     "description": "Zenu v2 pet UI"
   },
@@ -1025,43 +996,39 @@
       }
     }
   },
-  "v2PetNeverSuffers": "Your pet never gets sick, sad, or lost. It just needs what you need.",
-  "@v2PetNeverSuffers": {
-    "description": "Zenu v2 pet UI"
-  },
-  "v2BlurbMiro": "A calm sprout-spirit. Gentle, patient, hums when watered.",
+  "v2BlurbMiro": "Calm and patient.",
   "@v2BlurbMiro": {
     "description": "Zenu v2 pet UI"
   },
-  "v2BlurbPip": "A bouncy cloud-pup. Cheers loudest when you stand and move.",
+  "v2BlurbPip": "Bouncy and cheerful.",
   "@v2BlurbPip": {
     "description": "Zenu v2 pet UI"
   },
-  "v2BlurbLuma": "A dreamy star-cat. Guards your eyes and your evenings.",
+  "v2BlurbLuma": "Dreamy and watchful.",
   "@v2BlurbLuma": {
     "description": "Zenu v2 pet UI"
   },
-  "v2CareButtonWater": "Give water · I just drank",
+  "v2CareButtonWater": "Drank water",
   "@v2CareButtonWater": {
     "description": "Zenu v2 pet UI"
   },
-  "v2CareButtonEyeRest": "Rest eyes · Just did",
+  "v2CareButtonEyeRest": "Rested my eyes",
   "@v2CareButtonEyeRest": {
     "description": "Zenu v2 pet UI"
   },
-  "v2CareButtonMove": "We moved!",
+  "v2CareButtonMove": "Moved",
   "@v2CareButtonMove": {
     "description": "Zenu v2 pet UI"
   },
-  "v2CareButtonStretch": "We stretched!",
+  "v2CareButtonStretch": "Stretched",
   "@v2CareButtonStretch": {
     "description": "Zenu v2 pet UI"
   },
-  "v2CareButtonStrength": "Log workout",
+  "v2CareButtonStrength": "Log reps",
   "@v2CareButtonStrength": {
     "description": "Zenu v2 pet UI"
   },
-  "v2Snooze10": "Snooze 10 min",
+  "v2Snooze10": "Later (10 min)",
   "@v2Snooze10": {
     "description": "Zenu v2 pet UI"
   },
@@ -1071,22 +1038,6 @@
   },
   "v2Pause": "Pause",
   "@v2Pause": {
-    "description": "Zenu v2 pet UI"
-  },
-  "v2Wardrobe": "Wardrobe",
-  "@v2Wardrobe": {
-    "description": "Zenu v2 pet UI"
-  },
-  "v2Owned": "Owned",
-  "@v2Owned": {
-    "description": "Zenu v2 pet UI"
-  },
-  "v2Wearing": "Wearing",
-  "@v2Wearing": {
-    "description": "Zenu v2 pet UI"
-  },
-  "v2WardrobeHint": "Sparks come from care moments — a drink logged, a stretch done. Nothing to buy, nothing to lose.",
-  "@v2WardrobeHint": {
     "description": "Zenu v2 pet UI"
   },
   "v2CosmeticCozyScarf": "Cozy Scarf",
@@ -1142,15 +1093,6 @@
   "@v2Intervals": {
     "description": "Zenu v2 pet UI"
   },
-  "v2Every": "Every {minutes} min",
-  "@v2Every": {
-    "description": "Zenu v2 pet UI",
-    "placeholders": {
-      "minutes": {
-        "type": "int"
-      }
-    }
-  },
   "v2MinutesShort": "{minutes} min",
   "@v2MinutesShort": {
     "description": "Zenu v2 pet UI",
@@ -1196,7 +1138,7 @@
   "@v2NotificationsOff": {
     "description": "Zenu v2 pet UI"
   },
-  "v2NotificationsOffHint": "Zenu can't remind you until notifications are allowed.",
+  "v2NotificationsOffHint": "Allow notifications so your pet can remind you.",
   "@v2NotificationsOffHint": {
     "description": "Zenu v2 pet UI"
   },
@@ -1224,7 +1166,7 @@
   "@v2ClearAllConfirmTitle": {
     "description": "Zenu v2 pet UI"
   },
-  "v2ClearAllConfirmBody": "Your reminders, history, sparks, and pet will be gone. This can't be undone.",
+  "v2ClearAllConfirmBody": "Reminders, history, and your pet will be gone. This can't be undone.",
   "@v2ClearAllConfirmBody": {
     "description": "Zenu v2 pet UI"
   },
@@ -1244,22 +1186,6 @@
   "@v2Log": {
     "description": "Zenu v2 pet UI"
   },
-  "v2TabPet": "Pet",
-  "@v2TabPet": {
-    "description": "Zenu v2 pet UI"
-  },
-  "v2TabWardrobe": "Wardrobe",
-  "@v2TabWardrobe": {
-    "description": "Zenu v2 pet UI"
-  },
-  "v2TabJourney": "Journey",
-  "@v2TabJourney": {
-    "description": "Zenu v2 pet UI"
-  },
-  "v2TabSettings": "Settings",
-  "@v2TabSettings": {
-    "description": "Zenu v2 pet UI"
-  },
   "v2TrayShow": "Show Zenu",
   "@v2TrayShow": {
     "description": "Zenu v2 pet UI"
@@ -1276,8 +1202,151 @@
   "@v2TrayQuit": {
     "description": "Zenu v2 pet UI"
   },
-  "v2MigratedNotice": "Welcome back — your old reminders and history came along.",
+  "v2MigratedNotice": "Welcome back. Your reminders and history came along.",
   "@v2MigratedNotice": {
+    "description": "Zenu v2 pet UI"
+  },
+  "@v2SpeechResting": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Style": "Style",
+  "@v2Style": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Colour": "Colour",
+  "@v2Colour": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2Pattern": "Pattern",
+  "@v2Pattern": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2None": "None",
+  "@v2None": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2SlotHead": "Head",
+  "@v2SlotHead": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2SlotFace": "Face",
+  "@v2SlotFace": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2SlotNeck": "Neck",
+  "@v2SlotNeck": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2SlotCharm": "Charm",
+  "@v2SlotCharm": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ColorMint": "Mint",
+  "@v2ColorMint": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ColorSky": "Sky",
+  "@v2ColorSky": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ColorLilac": "Lilac",
+  "@v2ColorLilac": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ColorPeach": "Peach",
+  "@v2ColorPeach": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ColorRose": "Rose",
+  "@v2ColorRose": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ColorLemon": "Lemon",
+  "@v2ColorLemon": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ColorAqua": "Aqua",
+  "@v2ColorAqua": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2ColorSlate": "Slate",
+  "@v2ColorSlate": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2PatternPlain": "Plain",
+  "@v2PatternPlain": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2PatternSpots": "Spots",
+  "@v2PatternSpots": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2PatternFreckles": "Freckles",
+  "@v2PatternFreckles": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2PatternStripes": "Stripes",
+  "@v2PatternStripes": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2PatternHeart": "Heart",
+  "@v2PatternHeart": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticBowTie": "Bow Tie",
+  "@v2CosmeticBowTie": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticBandana": "Bandana",
+  "@v2CosmeticBandana": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticBellCollar": "Bell Collar",
+  "@v2CosmeticBellCollar": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticSunglasses": "Sunglasses",
+  "@v2CosmeticSunglasses": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticMonocle": "Monocle",
+  "@v2CosmeticMonocle": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticEyePatch": "Eye Patch",
+  "@v2CosmeticEyePatch": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticBeanie": "Beanie",
+  "@v2CosmeticBeanie": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticTopHat": "Top Hat",
+  "@v2CosmeticTopHat": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticHairBow": "Hair Bow",
+  "@v2CosmeticHairBow": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticHalo": "Halo",
+  "@v2CosmeticHalo": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticFlowerClip": "Flower Clip",
+  "@v2CosmeticFlowerClip": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticHeartCharm": "Heart Charm",
+  "@v2CosmeticHeartCharm": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticBalloon": "Balloon",
+  "@v2CosmeticBalloon": {
+    "description": "Zenu v2 pet UI"
+  },
+  "v2CosmeticButterfly": "Butterfly",
+  "@v2CosmeticButterfly": {
     "description": "Zenu v2 pet UI"
   }
 }

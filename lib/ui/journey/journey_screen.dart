@@ -20,15 +20,11 @@ class JourneyScreen extends StatelessWidget {
     final maxDaily =
         daily.fold(0, (max, v) => v > max ? v : max).clamp(1, 1 << 30);
 
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(22, 14, 22, 20),
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.v2Journey)),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(22, 6, 22, 20),
         children: [
-          Text(
-            l10n.v2Journey,
-            style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 16),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(18),

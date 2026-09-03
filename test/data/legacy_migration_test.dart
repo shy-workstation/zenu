@@ -56,8 +56,8 @@ void main() {
       expect(state.events.single.activityId, 'water');
       expect(state.events.single.qty, 250);
 
-      // Historic care seeds sparks: 5 completions x 5, capped at 300.
-      expect(state.game.sparks, 25);
+      // The pet is never chosen for the user; onboarding still runs.
+      expect(state.pet.onboarded, isFalse);
       // Migration never auto-starts a session on the user's behalf.
       expect(state.running, isFalse);
     });
@@ -86,13 +86,6 @@ void main() {
     test('garbage input returns null instead of a broken state', () {
       expect(LegacyMigration.migrate('not json at all'), isNull);
       expect(LegacyMigration.migrate('{"an": "object"}'), isNull);
-    });
-
-    test('sparks are capped at 300', () {
-      final legacy = jsonEncode([
-        {'id': 'a', 'type': 'water', 'interval': 1800, 'totalCompleted': 999},
-      ]);
-      expect(LegacyMigration.migrate(legacy)!.game.sparks, 300);
     });
   });
 }

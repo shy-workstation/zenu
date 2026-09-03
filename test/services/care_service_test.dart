@@ -66,8 +66,7 @@ void main() {
     expect(care.focusActivity()!.id, 'eyeRest');
   });
 
-  test('logCare records the event, resets the need, and earns sparks',
-      () async {
+  test('logCare records the event and resets the need', () async {
     final care = await makeService();
     await care.startSession();
     clock.advance(const Duration(minutes: 25));
@@ -75,7 +74,6 @@ void main() {
     await care.logCare('eyeRest');
 
     expect(care.state.events.length, 1);
-    expect(care.state.game.sparks, 5);
     expect(care.mood(), PetMood.content);
     final eyeRest =
         care.state.activities.firstWhere((a) => a.id == 'eyeRest');
@@ -111,41 +109,49 @@ void main() {
     expect(care.state.snoozeUntilMs.containsKey('eyeRest'), isFalse);
   });
 
-  test('rapid-fire logging cannot farm sparks (quarter-interval gate)',
+  test('styling is free: colour, pattern, and cosmetics apply instantly',
       () async {
     final care = await makeService();
-    await care.startSession();
-    clock.advance(const Duration(minutes: 30));
-    await care.logCare('water');
-    expect(care.state.game.sparks, 5);
+    await care.choosePet(PetSpecies.pip);
+    expect(care.state.pet.color.id, 'sky');
 
-    // Ten instant re-taps: events log fine, sparks don't accumulate.
-    for (var i = 0; i < 10; i++) {
-      await care.logCare('water');
-    }
-    expect(care.state.events.length, 11);
-    expect(care.state.game.sparks, 5);
+    await care.setPetColor('rose');
+    expect(care.state.pet.color.id, 'rose');
+    await care.setPetColor(null);
+    expect(care.state.pet.color.id, 'sky');
+
+    await care.setPetPattern(PetPattern.spots);
+    expect(care.state.pet.pattern, PetPattern.spots);
+
+    await care.wearCosmetic('cozyScarf');
+    expect(care.state.pet.worn[CosmeticSlot.neck], 'cozyScarf');
+    await care.wearCosmetic('bowTie');
+    expect(care.state.pet.worn[CosmeticSlot.neck], 'bowTie');
+    await care.wearCosmetic('bowTie');
+    expect(care.state.pet.worn.containsKey(CosmeticSlot.neck), isFalse);
+
+    await care.wearCosmetic('halo');
+    await care.clearSlot(CosmeticSlot.head);
+    expect(care.state.pet.worn, isEmpty);
+
+    // Survives a restart.
+    await care.wearCosmetic('topHat');
+    final revived = await makeService();
+    expect(revived.state.pet.pattern, PetPattern.spots);
+    expect(revived.state.pet.species, PetSpecies.pip);
+    expect(revived.state.pet.worn[CosmeticSlot.head], 'topHat');
   });
 
-  test('wardrobe: buying deducts sparks, wearing toggles, no debt possible',
+  test('a pre-release blob with sparks and unknown cosmetics loads cleanly',
       () async {
+    SharedPreferences.setMockInitialValues({
+      AppStore.stateKey: '{"schemaVersion":2,"game":{"species":"luma",'
+          '"sparks":120,"owned":["cozyScarf"],'
+          '"worn":{"neck":"cozyScarf","head":"gone"}}}',
+    });
     final care = await makeService();
-    await care.startSession();
-    for (var i = 0; i < 10; i++) {
-      clock.advance(const Duration(minutes: 30));
-      await care.logCare('water');
-    }
-    expect(care.state.game.sparks, 50);
-
-    expect(await care.buyCosmetic('cozyScarf'), isTrue); // costs 40
-    expect(care.state.game.sparks, 10);
-    expect(await care.buyCosmetic('starCharm'), isFalse); // costs 150
-    expect(care.state.game.sparks, 10);
-
-    await care.wearCosmetic('cozyScarf');
-    expect(care.state.game.worn[CosmeticSlot.neck], 'cozyScarf');
-    await care.wearCosmetic('cozyScarf');
-    expect(care.state.game.worn.containsKey(CosmeticSlot.neck), isFalse);
+    expect(care.state.pet.species, PetSpecies.luma);
+    expect(care.state.pet.worn, {CosmeticSlot.neck: 'cozyScarf'});
   });
 
   test('pauseSession keeps anchors so nothing resets on resume', () async {
@@ -167,7 +173,7 @@ void main() {
 
     await care.clearAllData();
 
-    expect(care.state.game.onboarded, isFalse);
+    expect(care.state.pet.onboarded, isFalse);
     expect(care.state.events, isEmpty);
     expect(care.running, isFalse);
   });

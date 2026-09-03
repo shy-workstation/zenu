@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 
 import '../domain/care_activity.dart';
 import '../domain/completion_event.dart';
-import '../domain/game_state.dart';
 import '../domain/zenu_state.dart';
 
 /// One-way migration from the v1 `reminders` SharedPreferences blob.
@@ -37,7 +36,6 @@ class LegacyMigration {
       // follow the most frequent enabled legacy reminder per activity.
       final enabled = <String, bool>{};
       final intervalSec = <String, int>{};
-      var totalCompleted = 0;
 
       for (final raw in decoded) {
         if (raw is! Map) continue;
@@ -67,8 +65,6 @@ class LegacyMigration {
             intervalSec[activityId] = clamped;
           }
         }
-
-        totalCompleted += (item['totalCompleted'] as num?)?.toInt() ?? 0;
 
         final log = item['completionLog'];
         if (log is List) {
@@ -100,10 +96,6 @@ class LegacyMigration {
       ];
       state.events.sort((a, b) => a.atMs.compareTo(b.atMs));
 
-      // Past care counts: seed the sparks wallet from v1 history.
-      state.game = GameState(
-        sparks: (totalCompleted * sparksPerCare).clamp(0, 300),
-      );
       return state;
     } catch (e) {
       debugPrint('LegacyMigration: failed, starting fresh: $e');

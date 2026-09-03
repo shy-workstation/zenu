@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../domain/pet.dart';
+import '../../domain/pet_profile.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/care_service.dart';
 import '../pet/pet_view.dart';
@@ -41,7 +42,7 @@ class _ChoosePetScreenState extends State<ChoosePetScreen> {
                 style:
                     const TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Text(
                 l10n.v2ChooseCompanionSubtitle,
                 textAlign: TextAlign.center,
@@ -69,16 +70,6 @@ class _ChoosePetScreenState extends State<ChoosePetScreen> {
                   await care.startSession();
                 },
                 child: Text(l10n.v2StartTogether(names[selected]!)),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                l10n.v2PetNeverSuffers,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
               ),
               const SizedBox(height: 24),
             ],
@@ -113,10 +104,11 @@ class _ChoosePetScreenState extends State<ChoosePetScreen> {
           child: Row(
             children: [
               PetView(
-                species: species,
+                profile: PetProfile(species: species),
                 mood: PetMood.content,
                 size: 88,
                 animated: isSelected,
+                onTap: () => setState(() => selected = species),
               ),
               const SizedBox(width: 16),
               Expanded(

@@ -9,6 +9,8 @@ import 'package:window_manager/window_manager.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/care_service.dart';
 import '../../services/theme_controller.dart';
+import '../journey/journey_screen.dart';
+import '../style/style_screen.dart';
 import '../zenu_theme.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -23,15 +25,33 @@ class SettingsScreen extends StatelessWidget {
     final themeController = context.watch<ThemeController>();
     final l10n = AppLocalizations.of(context)!;
 
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(22, 14, 22, 24),
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.v2Settings)),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(22, 6, 22, 24),
         children: [
-          Text(
-            l10n.v2Settings,
-            style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.palette_outlined),
+                  title: Text(l10n.v2Style),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const StyleScreen()),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.insights_outlined),
+                  title: Text(l10n.v2Journey),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const JourneyScreen()),
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 14),
           if (care.notificationsAllowed == false)
             Card(
               color: Theme.of(context).colorScheme.errorContainer,
@@ -40,8 +60,7 @@ class SettingsScreen extends StatelessWidget {
                   Icons.notifications_off_outlined,
                   color: Theme.of(context).colorScheme.onErrorContainer,
                 ),
-                title: Text(l10n.v2NotificationsOff),
-                subtitle: Text(l10n.v2NotificationsOffHint),
+                title: Text(l10n.v2NotificationsOffHint),
                 trailing: TextButton(
                   onPressed: () => care.refreshPermissionStatus(request: true),
                   child: Text(l10n.v2EnableNotifications),
@@ -227,7 +246,6 @@ class _ActivityRowState extends State<_ActivityRow> {
             color: ZenuColors.forKind(activity.kind),
           ),
           title: Text(label),
-          subtitle: Text(l10n.v2Every(shownMinutes)),
           value: activity.enabled,
           onChanged: (value) => care.setActivityEnabled(activity.id, value),
         ),

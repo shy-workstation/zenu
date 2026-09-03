@@ -7,6 +7,7 @@ import '../../l10n/app_localizations.dart';
 import '../../services/care_service.dart';
 import '../../services/ticker_service.dart';
 import '../pet/pet_view.dart';
+import '../settings/settings_screen.dart';
 import '../zenu_theme.dart';
 import 'care_sheet.dart';
 import 'need_ring.dart';
@@ -14,182 +15,176 @@ import 'need_ring.dart';
 /// The pet IS the app: your companion front and center, telling you what
 /// it needs. No takeovers — a due need changes the pet's mood and the
 /// care button, nothing hijacks the screen.
-class PetHomeScreen extends StatelessWidget {
+class PetHomeScreen extends StatefulWidget {
   const PetHomeScreen({super.key});
+
+  @override
+  State<PetHomeScreen> createState() => _PetHomeScreenState();
+}
+
+class _PetHomeScreenState extends State<PetHomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (context.read<CareService>().migratedFromV1) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.v2MigratedNotice)),
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final care = context.watch<CareService>();
     final ticker = context.read<TickerService>();
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final petName = _petName(care.state.game.species);
 
     return SafeArea(
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(22, 14, 22, 0),
+            padding: const EdgeInsets.fromLTRB(22, 6, 10, 0),
             child: Row(
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Ticker-driven so the greeting rolls over with the
-                      // clock instead of freezing on whatever hour the
-                      // screen last rebuilt in.
-                      ValueListenableBuilder<int>(
-                        valueListenable: ticker.nowMs,
-                        builder: (context, _, __) => Text(
-                          _greeting(l10n),
-                          style: const TextStyle(
-                              fontSize: 21, fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                      Text(
-                        l10n.v2PetWithYou(petName),
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
+                const Spacer(),
+                IconButton(
+                  tooltip: care.running ? l10n.v2Pause : l10n.v2Start,
+                  icon: Icon(care.running
+                      ? Icons.pause_circle_outline
+                      : Icons.play_circle_outline),
+                  onPressed: () =>
+                      care.running ? care.pauseSession() : care.startSession(),
+                ),
+                IconButton(
+                  tooltip: l10n.v2Settings,
+                  icon: const Icon(Icons.settings_outlined),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (_) => const SettingsScreen()),
                   ),
                 ),
-                _SparksChip(sparks: care.state.game.sparks),
               ],
             ),
           ),
           if (care.notificationsAllowed == false)
             _NotificationsOffBanner(care: care),
-          if (care.migratedFromV1) _MigratedNotice(l10n: l10n),
           Expanded(
             child: ValueListenableBuilder<int>(
               valueListenable: ticker.nowMs,
-              builder: (context, _, __) => _PetStage(
-                care: care,
-                l10n: l10n,
-                petName: petName,
-              ),
+              builder: (context, _, __) =>
+                  _PetStage(care: care, l10n: l10n),
             ),
           ),
         ],
       ),
     );
   }
-
-  String _greeting(AppLocalizations l10n) {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return l10n.v2GoodMorning;
-    if (hour < 18) return l10n.v2GoodAfternoon;
-    return l10n.v2GoodEvening;
-  }
-
-  static String _petName(PetSpecies? species) => switch (species) {
-        PetSpecies.pip => 'Pip',
-        PetSpecies.luma => 'Luma',
-        _ => 'Miro',
-      };
 }
 
 class _PetStage extends StatelessWidget {
   final CareService care;
   final AppLocalizations l10n;
-  final String petName;
 
-  const _PetStage({
-    required this.care,
-    required this.l10n,
-    required this.petName,
-  });
+  const _PetStage({required this.care, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final mood = care.mood();
     final focus = care.focusActivity();
-    final species = care.state.game.species ?? PetSpecies.miro;
+    final speech = _speech(mood);
 
     return LayoutBuilder(builder: (context, constraints) {
-      // ~300px of chrome (bubble, rings, buttons, gaps) surrounds the pet;
+      // ~280px of chrome (bubble, rings, buttons, gaps) surrounds the pet;
       // shrink the pet instead of overflowing on small windows/phones.
       final petSize =
-          (constraints.maxHeight - 300).clamp(120.0, 250.0).toDouble();
+          (constraints.maxHeight - 280).clamp(120.0, 260.0).toDouble();
       return Column(
-      children: [
-        const Spacer(),
-        Container(
-          constraints: const BoxConstraints(maxWidth: 260),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
-          decoration: BoxDecoration(
-            color: theme.cardTheme.color,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-              bottomRight: Radius.circular(20),
-              bottomLeft: Radius.circular(4),
+        children: [
+          const Spacer(),
+          // Fixed slot so the pet doesn't jump when the bubble comes and goes.
+          SizedBox(
+            height: 52,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: speech == null
+                  ? const SizedBox.shrink()
+                  : Container(
+                      key: ValueKey(speech),
+                      constraints: const BoxConstraints(maxWidth: 260),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18, vertical: 11),
+                      decoration: BoxDecoration(
+                        color: theme.cardTheme.color,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                          bottomLeft: Radius.circular(4),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.07),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        speech,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w700),
+                      ),
+                    ),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.07),
-                blurRadius: 14,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
-          child: Text(
-            _speech(mood),
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-          ),
-        ),
-        const SizedBox(height: 6),
-        PetView(
-          species: species,
-          mood: mood,
-          worn: care.state.game.worn,
-          size: petSize,
-        ),
-        const Spacer(),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              for (final activity in care.enabledActivities)
-                Expanded(
-                  child: NeedRing(
-                    activity: activity,
-                    fraction: care.needFraction(activity),
-                    overdue: care.isOverdue(activity),
-                    label: _activityLabel(activity.kind),
-                    onTap: () => _logWithSheet(context, activity),
+          const SizedBox(height: 6),
+          PetView(profile: care.state.pet, mood: mood, size: petSize),
+          const Spacer(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                for (final activity in care.enabledActivities)
+                  Expanded(
+                    child: NeedRing(
+                      activity: activity,
+                      fraction: care.needFraction(activity),
+                      overdue: care.isOverdue(activity),
+                      label: _activityLabel(activity.kind),
+                      onTap: () => _logWithSheet(context, activity),
+                    ),
                   ),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 14),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 22),
-          child: _primaryAction(context, focus),
-        ),
-        const SizedBox(height: 8),
-        if (care.running && focus != null)
-          TextButton(
-            onPressed: () => care.snooze(focus.id),
-            child: Text(
-              l10n.v2Snooze10,
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+              ],
             ),
           ),
-        const SizedBox(height: 8),
-      ],
+          const SizedBox(height: 14),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22),
+            child: _primaryAction(context, focus),
+          ),
+          SizedBox(
+            height: 44,
+            child: care.running && focus != null && care.isOverdue(focus)
+                ? TextButton(
+                    onPressed: () => care.snooze(focus.id),
+                    child: Text(
+                      l10n.v2Snooze10,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  )
+                : null,
+          ),
+          const SizedBox(height: 4),
+        ],
       );
     });
   }
@@ -210,10 +205,9 @@ class _PetStage extends StatelessWidget {
       );
     }
     final color = ZenuColors.forKind(focus.kind);
-    final due = care.timeUntilDue(focus);
     final label = care.isOverdue(focus)
         ? _careButtonLabel(focus.kind)
-        : '${_careButtonLabel(focus.kind)} · ${_format(due)}';
+        : '${_activityLabel(focus.kind)} · ${_format(care.timeUntilDue(focus))}';
     return FilledButton.icon(
       style: FilledButton.styleFrom(backgroundColor: color),
       onPressed: () => _logWithSheet(context, focus),
@@ -240,14 +234,15 @@ class _PetStage extends StatelessWidget {
     return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 
-  String _speech(PetMood mood) => switch (mood) {
-        PetMood.content => l10n.v2SpeechContent,
+  /// null when content: a happy pet doesn't need a caption.
+  String? _speech(PetMood mood) => switch (mood) {
+        PetMood.content => null as String?,
         PetMood.thirsty => l10n.v2SpeechThirsty,
         PetMood.tiredEyes => l10n.v2SpeechTiredEyes,
         PetMood.fidgety => l10n.v2SpeechFidgety,
         PetMood.stretchy => l10n.v2SpeechStretchy,
         PetMood.mighty => l10n.v2SpeechMighty,
-        PetMood.resting => l10n.v2SpeechResting(petName),
+        PetMood.resting => l10n.v2SpeechResting,
       };
 
   String _activityLabel(String kind) => switch (kind) {
@@ -269,41 +264,6 @@ class _PetStage extends StatelessWidget {
       };
 }
 
-class _SparksChip extends StatelessWidget {
-  final int sparks;
-
-  const _SparksChip({required this.sparks});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(999),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.auto_awesome, size: 16, color: ZenuColors.sparks),
-          const SizedBox(width: 5),
-          Text(
-            '$sparks',
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _NotificationsOffBanner extends StatelessWidget {
   final CareService care;
 
@@ -312,17 +272,17 @@ class _NotificationsOffBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
     return Container(
-      margin: const EdgeInsets.fromLTRB(22, 12, 22, 0),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.fromLTRB(22, 4, 22, 0),
+      padding: const EdgeInsets.fromLTRB(14, 6, 6, 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.errorContainer,
+        color: scheme.errorContainer,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          Icon(Icons.notifications_off_outlined,
-              color: Theme.of(context).colorScheme.onErrorContainer),
+          Icon(Icons.notifications_off_outlined, color: scheme.onErrorContainer),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -330,7 +290,7 @@ class _NotificationsOffBanner extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onErrorContainer,
+                color: scheme.onErrorContainer,
               ),
             ),
           ),
@@ -339,27 +299,6 @@ class _NotificationsOffBanner extends StatelessWidget {
             child: Text(l10n.v2EnableNotifications),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _MigratedNotice extends StatelessWidget {
-  final AppLocalizations l10n;
-
-  const _MigratedNotice({required this.l10n});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 8, 22, 0),
-      child: Text(
-        l10n.v2MigratedNotice,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
       ),
     );
   }

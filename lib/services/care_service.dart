@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/app_store.dart';
 import '../domain/care_activity.dart';
 import '../domain/completion_event.dart';
-import '../domain/game_state.dart';
 import '../domain/pet.dart';
 import '../domain/schedule_math.dart';
 import '../domain/zenu_state.dart';
@@ -82,12 +81,6 @@ class CareService extends ChangeNotifier {
     final activity = _activity(activityId);
     if (activity == null) return;
     final at = atMs ?? clock.nowMs();
-    // Sparks only once the need has meaningfully grown (a quarter of the
-    // interval) — logging always works, but rapid-fire taps can't farm
-    // the wardrobe economy.
-    final anchor = state.lastDoneMs[activityId];
-    final earnsSparks = anchor == null ||
-        (at - anchor) >= activity.interval.inMilliseconds ~/ 4;
     state.events.add(CompletionEvent(
       activityId: activityId,
       atMs: at,
@@ -95,10 +88,6 @@ class CareService extends ChangeNotifier {
     ));
     state.lastDoneMs[activityId] = at;
     state.snoozeUntilMs.remove(activityId);
-    if (earnsSparks) {
-      state.game =
-          state.game.copyWith(sparks: state.game.sparks + sparksPerCare);
-    }
     await _persistAndResync();
   }
 
@@ -194,40 +183,43 @@ class CareService extends ChangeNotifier {
   List<CareActivity> get enabledActivities =>
       state.activities.where((a) => a.enabled).toList();
 
-  // ------------------------------------------------------------------- game
+  // -------------------------------------------------------------- pet look
 
   Future<void> choosePet(PetSpecies species) async {
-    state.game = state.game.copyWith(species: species);
+    state.pet = state.pet.copyWith(species: species);
     await _persistAndResync();
   }
 
-  bool canAfford(Cosmetic cosmetic) => state.game.sparks >= cosmetic.cost;
-
-  Future<bool> buyCosmetic(String cosmeticId) async {
-    final cosmetic = Cosmetics.byId(cosmeticId);
-    if (cosmetic == null) return false;
-    if (state.game.ownedCosmetics.contains(cosmeticId)) return true;
-    if (!canAfford(cosmetic)) return false;
-    state.game = state.game.copyWith(
-      sparks: state.game.sparks - cosmetic.cost,
-      ownedCosmetics: {...state.game.ownedCosmetics, cosmeticId},
-    );
+  /// null restores the species' own colour.
+  Future<void> setPetColor(String? colorId) async {
+    state.pet = colorId == null
+        ? state.pet.copyWith(clearColor: true)
+        : state.pet.copyWith(colorId: PetColors.byId(colorId)?.id);
     await _persistAndResync();
-    return true;
   }
 
+  Future<void> setPetPattern(PetPattern pattern) async {
+    state.pet = state.pet.copyWith(pattern: pattern);
+    await _persistAndResync();
+  }
+
+  /// Wearing is free and instant. Tapping the worn item takes it off.
   Future<void> wearCosmetic(String cosmeticId) async {
     final cosmetic = Cosmetics.byId(cosmeticId);
-    if (cosmetic == null || !state.game.ownedCosmetics.contains(cosmeticId)) {
-      return;
-    }
-    final worn = Map<CosmeticSlot, String>.from(state.game.worn);
+    if (cosmetic == null) return;
+    final worn = Map<CosmeticSlot, String>.from(state.pet.worn);
     if (worn[cosmetic.slot] == cosmeticId) {
       worn.remove(cosmetic.slot);
     } else {
       worn[cosmetic.slot] = cosmeticId;
     }
-    state.game = state.game.copyWith(worn: worn);
+    state.pet = state.pet.copyWith(worn: worn);
+    await _persistAndResync();
+  }
+
+  Future<void> clearSlot(CosmeticSlot slot) async {
+    final worn = Map<CosmeticSlot, String>.from(state.pet.worn)..remove(slot);
+    state.pet = state.pet.copyWith(worn: worn);
     await _persistAndResync();
   }
 
@@ -386,7 +378,7 @@ class CareService extends ChangeNotifier {
             final anchor = state.lastDoneMs[activityId] ?? 0;
             // A queued Done at or before the current anchor is already
             // reflected (or a crash-replay) — applying it again would
-            // duplicate the event and the spark award.
+            // duplicate the event.
             if (atMs <= anchor) continue;
             state.events.add(CompletionEvent(
               activityId: activityId,
@@ -395,8 +387,6 @@ class CareService extends ChangeNotifier {
             ));
             state.lastDoneMs[activityId] = atMs;
             state.snoozeUntilMs.remove(activityId);
-            state.game =
-                state.game.copyWith(sparks: state.game.sparks + sparksPerCare);
           } else if (action == actionSnoozeId) {
             state.snoozeUntilMs[activityId] =
                 atMs + const Duration(minutes: 10).inMilliseconds;

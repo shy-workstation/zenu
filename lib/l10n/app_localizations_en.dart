@@ -711,48 +711,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get v2ActivityStrength => 'Strength';
 
   @override
-  String get v2SpeechContent => 'All good. I\'m happy when you\'re well.';
+  String get v2SpeechContent => 'All good.';
 
   @override
-  String get v2SpeechThirsty => 'I could use a sip of water…';
+  String get v2SpeechThirsty => 'A sip of water?';
 
   @override
-  String get v2SpeechTiredEyes => 'My eyes are getting heavy…';
+  String get v2SpeechTiredEyes => 'Rest your eyes with me.';
 
   @override
-  String get v2SpeechFidgety => 'I need to wiggle. Walk with me?';
+  String get v2SpeechFidgety => 'Let\'s move!';
 
   @override
-  String get v2SpeechStretchy => 'Stretch time! Arms up — do it with me!';
+  String get v2SpeechStretchy => 'Stretch time!';
 
   @override
-  String get v2SpeechMighty => 'Game face on. A few reps together!';
+  String get v2SpeechMighty => 'A few reps?';
 
   @override
-  String v2SpeechResting(String petName) {
-    return '$petName is resting. Tap Start when you\'re ready.';
-  }
-
-  @override
-  String get v2GoodMorning => 'Good morning';
-
-  @override
-  String get v2GoodAfternoon => 'Good afternoon';
-
-  @override
-  String get v2GoodEvening => 'Good evening';
-
-  @override
-  String v2PetWithYou(String petName) {
-    return '$petName is with you today';
-  }
+  String get v2SpeechResting => 'Resting. Tap Start when ready.';
 
   @override
   String get v2ChooseCompanionTitle => 'Choose your companion';
 
   @override
   String get v2ChooseCompanionSubtitle =>
-      'Your pet feels what your body needs — thirsty when you should drink, tired-eyed when you need a screen break. Caring for it is caring for you.';
+      'It feels what your body needs. Caring for it is caring for you.';
 
   @override
   String v2StartTogether(String name) {
@@ -760,57 +744,37 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get v2PetNeverSuffers =>
-      'Your pet never gets sick, sad, or lost. It just needs what you need.';
+  String get v2BlurbMiro => 'Calm and patient.';
 
   @override
-  String get v2BlurbMiro =>
-      'A calm sprout-spirit. Gentle, patient, hums when watered.';
+  String get v2BlurbPip => 'Bouncy and cheerful.';
 
   @override
-  String get v2BlurbPip =>
-      'A bouncy cloud-pup. Cheers loudest when you stand and move.';
+  String get v2BlurbLuma => 'Dreamy and watchful.';
 
   @override
-  String get v2BlurbLuma =>
-      'A dreamy star-cat. Guards your eyes and your evenings.';
+  String get v2CareButtonWater => 'Drank water';
 
   @override
-  String get v2CareButtonWater => 'Give water · I just drank';
+  String get v2CareButtonEyeRest => 'Rested my eyes';
 
   @override
-  String get v2CareButtonEyeRest => 'Rest eyes · Just did';
+  String get v2CareButtonMove => 'Moved';
 
   @override
-  String get v2CareButtonMove => 'We moved!';
+  String get v2CareButtonStretch => 'Stretched';
 
   @override
-  String get v2CareButtonStretch => 'We stretched!';
+  String get v2CareButtonStrength => 'Log reps';
 
   @override
-  String get v2CareButtonStrength => 'Log workout';
-
-  @override
-  String get v2Snooze10 => 'Snooze 10 min';
+  String get v2Snooze10 => 'Later (10 min)';
 
   @override
   String get v2Start => 'Start';
 
   @override
   String get v2Pause => 'Pause';
-
-  @override
-  String get v2Wardrobe => 'Wardrobe';
-
-  @override
-  String get v2Owned => 'Owned';
-
-  @override
-  String get v2Wearing => 'Wearing';
-
-  @override
-  String get v2WardrobeHint =>
-      'Sparks come from care moments — a drink logged, a stretch done. Nothing to buy, nothing to lose.';
 
   @override
   String get v2CosmeticCozyScarf => 'Cozy Scarf';
@@ -857,11 +821,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get v2Intervals => 'Reminders';
 
   @override
-  String v2Every(int minutes) {
-    return 'Every $minutes min';
-  }
-
-  @override
   String v2MinutesShort(int minutes) {
     return '$minutes min';
   }
@@ -895,7 +854,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get v2NotificationsOffHint =>
-      'Zenu can\'t remind you until notifications are allowed.';
+      'Allow notifications so your pet can remind you.';
 
   @override
   String get v2EnableNotifications => 'Allow';
@@ -917,7 +876,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get v2ClearAllConfirmBody =>
-      'Your reminders, history, sparks, and pet will be gone. This can\'t be undone.';
+      'Reminders, history, and your pet will be gone. This can\'t be undone.';
 
   @override
   String get v2Cancel => 'Cancel';
@@ -930,18 +889,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get v2Log => 'Log';
-
-  @override
-  String get v2TabPet => 'Pet';
-
-  @override
-  String get v2TabWardrobe => 'Wardrobe';
-
-  @override
-  String get v2TabJourney => 'Journey';
-
-  @override
-  String get v2TabSettings => 'Settings';
 
   @override
   String get v2TrayShow => 'Show Zenu';
@@ -957,5 +904,110 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get v2MigratedNotice =>
-      'Welcome back — your old reminders and history came along.';
+      'Welcome back. Your reminders and history came along.';
+
+  @override
+  String get v2Style => 'Style';
+
+  @override
+  String get v2Colour => 'Colour';
+
+  @override
+  String get v2Pattern => 'Pattern';
+
+  @override
+  String get v2None => 'None';
+
+  @override
+  String get v2SlotHead => 'Head';
+
+  @override
+  String get v2SlotFace => 'Face';
+
+  @override
+  String get v2SlotNeck => 'Neck';
+
+  @override
+  String get v2SlotCharm => 'Charm';
+
+  @override
+  String get v2ColorMint => 'Mint';
+
+  @override
+  String get v2ColorSky => 'Sky';
+
+  @override
+  String get v2ColorLilac => 'Lilac';
+
+  @override
+  String get v2ColorPeach => 'Peach';
+
+  @override
+  String get v2ColorRose => 'Rose';
+
+  @override
+  String get v2ColorLemon => 'Lemon';
+
+  @override
+  String get v2ColorAqua => 'Aqua';
+
+  @override
+  String get v2ColorSlate => 'Slate';
+
+  @override
+  String get v2PatternPlain => 'Plain';
+
+  @override
+  String get v2PatternSpots => 'Spots';
+
+  @override
+  String get v2PatternFreckles => 'Freckles';
+
+  @override
+  String get v2PatternStripes => 'Stripes';
+
+  @override
+  String get v2PatternHeart => 'Heart';
+
+  @override
+  String get v2CosmeticBowTie => 'Bow Tie';
+
+  @override
+  String get v2CosmeticBandana => 'Bandana';
+
+  @override
+  String get v2CosmeticBellCollar => 'Bell Collar';
+
+  @override
+  String get v2CosmeticSunglasses => 'Sunglasses';
+
+  @override
+  String get v2CosmeticMonocle => 'Monocle';
+
+  @override
+  String get v2CosmeticEyePatch => 'Eye Patch';
+
+  @override
+  String get v2CosmeticBeanie => 'Beanie';
+
+  @override
+  String get v2CosmeticTopHat => 'Top Hat';
+
+  @override
+  String get v2CosmeticHairBow => 'Hair Bow';
+
+  @override
+  String get v2CosmeticHalo => 'Halo';
+
+  @override
+  String get v2CosmeticFlowerClip => 'Flower Clip';
+
+  @override
+  String get v2CosmeticHeartCharm => 'Heart Charm';
+
+  @override
+  String get v2CosmeticBalloon => 'Balloon';
+
+  @override
+  String get v2CosmeticButterfly => 'Butterfly';
 }

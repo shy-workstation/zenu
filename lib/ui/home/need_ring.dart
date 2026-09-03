@@ -6,6 +6,7 @@ import '../../domain/care_activity.dart';
 import '../zenu_theme.dart';
 
 /// One circular need meter: fills as the need grows, full ring = due.
+/// Icon only; the label is exposed to assistive tech.
 class NeedRing extends StatelessWidget {
   final CareActivity activity;
   final double fraction;
@@ -38,8 +39,8 @@ class NeedRing extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
-                width: 54,
-                height: 54,
+                width: 58,
+                height: 58,
                 child: CustomPaint(
                   painter: _RingPainter(
                     fraction: fraction,
@@ -49,18 +50,9 @@ class NeedRing extends StatelessWidget {
                   ),
                   child: Icon(
                     ZenuColors.iconForKind(activity.kind),
-                    size: 20,
+                    size: overdue ? 24 : 21,
                     color: color,
                   ),
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: overdue ? FontWeight.w800 : FontWeight.w600,
-                  color: overdue ? color : theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],

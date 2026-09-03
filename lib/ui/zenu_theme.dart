@@ -13,8 +13,6 @@ class ZenuColors {
   static const stretch = Color(0xFF8B5CF6);
   static const strength = Color(0xFFF97316);
 
-  static const sparks = Color(0xFFF5B93E);
-
   static Color forKind(String kind) => switch (kind) {
         'water' => water,
         'eyeRest' => eyeRest,

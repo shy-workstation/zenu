@@ -1,6 +1,6 @@
 import 'care_activity.dart';
 import 'completion_event.dart';
-import 'game_state.dart';
+import 'pet_profile.dart';
 
 /// The whole persisted app state, versioned. Running state, anchors, and
 /// snoozes are all part of it — a restart or reboot changes nothing about
@@ -20,7 +20,7 @@ class ZenuState {
   /// Append-only care history. Never pruned.
   List<CompletionEvent> events;
 
-  GameState game;
+  PetProfile pet;
 
   bool closeToTray;
   bool alwaysOnTop;
@@ -33,7 +33,7 @@ class ZenuState {
     Map<String, int>? lastDoneMs,
     Map<String, int>? snoozeUntilMs,
     List<CompletionEvent>? events,
-    this.game = const GameState(),
+    this.pet = const PetProfile(),
     this.closeToTray = true,
     this.alwaysOnTop = false,
     this.launchAtStartup = false,
@@ -50,7 +50,7 @@ class ZenuState {
         'lastDoneMs': lastDoneMs,
         'snoozeUntilMs': snoozeUntilMs,
         'events': events.map((e) => e.toJson()).toList(),
-        'game': game.toJson(),
+        'pet': pet.toJson(),
         'closeToTray': closeToTray,
         'alwaysOnTop': alwaysOnTop,
         'launchAtStartup': launchAtStartup,
@@ -99,9 +99,11 @@ class ZenuState {
       lastDoneMs: intMap(json['lastDoneMs']),
       snoozeUntilMs: intMap(json['snoozeUntilMs']),
       events: events,
-      game: json['game'] is Map
-          ? GameState.fromJson(Map<String, dynamic>.from(json['game'] as Map))
-          : const GameState(),
+      // 'game' is the pre-release key for the same blob.
+      pet: switch (json['pet'] ?? json['game']) {
+        final Map raw => PetProfile.fromJson(Map<String, dynamic>.from(raw)),
+        _ => const PetProfile(),
+      },
       closeToTray: json['closeToTray'] as bool? ?? true,
       alwaysOnTop: json['alwaysOnTop'] as bool? ?? false,
       launchAtStartup: json['launchAtStartup'] as bool? ?? false,
